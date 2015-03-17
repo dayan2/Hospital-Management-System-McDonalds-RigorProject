@@ -1,0 +1,73 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class DoctorRecommendationManager : IDoctorRecommendationManager
+    {
+        #region private fields
+        private DoctorRecommendationDetails doctorRecommendationDetails;
+        #endregion
+
+        #region constructors
+        public DoctorRecommendationManager()
+        {
+            this.doctorRecommendationDetails = new DoctorRecommendationDetails();
+        }
+        #endregion
+
+
+        #region Public Methods
+
+        /// <summary>
+        /// Get all DoctorRecommendationDetails from DoctorRecommendationDetails class and return it to the controller
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<DoctorRecommendationDTO> IDoctorRecommendationManager.GetDoctorRecommendationDetails()
+        {
+            return doctorRecommendationDetails.GetDoctorRecommendationDetails();
+        }
+
+        /// <summary>
+        /// Returning DoctorRecommendation object into DoctorRecommendationDetails class to be saved
+        /// </summary>
+        /// <param name="doctor"></param>
+        /// <returns></returns>
+        bool IDoctorRecommendationManager.SaveTransferDoctorDetails(DoctorRecommendationDTO doctor)
+        {
+            return doctorRecommendationDetails.SaveTransferDoctorDetails(doctor);
+        }
+
+        /// <summary>
+        /// Get DoctorRecommendation details by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        DoctorRecommendationDTO IDoctorRecommendationManager.GetDoctorRecommendationById(int id)
+        {
+            return doctorRecommendationDetails.GetDoctorRecommendationById(id);
+        }
+
+        /// <summary>
+        /// Remove DoctorRecommendation details from DB
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        bool IDoctorRecommendationManager.RemoveDoctorRecommendationDetails(int id)
+        {
+            return doctorRecommendationDetails.RemoveDoctorRecommendationDetails(id);
+        }
+        #endregion
+
+
+
+
+
+
+
+        
+    }
+}

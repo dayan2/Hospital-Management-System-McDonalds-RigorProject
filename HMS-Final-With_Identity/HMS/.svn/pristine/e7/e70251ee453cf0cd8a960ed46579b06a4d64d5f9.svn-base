@@ -1,0 +1,13 @@
+﻿@model System.Web.Mvc.HandleErrorInfo
+@{
+    ViewBag.Title = "ExceptionDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Exception details</h2>
+<p>
+    Controller: @Model.ControllerName <br>
+    Action: @Model.ActionName
+    Exception: @Model.Exception
+</p>
+

@@ -1,0 +1,45 @@
+﻿using Mcd.HospitalManagement.Web.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class AdminHomeController : Controller
+    {
+
+        #region constants
+        const string ACCESSDENIED = "AccessDenied";
+        const string ERROR = "Error";
+        const string ADMINHOME = "AdminHome";
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Redirect to admin home according logged on user role
+        /// </summary>
+        /// <returns>Admin home view</returns>
+        public ActionResult Index()
+        {
+            //If an user is not already loged in to the system,Redirect to error page as a invalid login
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction(ACCESSDENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            //Check user role that already logged on have permissions to this function
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                return View(ADMINHOME);
+            }
+            //Redirect to error page if logged user dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESSDENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+        #endregion
+    }
+}

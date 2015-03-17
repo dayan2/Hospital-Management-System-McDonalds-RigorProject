@@ -1,0 +1,83 @@
+﻿#region Using Directives
+using Mcd.HospitalManagementSystem.Data;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+#endregion  
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class HMSMedicalTestType :IHMSMedicalTestType 
+    {
+        #region Public Methods
+
+        //save medical Test details
+        public void InsertMedicalTestType(MedicalTestTypeDTO medicalTestTypeDTO)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                MedicalTestType medicalTestType = new MedicalTestType { Id = medicalTestTypeDTO.Id, Description = medicalTestTypeDTO.Description };
+                db.MedicalTestTypes.Add(medicalTestType);
+                db.SaveChanges();
+
+            }
+        }
+        // modify medical details
+        public void EditMedicalTestType(MedicalTestTypeDTO medicalTestTypeDTO)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                MedicalTestType medicalTestType = new MedicalTestType { Id = medicalTestTypeDTO.Id, Description = medicalTestTypeDTO.Description };
+                db.Entry(medicalTestType).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+        }
+
+
+        public void DeleteMedicalTestType(int medicalTestTypeId)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                MedicalTestType medicalTestType = db.MedicalTestTypes.Find(medicalTestTypeId);
+                db.MedicalTestTypes.Remove(medicalTestType);
+                db.SaveChanges();
+            }
+        }
+
+        public IEnumerable<MedicalTestTypeDTO> ViewtMedicalTestType()
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                var medicalTestTypes = db.MedicalTestTypes.ToList();
+                IEnumerable<MedicalTestTypeDTO> medicalTestTypeList = from c in medicalTestTypes
+                                                                      select new MedicalTestTypeDTO
+                                                                      {
+                                                                          Id = c.Id,
+                                                                          Description = c.Description
+                                                                      };
+
+                return medicalTestTypeList;
+            }
+        }
+
+        public MedicalTestTypeDTO ViewtMedicalTestTypeById(int? medicalTestTypeId)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                MedicalTestType medicalTestType = db.MedicalTestTypes.Find(medicalTestTypeId);
+
+                MedicalTestTypeDTO MedicalTestTypeDTO = new MedicalTestTypeDTO
+                {
+                    Id = medicalTestType.Id,
+                    Description = medicalTestType.Description
+                };
+                return MedicalTestTypeDTO;
+            }
+        }
+
+        #endregion
+    }
+}

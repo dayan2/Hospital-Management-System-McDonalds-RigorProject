@@ -1,0 +1,140 @@
+﻿@model Mcd.HospitalManagement.Web.Models.DoctorModel
+
+@{
+    ViewBag.Title = "AddDoctor";
+    <link href="~/Content/Style.css" rel="stylesheet" />
+
+}
+<h3>Add Doctor</h3> 
+
+
+@using (Html.BeginForm("AddDoctor", "Doctor", FormMethod.Post, new { @id = "form" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4></h4>
+        <hr />
+        @Html.ValidationSummary(true)
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label"> User ID</label>
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.UserId, (IEnumerable<SelectListItem>)ViewBag.userViewbag, new { @class = "btn-group-vertical" })
+                @Html.ValidationMessageFor(model => model.UserId)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, new { @class = "col-sm-2 control-label" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.Name, new { @class = "form-control", @name = "Name" })
+                @Html.ValidationMessageFor(model => model.Name)
+            </div>
+        </div>        
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label"> Doctor Speciality ID</label>
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.DoctorSpecialityId, (IEnumerable<SelectListItem>)ViewBag.doctorSpecialitiesViewbag, 
+                new { @class = "btn-group-vertical" })
+                @Html.ValidationMessageFor(model => model.DoctorSpecialityId)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Charges, new { @class = "col-sm-2 control-label" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.Charges, new { @class = "form-control", @name = "Charges" })
+                @Html.ValidationMessageFor(model => model.Charges)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.WardId, new { @class = "col-sm-2 control-label" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.WardId, (IEnumerable<SelectListItem>)ViewBag.wardViewbag, new { @class = "btn-group-vertical" })
+                @Html.ValidationMessageFor(model => model.WardId)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.PhoneNo, new { @class = "col-sm-2 control-label" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.PhoneNo, new { @class = "form-control", @name = "PhoneNo" })
+                @Html.ValidationMessageFor(model => model.PhoneNo)
+            </div>
+        </div>
+
+        
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-primary" id="submit" />
+                <a href="~/AdminHome/Index" class="btn btn-primary">Exit</a>
+            </div>
+        </div>    
+
+    </div> @*End form-horizontal*@
+}
+
+
+@section Scripts {
+ 
+    <script type="text/javascript">
+       
+
+        $(document).ready(function () {
+
+            var jsonObj = $('#form').serialize();
+
+            //validation rules
+            $("#form").validate({
+                rules: {
+                    "Name": {
+                        required: true
+                    },
+                    "Charges": {
+                        required: true,
+                        number: true
+                    },
+                    "PhoneNo": {
+                        required: true,
+                        number: true
+
+                    },
+                    "WardId": {
+                        required: true,
+                        number: true
+                    }
+                },
+                //perform an AJAX post to ajax.php
+                submitHandler: function () {
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Content("~/Doctor/AddDoctor")',
+                        data: $('#form').serialize(),
+                        success: function (data) {
+                            $('#submit').hide();
+                            TriggerMsg(data.Message);
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert("Error: " + errorThrown + " , Please try again");
+
+                        }
+                    });
+                    return false;
+
+                }
+            });
+        });
+        function TriggerMsg(value) {
+            alert(value);
+            return false;
+        }        
+
+        
+
+    </script>
+}

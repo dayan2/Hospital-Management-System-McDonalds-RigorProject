@@ -1,0 +1,243 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business;
+using AutoMapper;
+using Mcd.HospitalManagement.Web.Models;
+using Mcd.HospitalManagement.Web.Enums;
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class WardController : BaseController
+    {
+        private LP_HMSDbEntities db = new LP_HMSDbEntities();
+
+        private IWards wardManager;
+        public WardController():base()
+        {
+            wardManager = new WardManager();
+        }
+
+
+        // GET: /Ward/
+        public ActionResult Index()
+        {
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                IEnumerable<WardDTO> ward = wardManager.ViewWardDetails();
+
+                var wardModel = from wd in ward
+                                select new WardModel()
+                                {
+                                    Id = wd.Id,
+                                    WardFee = wd.WardFee,
+                                    WardNo = wd.WardNo
+                                };
+
+                //IEnumerable<WardDTO> ward = wardManager.ViewWardDetails();
+
+                //Mapper.CreateMap<WardDTO, WardModel>();
+                //Mapper.AssertConfigurationIsValid();
+                //var modelList = Mapper.Map<IEnumerable<WardDTO>, IEnumerable<WardModel>>(ward);
+
+                return View(wardModel);
+            }
+            else
+            {
+            
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+          
+            }
+        }
+
+        // GET: /Ward/Details/5
+        public ActionResult Details(int id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            WardDTO wardDto = wardManager.ViewWardById(id);
+
+            WardModel ward = new WardModel()
+            {
+                Id = wardDto.Id,
+                WardFee = wardDto.WardFee,
+                WardNo = wardDto.WardNo
+            };
+            
+            if (ward == null)
+            {
+                return HttpNotFound();
+            }
+            return View(ward);
+        }
+
+        // GET: /Ward/Create
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: /Ward/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include="Id,WardNo,WardFee")] WardModel wardModel)
+        {
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                if (ModelState.IsValid)
+                {
+                    WardDTO wardDto = new WardDTO()
+                    {
+                        WardFee = wardModel.WardFee,
+                        WardNo = wardModel.WardNo
+                    };
+
+                    string displayMessage = string.Empty;
+                    if (!wardManager.InsertWard(wardDto))
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+                        return Json(new { Message = displayMessage });
+                    }
+                    else
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationInsertedMsg);
+                        return Json(new { Message = displayMessage });
+                    }
+                }
+
+                return View(wardModel);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+
+            }
+        }
+
+        // GET: /Ward/Edit/5
+        public ActionResult Edit(int id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            WardDTO wardDto = wardManager.ViewWardById(id);
+
+            WardModel ward = new WardModel()
+            {
+                Id =wardDto.Id,
+                WardFee =wardDto.WardFee,
+                WardNo =wardDto.WardNo 
+            };
+
+            if (ward == null)
+            {
+                return HttpNotFound();
+            }
+            return View(ward);
+        }
+
+        // POST: /Ward/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include="Id,WardNo,WardFee")] WardDTO wardDto)
+        {
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                if (ModelState.IsValid)
+                {
+                    string displayMessage = string.Empty;
+                    if (!wardManager.EditWard(wardDto))
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+                        return Json(new { Message = displayMessage });
+                    }
+                    else
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationUpdatedMsg);
+                        return Json(new { Message = displayMessage });
+                    }
+                }
+                return View(wardDto);
+
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+
+            }
+        }
+
+        // GET: /Ward/Delete/5
+        public ActionResult Delete(int id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            WardDTO wardDto = wardManager.ViewWardById(id);
+
+            WardModel ward = new WardModel()
+            {
+                Id = wardDto.Id,
+                WardFee = wardDto.WardFee,
+                WardNo = wardDto.WardNo
+            };
+            
+            if (ward == null)
+            {
+                return HttpNotFound();
+            }
+            return View(ward);
+        }
+
+        // POST: /Ward/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+               
+                string displayMessage = string.Empty;
+                if (!wardManager.DeleteWard(id))
+                {
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+                    return Json(new { Message = displayMessage });
+                }
+                else
+                {
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationDeletedMsg);
+                    return Json(new { Message = displayMessage });
+                }
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+
+            }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+    }
+}

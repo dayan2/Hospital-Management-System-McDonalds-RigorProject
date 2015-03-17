@@ -1,0 +1,93 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business.DTO;
+using AutoMapper;
+using System.Data.Entity;
+using System.Collections.Generic;
+using System.Collections;
+namespace Mcd.HospitaManagementSystem.Business
+{
+ public class PatientAdmissionDetails
+    {
+     private LP_HMSDbEntities db = new LP_HMSDbEntities();
+     IPatientManager PatientManager;
+     PatientDetail patientDetails;
+     PatientAdmissionDTO patientAdmissionDTO;
+     public void InsertPatientAdmissionDetails(PatientAdmissionDTO PatientAdmissionDTO)
+     {
+         patientDetails = new PatientDetail()
+         {
+             PatientDetailId=PatientAdmissionDTO.PatientDetailId ,
+             AdmitDate = PatientAdmissionDTO.AdmitDate,
+             BedId = PatientAdmissionDTO.BedId,
+             WardId=PatientAdmissionDTO.WardId,
+             DoctorId=PatientAdmissionDTO.DoctorId,
+             PatientId=PatientAdmissionDTO.PatientId,
+             IsDischarged=PatientAdmissionDTO.IsDischarged,
+
+
+         };
+         db.PatientDetails.Add(patientDetails);
+         db.SaveChanges();
+     }
+     public IEnumerable<PatientDTO> FillPatients()
+     {
+         PatientManager = new PatientManager();
+         return PatientManager.ViewAllPatientDetails();
+     }
+
+     public void EditPatientAdmissionDetails(PatientAdmissionDTO  PatientAdmissionDTO)
+     {
+         patientDetails = new PatientDetail()
+         {
+             PatientDetailId = PatientAdmissionDTO.PatientDetailId,
+             AdmitDate = PatientAdmissionDTO.AdmitDate,
+             BedId = PatientAdmissionDTO.BedId,
+             WardId = PatientAdmissionDTO.WardId,
+             DoctorId = PatientAdmissionDTO.DoctorId,
+             PatientId = PatientAdmissionDTO.PatientId,
+             IsDischarged = PatientAdmissionDTO.IsDischarged,
+
+         };
+         db.Entry(patientDetails).State = EntityState.Modified;
+         db.SaveChanges();
+     }
+
+     public PatientAdmissionDTO ViewPatientAdmissionDetails(int? PatientDetailID)
+     {
+         patientDetails = db.PatientDetails.Find(PatientDetailID);
+         patientAdmissionDTO = new PatientAdmissionDTO()
+         {
+             PatientDetailId = patientDetails.PatientDetailId,
+             AdmitDate = patientDetails.AdmitDate,
+             BedId = patientDetails.BedId,
+             WardId = patientDetails.WardId,
+             DoctorId = patientDetails.DoctorId,
+             PatientId = patientDetails.PatientId,
+             IsDischarged = patientDetails.IsDischarged,
+
+         };
+         return patientAdmissionDTO;
+        
+       
+     }
+     public IEnumerable<PatientAdmissionDTO> ViewAllAdmissionPatientDetails()
+      {
+          IList<PatientDetail> patientDetails = db.PatientDetails.ToList();
+          Mapper.CreateMap<PatientDetail, PatientAdmissionDTO>();
+          var patientAdmissionList = Mapper.Map<IEnumerable<PatientDetail>, IEnumerable<PatientAdmissionDTO>>(patientDetails);
+          return patientAdmissionList;
+      }
+     public void DeletePatientAdmissionDetails(int? PatientId)
+     {
+         patientDetails = db.PatientDetails.Find(PatientId);
+         db.PatientDetails.Remove(patientDetails);
+         db.SaveChanges();
+     }
+       
+    }
+}

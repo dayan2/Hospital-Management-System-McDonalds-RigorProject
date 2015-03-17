@@ -1,0 +1,305 @@
+﻿#region Using Directives
+using Mcd.HospitalManagement.Web.Models;
+using Mcd.HospitaManagementSystem.Business;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitalManagement.Web;
+using Mcd.HospitalManagement.Web.Enums;
+#endregion
+
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class PatientController : Controller
+    {
+        #region private variables
+        private IPatientManager patientManager;
+        private PatientModel patient;
+        private string displayMessage;
+        private bool confirmationResult;
+        #endregion
+
+        #region constructors
+        public PatientController()
+        {
+            patientManager = new PatientManager();
+        }
+        #endregion
+
+        #region public methods
+        // GET: /Patient/
+        public ActionResult Index()
+        {
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin || (UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Cashier)
+            {
+                patient = new PatientModel();
+
+                //view all patient records
+                var patients = patientManager.ViewAllPatientDetails();
+                IEnumerable<PatientModel> PList = from c in patients
+                                                  select new PatientModel
+                                                  {
+                                                      Id = c.Id,
+                                                      Name = c.Name,
+                                                      NIC = c.NIC,
+                                                      Address = c.Address,
+                                                      Gender = c.Gender,
+                                                      MobileNo = c.MobileNo,
+
+
+                                                  };
+                patient.Patients = PList;
+                return View(patient);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+
+        }
+
+        // GET: /Patient/Details/5
+        public ActionResult DetailsPatientDetails(int id)
+        {
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin || (UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Cashier)
+            {
+                if (id == null)
+                {
+                    return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.BadRequest) });
+                }
+
+
+                //view patient recors according to id
+                PatientDTO PatientDTO = patientManager.ViewPatientDetails(id);
+                patient = new PatientModel
+                {
+                    Id = PatientDTO.Id,
+                    Name = PatientDTO.Name,
+                    Address = PatientDTO.Address,
+                    NIC = PatientDTO.NIC,
+                    Gender = PatientDTO.Gender,
+                    MobileNo = PatientDTO.MobileNo,
+
+
+                };
+
+
+
+
+                if (patient == null)
+                {
+                    return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.NotFound) });
+                }
+                return View(patient);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        // GET: /Patient/Create
+        public ActionResult CreatePatientDetails()
+        {
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin || (UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Cashier)
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        // POST: /Patient/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreatePatientDetails(PatientModel patient)
+        {
+
+
+            PatientDTO patientDTO = new PatientDTO { Id = patient.Id, Name = patient.Name, NIC = patient.NIC, Address = patient.Address, Gender = patient.Gender, MobileNo = patient.MobileNo };
+            if (ModelState.IsValid)
+            {
+
+                //check availble patients according to id
+                if (patientManager.CheckPatientAvilability(patientDTO.NIC))
+                {
+
+                    //insert patient
+                    confirmationResult = patientManager.InsertPatient(patientDTO);
+                    displayMessage = string.Empty;
+                    if (confirmationResult == true)
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationInsertedMsg);
+                    else
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+
+                    return Json(new { Message = displayMessage });
+                }
+                else
+                {
+                    displayMessage = CustomEnumMessage.GetStringValue(PatientErrorMessage.checkAvilabiltyOfPatient);
+                    return Json(new { Message = displayMessage });
+                }
+
+            }
+            return View();
+        }
+
+        // GET: /Patient/Edit/5
+        public ActionResult EditPatientDetails(int? id)
+        {
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin || (UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Cashier)
+            {
+                if (id == null)
+                {
+                    return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.BadRequest) });
+                }
+
+                //view patient according to id
+                PatientDTO patientDTO = patientManager.ViewPatientDetails(id);
+                patient = new PatientModel
+                {
+                    Id = patientDTO.Id,
+                    Name = patientDTO.Name,
+                    Address = patientDTO.Address,
+                    NIC = patientDTO.NIC,
+                    Gender = patientDTO.Gender,
+                    MobileNo = patientDTO.MobileNo,
+
+
+                };
+
+
+
+
+
+                if (patient == null)
+                {
+                    return HttpNotFound();
+                }
+                return View(patient);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+
+        // POST: /Patient/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditPatientDetails(PatientModel patient)
+        {
+            PatientDTO patientDTO = new PatientDTO { Id = patient.Id, Name = patient.Name, NIC = patient.NIC, Address = patient.Address, Gender = patient.Gender, MobileNo = patient.MobileNo };
+            if (ModelState.IsValid)
+            {
+
+
+                //edit patient 
+                confirmationResult = patientManager.EditPatient(patientDTO);
+                displayMessage = string.Empty;
+                if (confirmationResult == true)
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationUpdatedMsg);
+                else
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+
+                return Json(new { Message = displayMessage });
+
+            }
+            return View(patient);
+        }
+
+        //// GET: /Patient/Delete/5
+        public ActionResult DeletePatientDetails(int id)
+        {
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin || (UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Cashier)
+            {
+                if (id == null)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                }
+
+                //view patient according to id
+                PatientDTO patientDTO = patientManager.ViewPatientDetails(id);
+                patient = new PatientModel
+                {
+                    Id = patientDTO.Id,
+                    Name = patientDTO.Name,
+                    Address = patientDTO.Address,
+                    NIC = patientDTO.NIC,
+                    Gender = patientDTO.Gender,
+                    MobileNo = patientDTO.MobileNo,
+
+
+                };
+                if (patient == null)
+                {
+                    return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.NotFound) });
+                }
+                return View(patient);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        //// POST: /Patient/Delete/5
+        [HttpPost, ActionName("DeletePatientDetails")]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            //get the relationship between patinet and patientdetails...if their is relationship can't delete
+            if (!patientManager.CheckRelationshipBetweenPatientAndPatientDetails(id))
+            {
+                displayMessage = CustomEnumMessage.GetStringValue(PatientErrorMessage.valideteRelationshipTopatientDetils);
+                return Json(new { Message = displayMessage });
+            }
+            else
+            {
+
+                //delete patient according to patient id
+                confirmationResult = patientManager.Deletepatient(id);
+                displayMessage = string.Empty;
+                if (confirmationResult == true)
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationRemovedMsg);
+                else
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+
+                return Json(new { Message = displayMessage });
+            }
+
+
+
+        }
+        #endregion
+
+    }
+}

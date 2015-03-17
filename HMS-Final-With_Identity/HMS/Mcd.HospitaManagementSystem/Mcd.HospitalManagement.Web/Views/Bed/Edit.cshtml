@@ -1,0 +1,95 @@
+﻿@model Mcd.HospitalManagement.Web.Models.BedDetailsModel
+
+
+<h3>Modify Bed Details</h3>
+
+
+@using (Html.BeginForm("Edit", "Bed", FormMethod.Post, new { @id = "form" }))
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <h4>Bed</h4>
+        <hr />
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.WardId, "WardId", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("WardId",String.Empty)
+                @Html.ValidationMessageFor(model => model.WardId)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.BedTicketNo, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.BedTicketNo, new {@class = "form-control", @name = "BedTicketNo" })
+                @Html.ValidationMessageFor(model => model.BedTicketNo)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" id="submit" value="Save" class="btn btn-primary" />
+                <a href="~/AdminHome/Index" id="cancel" class="btn btn-primary">Cancel</a>
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+
+    <script type="text/javascript">
+
+         $(document).ready(function () {
+
+            var jsonObj = $('#form').serialize();
+
+
+            //validation rules
+            $("#form").validate({
+                rules: {
+                    "BedTicketNo": {
+                        required: true
+                    },
+                    "WardId": {
+                        required: true
+                    }
+                },
+                //perform an AJAX post to ajax.php
+                submitHandler: function () {
+                    $.ajax({
+                            type: "POST",
+                            url: '@Url.Content("~/Bed/Edit")',
+                            data: $('#form').serialize(),
+                            success: function (data) {
+                                $('#submit').hide();
+                                $("#cancel").html('Exit');
+                                TriggerMsg(data.Message);
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                alert("Error: " + errorThrown + " , Please try again");
+
+                            }
+                        });
+                        return false;
+
+                    }
+                });
+            });
+
+
+            function TriggerMsg(value) {
+                alert(value);
+                return false;
+            }
+
+</script>
+
+}

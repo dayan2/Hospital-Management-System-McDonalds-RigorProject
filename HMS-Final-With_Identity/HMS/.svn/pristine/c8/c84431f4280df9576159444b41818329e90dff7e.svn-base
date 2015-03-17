@@ -1,0 +1,191 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientModel
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create</h2>
+<div class="col-xs-2">
+    <ul class="nav nav-pills" role="tablist">
+
+        <li role="presentation"><a href="~/HomePage/HomePageForClerk">Home</a></li>
+        <li role="presentation"><a href="~/Patient/CreatePatientDetails">Add Patient</a></li>
+        <li role="presentation"><a href="~/PatientAdmissionDetails/Index">Patient Details</a></li>
+        <li role="presentation" class="active"><a href="~/PatientFeedback/Index">FeedBack Details</a></li>
+     
+    </ul>
+</div>
+<div class="col-xs-1"></div>
+<div class="col-xs-9">
+    @using (Html.BeginForm("CreatePatientDetails", "CreatePatientDetails", FormMethod.Post, new { @id = "form" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            <h4>Patient</h4>
+            <hr />
+            @Html.ValidationSummary(true)
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Name, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Name, new { @class = "form-control", @name = "Patient Name" })
+                    @Html.ValidationMessageFor(model => model.Name)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.NIC, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.NIC, new { @class = "form-control", @name = "NIC" })
+                    @Html.ValidationMessageFor(model => model.NIC)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Address, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Address, new { @class = "form-control", @name = "Address" })
+                    @Html.ValidationMessageFor(model => model.Address)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Gender, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Gender, new { @class = "form-control", @name = "Gender" })
+                    @Html.ValidationMessageFor(model => model.Gender)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.MobileNo, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.MobileNo, new { @class = "form-control", @name = "mobile number" })
+                    @Html.ValidationMessageFor(model => model.MobileNo)
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Create" class="btn btn-info" id="submit" />
+                </div>
+            </div>
+        </div>
+    }
+    </div>
+
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+
+    @section Scripts {
+       
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+
+        var jsonObj = $('#form').serialize();
+       
+
+
+        //validation rules
+        $("#form").validate({
+            rules: {
+                "Patient Name": {
+                    required: true
+                },
+                "NIC": {
+                    required: true
+                },
+                "Address": {
+                    required: true
+                },
+                "Gender": {
+                    required: true
+                },
+                "mobile number": {
+                    required: true
+                }
+            },
+            //perform an AJAX post to ajax.php
+            submitHandler: function () {
+
+
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("CreatePatientDetails")',
+                    data: $('#form').serialize(),
+                    success: function (data) {
+                        //alert(data.Message);
+
+                        $('#submit').hide();
+                        if (data.Message == "You have successfully inserted your record!") {
+
+                            toastr.options = {
+                                "closeButton": true,
+                                "debug": false,
+                                "newestOnTop": true,
+                                "progressBar": true,
+                                "positionClass": "toast-top-full-width",
+                                "preventDuplicates": true,
+                                "onclick": null,
+                                "showDuration": "5000",
+                                "hideDuration": "5000",
+                                "timeOut": "5000",
+                                "extendedTimeOut": "5000",
+                                "showEasing": "swing",
+                                "hideEasing": "linear",
+                                "showMethod": "fadeIn",
+                                "hideMethod": "fadeOut"
+                            }
+                            toastr["success"]("You have successfully inserted your record!", "Success!!");
+
+                        }
+                        else {
+
+                            toastr.options = {
+                                "closeButton": true,
+                                "debug": false,
+                                "newestOnTop": true,
+                                "progressBar": true,
+                                "positionClass": "toast-top-full-width",
+                                "preventDuplicates": true,
+                                "onclick": null,
+                                "showDuration": "5000",
+                                "hideDuration": "5000",
+                                "timeOut": "5000",
+                                "extendedTimeOut": "5000",
+                                "showEasing": "swing",
+                                "hideEasing": "linear",
+                                "showMethod": "fadeIn",
+                                "hideMethod": "fadeOut"
+                            }
+                            toastr["error"]("Please try again!!", "Error!!");
+
+                        }
+
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Error: " + errorThrown + " , Please try again");
+                    }
+                });
+                return false;
+
+
+
+            }
+        });
+    });
+
+
+
+
+
+
+</script>
+
+    }

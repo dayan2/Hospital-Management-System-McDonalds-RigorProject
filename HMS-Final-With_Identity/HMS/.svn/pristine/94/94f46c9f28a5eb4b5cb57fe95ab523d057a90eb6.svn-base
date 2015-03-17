@@ -1,0 +1,64 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientAdmissionDetailsModel
+
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.AdmitDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IsDischarged)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.bedDetails)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.doctorDetails)
+        </th>
+        @*<th>
+            @Html.DisplayNameFor(model => model.Patient.Name)
+        </th>*@
+        <th>
+            @Html.DisplayNameFor(model => model.wardDetails)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model.PatientAdmissonDetails) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.AdmitDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsDischarged)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.bedDetails)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.doctorDetails)
+        </td>
+        @*<td>
+            @Html.DisplayFor(modelItem => item.Patient.Name)
+        </td>*@
+        <td>
+            @Html.DisplayFor(modelItem => item.wardDetails)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.PatientDetailId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.PatientDetailId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.PatientDetailId })
+        </td>
+    </tr>
+}
+
+</table>

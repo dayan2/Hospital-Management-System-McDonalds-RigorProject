@@ -1,0 +1,200 @@
+﻿#region Using Directives
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitalManagement.Web.Models;
+#endregion
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class PatientMedicalTestsController : Controller
+    {
+        #region Private Fields
+        IPatientManager dbPatient;
+        INurse dbNurse;
+        IHMSMedicalTestType dbMedicalTest;
+        IPatientMedicalTestAllocation dbMedicalTestAllocation;
+        #endregion
+
+        public PatientMedicalTestsController()
+        {
+            dbPatient = new PatientManager();
+            dbNurse = new HMSNurse();
+            dbMedicalTest = new HMSMedicalTestType();
+            dbMedicalTestAllocation = new PatientMedicalTestAllocation();
+        }
+
+        #region Public Methods
+        // GET: PatientMedicalTests
+        public ActionResult Index()
+        {
+
+            
+            return View();
+        }
+
+        //// GET: PatientMedicalTests/Details/5
+        //public ActionResult Details(int? id)
+        //{
+
+        //    }
+        //    return View();
+        //}
+
+        //// GET: PatientMedicalTests/Create
+        //public ActionResult Create()
+        //{
+
+        //    return View();
+        //}
+
+         
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include = "Id,PatientDetailId,MedicalTestId,NurseId")] PatientMedicalTestModel patientMedicalTest)
+        {
+            return View();
+        }
+
+
+        public ActionResult Create(int? id)
+        {
+            if (id==null)
+            {
+                return HttpNotFound();
+            }
+
+            PatientMedicalTestModel patientMedicalTest = new PatientMedicalTestModel();
+
+            IEnumerable<NurseModel> nurseModel = dbNurse.ViewtNurse().
+                Select(m => new NurseModel
+                {
+                    Id = m.Id,
+                    Name = m.Name
+                });
+            IEnumerable<MedicalTestTypeModel> medicalTestModel = dbMedicalTest.ViewtMedicalTestType().
+               Select(m => new MedicalTestTypeModel
+               {
+                   Id = m.Id,
+                   Description = m.Description
+               });
+
+            //ViewBag.PatientDetailId = new SelectList(patientModel, "Id", "Name", 0);
+            ViewBag.NurseId = new SelectList(nurseModel, "Id", "Name", 0);
+            ViewBag.MedicalTestId = new SelectList(medicalTestModel, "Id", "Description");
+
+            PatientAdmissionDTO patientDetatilDto= dbPatient.getPatientDetailId(id);
+            PatientAdmissionDetailsModel patientDetailsModel = new PatientAdmissionDetailsModel {
+                AdmitDate = patientDetatilDto.AdmitDate,
+                IsDischarged = patientDetatilDto.IsDischarged,
+                PatientDetailId = patientDetatilDto.PatientDetailId
+            };
+            patientMedicalTest.PatientDetailId = patientDetatilDto.PatientDetailId;
+            patientMedicalTest.PatientAdmissionDetails = patientDetailsModel;
+            return View(patientMedicalTest);
+        }
+
+        // GET: PatientMedicalTests/Edit/5
+        //public ActionResult Edit(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+        //    }
+        //    PatientMedicalTest patientMedicalTest = db.PatientMedicalTests.Find(id);
+        //    if (patientMedicalTest == null)
+        //    {
+        //        return HttpNotFound();
+        //    }
+        //    ViewBag.MedicalTestId = new SelectList(db.MedicalTestTypes, "Id", "Description", patientMedicalTest.MedicalTestId);
+        //    ViewBag.NurseId = new SelectList(db.Nurses, "Id", "Name", patientMedicalTest.NurseId);
+        //    ViewBag.PatientDetailId = new SelectList(db.PatientDetails, "PatientDetailId", "PatientDetailId", patientMedicalTest.PatientDetailId);
+        //    return View(patientMedicalTest);
+        //}
+
+        // POST: PatientMedicalTests/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Edit([Bind(Include = "Id,PatientDetailId,MedicalTestId,NurseId")] PatientMedicalTest patientMedicalTest)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        db.Entry(patientMedicalTest).State = EntityState.Modified;
+        //        db.SaveChanges();
+        //        return RedirectToAction("Index");
+        //    }
+        //    ViewBag.MedicalTestId = new SelectList(db.MedicalTestTypes, "Id", "Description", patientMedicalTest.MedicalTestId);
+        //    ViewBag.NurseId = new SelectList(db.Nurses, "Id", "Name", patientMedicalTest.NurseId);
+        //    ViewBag.PatientDetailId = new SelectList(db.PatientDetails, "PatientDetailId", "PatientDetailId", patientMedicalTest.PatientDetailId);
+        //    return View(patientMedicalTest);
+        //}
+
+        //// GET: PatientMedicalTests/Delete/5
+        //public ActionResult Delete(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+        //    }
+        //    PatientMedicalTest patientMedicalTest = db.PatientMedicalTests.Find(id);
+        //    if (patientMedicalTest == null)
+        //    {
+        //        return HttpNotFound();
+        //    }
+        //    return View(patientMedicalTest);
+        //}
+
+        //// POST: PatientMedicalTests/Delete/5
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult DeleteConfirmed(int id)
+        //{
+        //    PatientMedicalTest patientMedicalTest = db.PatientMedicalTests.Find(id);
+        //    db.PatientMedicalTests.Remove(patientMedicalTest);
+        //    db.SaveChanges();
+        //    return RedirectToAction("Index");
+        //}
+
+        //protected override void Dispose(bool disposing)
+        //{
+        //    if (disposing)
+        //    {
+        //        db.Dispose();
+        //    }
+        //    base.Dispose(disposing);
+        //}
+
+        [HttpPost]
+        public ActionResult RenderPatientDetailsGrid(string name)
+        {
+
+            IEnumerable<PatientDTO> patientDetialsDTOList = dbMedicalTestAllocation.FindPatientDetails(name);
+
+                if (patientDetialsDTOList==null)
+                {
+                    ViewBag.Result = "null";
+                }
+
+              IEnumerable<PatientModel> PatientModel=  patientDetialsDTOList.Select(m => new PatientModel
+                    {
+                        Id=m.Id,
+                        Address=m.Address,
+                        Name=m.Name,
+                        NIC=m.NIC
+                    } ).ToList();
+
+
+              return PartialView("_PatientMedicalTest", PatientModel);
+        }
+        #endregion
+        
+    }
+}

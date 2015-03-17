@@ -1,0 +1,59 @@
+﻿@model IEnumerable<Mcd.HospitalManagement.Web.Models.DoctorDetailModel>
+@{
+    ViewBag.Title = "RecommendDoctors";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+    <link href="~/Content/Style.css" rel="stylesheet" />
+    int userId = (int)Session["USERID"];
+}
+<input type="hidden" name="" />
+
+<div class="row">
+
+    <div class="col-xs-7">
+        <h2>Recommend Doctors</h2>
+    </div>
+    <div class="col-xs-1" id="txtTempo">
+        Filter:
+    </div>
+
+    <div class="col-xs-3">
+
+        <select id="filterDropdown" class="form-control formSelect">
+            <option value="0">All</option>
+            <option value="1">Dentists‎</option>
+            <option value="2">Physicians‎ </option>
+            <option value="3">Surgeons‎</option>
+            <option value="4">Radiologists‎</option>
+            <option value="5">Neurologists‎‎</option>
+            <option value="6">Neurosurgeons‎</option>
+        </select>
+
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="col-xs-3">
+        <ol class="breadcrumb">
+            <li><a href="~/Doctor/HomePage">Home</a></li>
+            <li class="active">Recommended Doctors</li>
+        </ol>
+    </div>
+</div>
+
+<div class="col-xs-1">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation"><a href="~/Doctor/Index">My Patients</a></li>
+        <li role="presentation"><a href="~/Doctor/Details/@userId">Profile</a></li>
+        <li role="presentation" class="active"><a href="~/Doctor/RecommendDoctors">Recommended Doctors</a></li>
+    </ul>
+</div>
+<div class="col-xs-1"></div>
+<div class="col-xs-10">
+
+    <div id="tableHere">
+        @{Html.RenderPartial("DoctorDetails", Model);}
+
+    </div>
+   
+</div>

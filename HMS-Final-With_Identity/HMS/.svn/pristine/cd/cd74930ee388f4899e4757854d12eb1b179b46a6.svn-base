@@ -1,0 +1,87 @@
+﻿@model Mcd.HospitalManagement.Web.Models.MedicalTestTypeModel
+@{
+    ViewBag.Title = "Edit";
+}
+<h2>Edit</h2>
+<div class="row">
+    <div class="col-xs-3">
+        <ol class="breadcrumb">
+            <li><a href="~/AdminHome/Index">Home</a></li>
+            <li class="active">Medical Test Edit</li>
+        </ol>
+    </div>
+</div>
+
+<div class="row">
+
+    <div class="col-xs-2">
+        <ul class="nav nav-pills" role="tablist">
+            <li role="presentation"><a href="~/MedicalTestType/Create">Create Medical Test</a></li>
+            <li role="presentation"><a href="~/MedicalTestType/Index">View Medical Tests</a></li>
+        </ul>
+    </div>
+    <div class="col-xs-10">
+        @using (Html.BeginForm("Edit", "MedicalTestType", FormMethod.Post, new { @id = "form" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+                <h4>Medical Test Type</h4>
+                <hr />
+                @Html.ValidationSummary(true)
+                @Html.HiddenFor(model => model.Id)
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Description, new { @name = "Description" })
+                        @Html.ValidationMessageFor(model => model.Description)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save" class="btn btn-primary" id="submit" />
+                        <a href="~/AdminHome/Index" class="btn btn-primary">Exit</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            var jsonObj = $('#form').serialize();
+
+            $("#form").validate({
+                rules: {
+                    "Description": {
+                        required: true
+                    }
+                },
+                //perform an AJAX post to ajax.php
+                submitHandler: function () {
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Content("~/MedicalTestType/Edit")',
+                        data: $('#form').serialize(),
+                        success: function (data) {
+
+                            $('#submit').hide();
+                            msg(data.Message);
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert("Error: " + errorThrown + " , Please try again");
+                        }
+                    });
+                    return false;
+                }
+            });
+        });
+        function msg(value) {
+            alert(value);
+            return false;
+        }
+    </script>
+}

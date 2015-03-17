@@ -1,0 +1,215 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitalManagement.Web.Models;
+using AutoMapper;
+using Mcd.HospitalManagement.Web.Enums;
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class UserRoleController : BaseController
+    {
+        private LP_HMSDbEntities db = new LP_HMSDbEntities();
+
+        private IUserManager usermanager;
+
+        public UserRoleController(): base()
+        {
+            usermanager = new UserManager();
+        }
+
+
+        // GET: /UserRole/
+        public ActionResult Index()
+        {
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                IEnumerable<UserRoleDTO> lstuserrole = usermanager.ViewtUserRole();
+
+                Mapper.CreateMap<UserRoleDTO, UserRoleModel>();
+                var modelList = Mapper.Map<IEnumerable<UserRoleDTO>, IEnumerable<UserRoleModel>>(lstuserrole);
+
+                return View(modelList);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        // GET: /UserRole/Details/5
+        public ActionResult Details(int id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            UserRoleDTO userrole = usermanager.ViewtUserRoleById(id);
+
+            UserRoleModel UserRole = new UserRoleModel()
+            {
+                Role = userrole.Role,
+            };
+
+            if (userrole == null)
+            {
+                return HttpNotFound();
+            }
+            return View(UserRole);
+        }
+
+        // GET: /UserRole/Create
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: /UserRole/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include = "Id,Role")] UserRoleModel userrole)
+        {
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                UserRoleDTO UserRole = new UserRoleDTO()
+                {
+                    Role = userrole.Role,
+                };
+
+                if (ModelState.IsValid)
+                {
+                    if (!usermanager.InsertUserRole(UserRole))
+                    {
+                        ViewBag.Message = CustomEnumMessage.GetStringValue(UserErrorMessage.AlreadyExistUserRole);
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index");
+                    }
+                }
+
+                return View(userrole);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+
+        }
+
+        // GET: /UserRole/Edit/5
+        public ActionResult Edit(int id)
+        {
+
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+
+            }
+            UserRoleDTO userrole = usermanager.SelectUserRoleById(id);
+            UserRoleModel UserRole = new UserRoleModel()
+            {
+                Role = userrole.Role,
+            };
+            if (UserRole == null)
+            {
+                return HttpNotFound();
+            }
+            return View(UserRole);
+        }
+
+        // POST: /UserRole/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include = "Id,Role")] UserRoleModel usrmodel)
+        {
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                UserRoleDTO usrroledto = new UserRoleDTO()
+                {
+                    Id = usrmodel.Id,
+                    Role = usrmodel.Role
+                };
+
+                if (ModelState.IsValid)
+                {
+                    if (!usermanager.EditUserRole(usrroledto))
+                    {
+                        ViewBag.Message = CustomEnumMessage.GetStringValue(UserErrorMessage.AlreadyExistUserRole);
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index");
+                    }
+
+
+                }
+                return View(usrmodel);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+
+            }
+        }
+
+        // GET: /UserRole/Delete/5
+        public ActionResult Delete(int id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            UserRoleDTO userrole = usermanager.SelectUserRoleById(id);
+
+            UserRoleModel usrRoleModel = new UserRoleModel()
+            {
+                Id = userrole.Id,
+                Role = userrole.Role
+          
+            };
+
+            if (userrole == null)
+            {
+                return HttpNotFound();
+            }
+            return View(usrRoleModel);
+        }
+
+        // POST: /UserRole/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                usermanager.DeleteUserRole(id);
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+    }
+}

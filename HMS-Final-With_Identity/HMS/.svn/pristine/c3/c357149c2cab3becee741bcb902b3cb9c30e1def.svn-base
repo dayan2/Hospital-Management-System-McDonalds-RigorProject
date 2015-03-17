@@ -1,0 +1,209 @@
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using System.Data.Entity;
+using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
+using System.Security;
+
+namespace Mcd.HospitalManagement.Web.Tests
+{
+    [TestClass]
+    public class DoctorUnitTest
+    {
+        
+        #region Through DB
+
+        /// <summary>
+        /// DoctorDetails class GetDoctors Method should return a DoctorRoleDTO type of 
+        /// list to the controller
+        /// </summary>
+        [TestMethod]
+        public void DoctorDetailsGetDoctorsMethodShouldReturnADoctorRoleDTOTypeOfList()
+        {
+            // Arrange
+            IDoctorManager manager = new DoctorManager();
+
+            //Act
+            var expectedDoctorList = manager.GetDoctors();
+
+            //Assert
+            Assert.IsInstanceOfType(expectedDoctorList, typeof(IEnumerable<DoctorRoleDTO>));
+        }
+
+        /// <summary>
+        /// DoctorDetails class GetDoctorsById Method should return a Doctor Object to the controller
+        /// </summary>
+        [TestMethod]
+        public void DoctorDetailsGetDoctorsByIdMethodShouldReturnADoctorObject()
+        {
+            // Arrange
+            IDoctorManager manager = new DoctorManager();
+            DoctorRoleDTO doctor = new DoctorRoleDTO
+            {
+                Name = "Neranjan Mendis",
+                PhoneNo = "0786950333",
+                UserId = 24,
+                WardId = 1,
+                Charges = 600,
+                DoctorSpecialityId = 2
+            };
+
+            // Act
+            manager.AddDoctor(doctor);
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                var lastDoctorIndex = db.Doctors.OrderByDescending(u => u.Id).Max(c => c.Id);
+
+                var expectedDoctor = manager.GetDoctorsById(Convert.ToInt32(lastDoctorIndex ));
+
+                //Assert
+                Assert.AreEqual("Neranjan Mendis", expectedDoctor.Name);
+                Assert.AreEqual(600, expectedDoctor.Charges);
+
+                //Deleting the testing Doctor object
+                manager.RemoveDoctor(Convert.ToInt32(lastDoctorIndex));
+            }
+        }
+
+
+        /// <summary>
+        /// DoctorDetails class AddDoctor Method should save the Doctor Object in the Database
+        /// </summary>
+        [TestMethod]
+        public void DoctorDetailsAddDoctorMethodSavesADoctorObjectViaContext()
+        {
+            // Arrange
+            IDoctorManager manager = new DoctorManager();
+            DoctorRoleDTO doctor = new DoctorRoleDTO
+            {
+                Name = "Neranjan Mendis",
+                PhoneNo = "0786950333",
+                UserId = 24,
+                WardId = 1,
+                Charges = 600,
+                DoctorSpecialityId = 2
+            };
+
+            // Act
+            manager.AddDoctor(doctor);
+            using (var db = new LP_HMSDbEntities())
+            {
+                var lastDoctorIndex = db.Doctors.OrderByDescending(u => u.Id).Max(c=> c.Id);
+
+                var expectedDoctor = manager.GetDoctorsById(Convert.ToInt32(lastDoctorIndex));
+
+                //Assert
+                Assert.IsInstanceOfType(expectedDoctor, typeof(DoctorRoleDTO));
+
+                //Deleting the testing Doctor object
+                manager.RemoveDoctor(Convert.ToInt32(lastDoctorIndex));
+            }
+
+        }
+
+        /// <summary>
+        /// DoctorDetails class RemoveDoctor Method should remove Doctor Objects from the Database
+        /// </summary>
+        [TestMethod]
+        public void DoctorDetailsRemoveDoctorMethodShouldRemoveObjectsFromDB()
+        {
+            // Arrange
+            IDoctorManager manager = new DoctorManager();
+            DoctorRoleDTO doctor = new DoctorRoleDTO
+            {
+                Name = "Neranjan Mendis",
+                PhoneNo = "0786950333",
+                UserId = 24,
+                WardId = 1,
+                Charges = 600,
+                DoctorSpecialityId = 2
+            };
+
+            // Act
+            manager.AddDoctor(doctor);
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                //var lastDoctor = db.Doctors.Max();
+                var lastDoctor = db.Doctors.OrderByDescending(u => u.Id).FirstOrDefault();
+
+                //Deleting the testing Doctor object
+                manager.RemoveDoctor(Convert.ToInt32(lastDoctor.Id));
+            }
+        }
+
+        /// <summary>
+        /// DoctorDetails class TransferDoctor Method should Save a DoctorRecommendation Object into DB
+        /// </summary>
+        [TestMethod]
+        public void DoctorDetailsTransferDoctorMethodShouldSaveDoctorRecommendationDTOTypeObjectInDB()
+        {
+            // Arrange
+            IDoctorManager manager = new DoctorManager();
+            DoctorRecommendationDTO doctor = new DoctorRecommendationDTO
+            {
+                Reason = "Doesn't have Insurance",
+                CurrentDoctorId = 44,
+                RecomendedDoctorId = 45
+            };
+
+            // Act
+            manager.TransferDoctor(doctor);
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                var lastRecommendationIndex = db.DoctorRecomendations.OrderByDescending(u => u.Id).Max(c => c.Id);
+
+                var expectedDoctor = db.DoctorRecomendations.Find(lastRecommendationIndex);
+
+                //Assert
+                Assert.AreEqual("Doesn't have Insurance", expectedDoctor.Reason);
+                Assert.AreEqual(44, expectedDoctor.CurrentDoctorId);
+
+                //Deleting the testing DoctorRecommendation object
+                var actualDoctor = db.DoctorRecomendations.Find(lastRecommendationIndex);
+                db.DoctorRecomendations.Remove(actualDoctor);
+            }
+        }
+
+        /// <summary>
+        /// DoctorDetails class GetAllDoctorSpecialityTypes Method should Return a DoctorSpeciality type of list to the controller
+        /// </summary>
+        [TestMethod]
+        public void DoctorDetailsGetAllDoctorSpecialityTypesMethodShouldReturnADoctorSpecialityDTOTypeOfList()
+        {
+            // Arrange
+            IDoctorManager manager = new DoctorManager();
+            
+            //Act
+            var specialityList = manager.GetAllDoctorSpecialityTypes();
+
+            //Assert
+            Assert.IsInstanceOfType(specialityList, typeof(IEnumerable<DoctorSpecialityDTO>));
+        }
+
+
+        /// <summary>
+        /// DoctorDetails class GetDoctorByDoctorIdWithSpecializeAreaForProfileDetail Method should return a DoctorDetailDTO Object to the controller
+        /// </summary>
+        [TestMethod]
+        public void DoctorDetailsGetDoctorByDoctorIdWithSpecializeAreaForProfileDetailMethodShouldReturnADoctorDetailDTOObject()
+        {
+            // Arrange
+            IDoctorManager manager = new DoctorManager();            
+
+            // Act
+            var doctor = manager.GetDoctorByDoctorIdWithSpecializeAreaForProfileDetail(30);
+            
+            //Assert
+            Assert.IsInstanceOfType(doctor, typeof(DoctorDetailDTO));
+        }
+
+
+        #endregion
+
+
+    }
+}

@@ -1,0 +1,86 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientFeedbackModel
+
+@{
+    ViewBag.Title = "Create";
+}
+
+@if (ViewBag.Message != null)
+{
+    <p>@ViewBag.Message</p>
+}
+
+
+<h2>Create</h2>
+<div class="col-xs-2">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation"><a href="~/Patient/Index">View Patient</a></li>
+        <li role="presentation"><a href="~/PatientAdmissionDetails/CreatePatientAdmission">Admission</a></li>
+        <li role="presentation" class="active"><a href="~/PatientAdmissionDetails/Index">View Patient Details</a></li>
+
+    </ul>
+</div>
+
+<div class="col-xs-10">
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            <h4>PatientFeedback</h4>
+            <hr />
+            @Html.ValidationSummary(true)
+
+       
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.PatientId, "PatientId", new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.PatientId, (IEnumerable<SelectListItem>)ViewBag.PatientId, "--Select Bed Number--", new { @class = "btn-group-vertical", style = "width: 200px;", @id="dropDown"})
+                    @Html.ValidationMessageFor(model => model.PatientId)
+                </div>
+            </div>
+            @*<div class="form-group">
+            @Html.LabelFor(model => model.DoctorId, "DoctorId", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+              @Html.DropDownListFor(model => model.DoctorId, (IEnumerable<SelectListItem>)ViewBag.DoctorId, "--Select Bed Number--", new { @class = "btn-group-vertical", style = "width: 200px;", @id = "dropDown" })
+                @Html.ValidationMessageFor(model => model.DoctorId)
+            </div>
+        </div>*@
+
+            @*<div class="form-group">
+                    @Html.LabelFor(model => model.FeedbackDate, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.FeedbackDate)
+                        @Html.ValidationMessageFor(model => model.FeedbackDate)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.FeedbackDescription, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.FeedbackDescription)
+                        @Html.ValidationMessageFor(model => model.FeedbackDescription)
+                    </div>
+                </div>*@
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Create" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+    }
+
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+    @*<div id="tableHere">
+        @{Html.RenderPartial("PatientFeedBackDetails", Model);}
+
+    </div>*@
+    @section scripts{
+
+        }
+
+
+

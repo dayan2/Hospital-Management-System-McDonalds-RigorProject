@@ -1,0 +1,24 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientMedicalTestModel
+
+@{
+    ViewBag.Title = "Patient Medical Test";
+}
+
+
+<div>
+
+
+    <h2>Patient Medical Allocation</h2>
+    <br />
+
+    <div>
+        @Html.DisplayName("Enter Name :") <br />
+       @* @Html.DropDownListFor(m => m.Id, (IEnumerable<SelectListItem>)ViewBag.PatientId, "--Select Patient--", new { @class = "btn-group-vertical", style = "width: 200px;", @id = "dropDown" })*@
+        @Html.TextBox("pname","", new { @class = "btn-group-vertical", style = "width: 200px;", @id = "pname" })
+
+        <div id="tableHere">
+            @{Html.RenderPartial("_PatientMedicalTest", Model);}
+
+        </div>
+    </div>
+</div>

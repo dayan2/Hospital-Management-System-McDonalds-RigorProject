@@ -1,0 +1,206 @@
+﻿@model Mcd.HospitalManagement.Web.Models.InvoiceDetailsModel
+
+@{
+    ViewBag.Title = "Create";
+}
+<h2>Create</h2>
+<div class="row">
+    <div class="col-xs-3">
+        <ol class="breadcrumb">
+            @if ((string)Session["USERROLE"] == "Admin")
+            {
+                <li><a href="~/AdminHome/Index">Home</a></li>
+            }
+            else
+            {
+                <li><a href="~/HomePage/HomePageForClerk">Home</a></li>
+            }
+            <li class="active">Create Invoice</li>
+        </ol>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        
+
+        <div class="col-md-1">
+            <ul class="nav nav-pills" role="tablist">
+                <li role="presentation"><a href="~/Patient/Index">Patient Details</a></li>
+                <li role="presentation"><a href="~/Invoices/viewInvoices">Invoice List</a></li>
+                <li role="presentation"><a href="~/Invoices/Index">Prepare Invoices</a></li>
+            </ul>
+        </div>
+        <div class="col-lg-11">
+        @using (Html.BeginForm("Create", "Invoices", FormMethod.Post, new { @id = "form" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+                <h4>Invoice</h4>
+                <hr />
+                @Html.ValidationSummary(true)
+
+                <div class="col-md-8">
+                    <div class="form-group">
+
+
+                        <table class="table table-striped">
+                            <tr>
+
+                                <td>
+                                    @Html.HiddenFor(model => model.PatientDetailId, new { @name = "PatientDetailId", @id = "PatientDetailId" })
+                                    @Html.LabelFor(model => model.PatientName, "Patient Name")
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(model => model.PatientName)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+
+                                    @Html.Label("Invoice Date")
+                                </td>
+                                <td>
+                 
+                                    @Html.TextBoxFor(model => model.InvoiceDate, new { @name = "InvoiceDate", @id = "InvoiceDate", @class = "date-picker InvoiceDate", style = "width: 200px;", })
+
+                                    @Html.ValidationMessageFor(model => model.InvoiceDate)
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td>@Html.Label("Word No")</td>
+                                <td>@Html.DisplayFor(model => model.WardNo)</td>
+                            </tr>
+                            <tr>
+                                <td>@Html.Label("Admit Date")</td>
+                                <td>
+                                    @Html.DisplayFor(model => model.AdmitDate)
+                                    @Html.HiddenFor(model => model.AdmitDate, new { @id = "admitDate" })
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>@Html.Label("Word Fee")</td>
+                                <td>
+                                    @Html.DisplayFor(model => model.WardFee)
+                                    @Html.HiddenFor(model => model.WardFee, new { @id = "wardFee" })
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>@Html.Label("Doctor Name")</td>
+                                <td>@Html.DisplayFor(model => model.DoctorName)</td>
+                            </tr>
+                            <tr>
+                                <td>@Html.Label("Doctor Fee")</td>
+                                <td>
+                                    @Html.DisplayFor(model => model.DoctorCharges)
+                                    @Html.HiddenFor(model => model.DoctorCharges, new { @id = "doctorCharges" })
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>@Html.Label("Total Fee")</td>
+                                <td id="total">
+                                    @Html.DisplayFor(model => model.TotalFee)
+                                    @Html.HiddenFor(model => model.DoctorId, new { @name = "DoctorId" });
+
+                                </td>
+                            </tr>
+                        </table>
+
+                    </div>
+                    <div class="col-md-1"></div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Save Invoice" class="btn btn-primary" id="submit" />
+                            @if ((string)Session["USERROLE"] == "Admin")
+                            {
+                                <a href="~/AdminHome/Index" class="btn btn-primary">Cancel</a>
+                            }
+                            else
+                            {
+                                <a href="~/HomePage/HomePageForClerk" class="btn btn-primary">Cancel</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+    </div>
+@section Scripts {
+
+
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#InvoiceDate').datepicker({
+                changeMonth: true,
+                changeYear: true,
+                maxDate: new Date,
+                minDate: new Date(2014, 6, 12)
+            });
+
+            var jsonObj = $('#form').serialize();
+            
+
+            //validation rules
+            $("#form").validate({
+                rules: {
+                    "InvoiceDate": {
+                        required: true
+
+                    },
+                    "PatientDetailId": {
+                        required: true
+                    }
+
+                },
+                //perform an AJAX post to ajax.php
+                submitHandler: function () {
+
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Content("~/Invoices/Create")',
+                        data: $('#form').serialize(),
+                        success: function (data) {
+     
+                            $('#submit').hide();
+                            msg(data.Message);
+
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert("Error: " + errorThrown + " , Please try again");
+                        }
+                    });
+                    return false;
+                }
+            });
+
+
+
+            $('#InvoiceDate').change(function () {
+                datediff();
+            });
+        });
+
+        //change total charges with date invoice changing
+        function datediff() {
+            var one_day = 1000 * 60 * 60 * 24,
+            invDate = new Date($('#InvoiceDate').val()),
+            admitDate = new Date(Date.parse($('#admitDate').val())),
+            value = invDate.getTime() - admitDate.getTime(),
+            result = Math.round(value / one_day) + 1,
+            fee = parseInt($('#wardFee').val()) + parseInt($('#doctorCharges').val()),
+            total = parseInt(fee) * parseInt(result);
+            $("#total").html(total);
+        }
+
+        function msg(value) {
+            alert(value);
+            return false;
+        }
+    </script>
+}

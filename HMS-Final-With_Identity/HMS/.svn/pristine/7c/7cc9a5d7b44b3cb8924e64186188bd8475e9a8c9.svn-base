@@ -1,0 +1,142 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Mcd.HospitalManagementSystem.Data;
+using AutoMapper;
+using System.Data.Entity;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class MainPatientDetails
+    {
+        #region private Variable
+        private Patient patient;
+        private PatientDetail objPatientDetails;
+
+        #endregion
+
+        #region Public Methods
+        /// <summary>
+        /// used to insert all patient basic details of patient 
+        /// </summary>
+        /// <param name="patientDTO"></param>
+        public void InsertPatient(PatientDTO patientDTO)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+
+                patient = new Patient
+                   {
+                       Name = patientDTO.Name,
+                       NIC = patientDTO.NIC,
+                       Address = patientDTO.Address,
+                       Gender = patientDTO.Gender,
+                       MobileNo = patientDTO.MobileNo,
+                   };
+                db.Patients.Add(patient);
+                db.SaveChanges();
+            }
+        }
+
+        /// <summary>
+        /// retrive specific patient basic details
+        /// </summary>
+        /// <param name="patientID"></param>
+        /// <returns name=patientDTO></returns>
+        public PatientDTO ViewPatientDetails(int? patientID)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                patient = db.Patients.Find(patientID);
+                var patientDTO = new PatientDTO()
+                  {
+                      Id = patient.Id,
+                      Name = patient.Name,
+                      NIC = patient.NIC,
+                      Address = patient.Address,
+                      Gender = patient.Gender,
+                      MobileNo = patient.MobileNo,
+
+                  };
+                return patientDTO;
+            }
+        }
+
+
+        /// <summary>
+        /// retrive all patient details 
+        /// </summary>
+        /// <returns name=patientList></returns>
+        public IEnumerable<PatientDTO> ViewAllPatientDetails()
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                IList<Patient> patient = db.Patients.ToList();
+                Mapper.CreateMap<Patient, PatientDTO>();
+                var patientList = Mapper.Map<IEnumerable<Patient>, IEnumerable<PatientDTO>>(patient);
+                return patientList;
+            }
+        }
+
+        /// <summary>
+        /// use to edit patient basic details 
+        /// </summary>
+        /// <param name="patientDTO"></param>
+        public void EditPatient(PatientDTO patientDTO)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                patient = new Patient()
+                {
+                    Id = patientDTO.Id,
+                    Name = patientDTO.Name,
+                    NIC = patientDTO.NIC,
+                    Address = patientDTO.Address,
+                    Gender = patientDTO.Gender,
+                    MobileNo = patientDTO.MobileNo,
+                };
+
+                db.Entry(patient).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+        }
+
+        /// <summary>
+        /// use to delete basic patient details
+        /// </summary>
+        /// <param name="PatientId"></param>
+        public void Deletepatient(int? PatientId)
+        {
+
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                patient = db.Patients.Find(PatientId);
+                db.Patients.Remove(patient);
+                db.SaveChanges();
+            }
+
+        }
+        /// <summary>
+        /// check the availabe patient according to nic
+        /// </summary>
+        /// <param name="nic"></param>
+        /// <returns></returns>
+        public bool CheckPatientAvilability(string nic)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+
+                var patient = db.Patients.Where(x => x.NIC == nic).ToList();
+                if (patient.Count() >= 1)
+                {
+                    return false;
+                }
+                return true;
+            }
+        }
+        #endregion
+
+    }
+}

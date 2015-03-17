@@ -1,0 +1,204 @@
+﻿using Mcd.HospitalManagementSystem.Data;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Collections;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    class UserRegistration
+    {
+
+        #region Private Fields
+        private LP_HMSDbEntities db = new LP_HMSDbEntities();
+        #endregion
+
+        #region Public Methods
+        public bool AddNewUser(User user)
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    User users = db.Users.Where(x => x.UserName == user.UserName).FirstOrDefault();
+                    if (users == null)
+                    {
+                        db.Users.Add(user);
+                        db.SaveChanges();
+                        return true;
+                    }
+
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+
+        }
+
+        public IEnumerable<UserDTO> ViewAllUser()
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    var userList = db.Users.ToList();
+                    var userRoleList = db.UserRoles.ToList();
+                    IEnumerable<UserDTO> userSelectedList = from ul in userList
+                                                            from ur in userRoleList
+                                                            where ul.UserRoleId == ur.Id
+                                                            select new UserDTO
+                                                            {
+                                                                Id = ul.Id,
+                                                                UserName = ul.UserName,
+                                                                Password = ul.Password,
+                                                                UserRole = ul.UserRole,
+                                                                UserRoleId = ul.UserRoleId,
+                                                                UserRoleType = ur.Role,
+
+                                                            };
+
+                    return userSelectedList;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+
+        public bool EditUser(User user)
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    User users = db.Users.Where(x => x.UserName == user.UserName && x.Id != user.Id).FirstOrDefault();
+                    if (users == null)
+                    {
+                        db.Entry(user).State = EntityState.Modified;
+                        db.SaveChanges();
+                        return true;
+                    }
+
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+        public UserDTO ViewUserById(int Id)
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    User user = db.Users.Find(Id);
+
+                    UserDTO userdto = new UserDTO()
+                    {
+                        Id = user.Id,
+                        Password = user.Password,
+                        UserName = user.UserName,
+                        UserRoleId = user.UserRoleId,
+                        UserRole = user.UserRole,
+                        UserRoleType =user.UserRole.Role
+                    };
+
+                    return userdto;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+        public IEnumerable<UserDTO> SelectUsersByUserRole(string userRole)
+        {
+
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                var userList = db.Users.ToList();
+                var userRoleList = db.UserRoles.ToList();
+                IEnumerable<UserDTO> userSelectedList = from ul in userList
+                                                        from ur in userRoleList
+                                                        where ul.UserRoleId == ur.Id && ur.Role == userRole
+                                                        select new UserDTO
+                                                        {
+                                                            Id = ul.Id,
+                                                            UserName = ul.UserName,
+                                                            Password = ul.Password,
+                                                            UserRoleId = ul.UserRoleId,
+                                                            UserRoleType = ur.Role
+
+                                                        };
+
+                return userSelectedList;
+            }
+        }
+        public IEnumerable<UserDTO> SelectToCreate()
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    var usersList = db.Users.ToList();
+                    IEnumerable<UserDTO> users = from ul in usersList
+                                                 select new UserDTO
+                                                 {
+                                                     Id = ul.Id,
+                                                     UserName = ul.UserName,
+                                                     Password = ul.Password,
+                                                     ConfirmPassword = ""
+                                                 };
+                    return users;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+
+        public bool DeleteUser(int Id)
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    User user = db.Users.Find(Id);
+                    db.Users.Remove(user);
+                    db.SaveChanges();
+
+                    return true;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+        #endregion
+
+
+    }
+}

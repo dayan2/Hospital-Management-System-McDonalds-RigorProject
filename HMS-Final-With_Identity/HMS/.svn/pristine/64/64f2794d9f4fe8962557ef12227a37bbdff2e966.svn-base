@@ -1,0 +1,83 @@
+﻿using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business.DTO;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class HMSNurse : INurse
+    {
+        private LP_HMSDbEntities db = new LP_HMSDbEntities();
+
+
+        public void InsertNurse(NurseDTO NurseDTO)
+        {
+            Nurse Nurse = new Nurse { Id = NurseDTO.Id, Name = NurseDTO.Name, WardId = NurseDTO.WardId };
+            db.Nurses.Add(Nurse);
+            db.SaveChanges();
+
+        }
+
+        public void EditNurse(NurseDTO NurseDTO)
+        {
+            Nurse nurse = new Nurse { Id = NurseDTO.Id, Name = NurseDTO.Name, WardId = NurseDTO.WardId };
+            db.Entry(nurse).State = EntityState.Modified;
+            db.SaveChanges();
+        }
+
+        public void DeleteNurse(int NurseId)
+        {
+            Nurse nurse = db.Nurses.Find(NurseId);
+            db.Nurses.Remove(nurse);
+            db.SaveChanges();
+        }
+
+        public IEnumerable<NurseDTO> ViewtNurse()
+        {
+            var nurses = db.Nurses.ToList();
+            IEnumerable<NurseDTO> NurseList = from c in nurses
+                                              select new NurseDTO
+                                              {
+                                                  Id = c.Id,
+                                                  Name = c.Name,
+                                                  WardId = c.WardId
+                                              };
+
+            return NurseList;
+        }
+
+        //public NurseDTO ViewtNurseById(int NurseId)
+        //{
+           
+        //}
+    
+
+        public NurseDTO ViewtNurseById(int? NurseId)
+        {
+            Nurse Nurse = db.Nurses.Find(NurseId);
+
+            NurseDTO NurseDTO = new NurseDTO
+            {
+                Id = Nurse.Id,
+                Name = Nurse.Name,
+                WardId = Nurse.WardId
+            };
+            return NurseDTO;
+        }
+
+       
+
+        void INurse.Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+        }
+    }
+}
+

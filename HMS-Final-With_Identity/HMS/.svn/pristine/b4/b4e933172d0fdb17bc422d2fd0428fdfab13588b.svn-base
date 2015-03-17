@@ -1,0 +1,400 @@
+﻿#region Using Directives
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitalManagement.Web.Models;
+using Mcd.HospitalManagement.Web.Enums;
+#endregion
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class PatientMedicalTestsController : Controller
+    {
+        #region Constant
+        const string ERROR_TYPE = "AccessDenied";
+        const string ERROR_MSG = "Error";
+        #endregion
+
+        #region Private Fields
+        IPatientManager dbPatient;
+        INurse dbNurse;
+        IHMSMedicalTestType dbMedicalTest;
+        IPatientMedicalTestAllocation dbMedicalTestAllocation;
+        string displayMessage = string.Empty;
+        #endregion
+
+        #region Constructor Method
+        public PatientMedicalTestsController()
+        {
+            dbMedicalTestAllocation = new PatientMedicalTestAllocation();
+        }
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// This action method have one partial view. 
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult Index()
+        {
+            if (Session["USERROLE"] == null)// checking the login state. if not login, then pass the error page.
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            // checking the permission.
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin ||
+                (UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Cashier)
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        /// <summary>
+        /// Medical test details send to save that recieve by Json mwthod
+        /// </summary>
+        /// <param name="patientDetailsId"></param>
+        /// <param name="medicalTestId"></param>
+        /// <param name="nurseId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult Create(int patientDetailsId, int medicalTestId, int nurseId)
+        {
+            PatientMedicalTestDTO patientDto = new PatientMedicalTestDTO    //mapping
+                   {
+                       MedicalTestId = Convert.ToInt32(medicalTestId),
+                       NurseId = Convert.ToInt32(nurseId),
+                       PatientDetailId = Convert.ToInt32(patientDetailsId)
+                   };
+            if (ModelState.IsValid)// check model validation
+            {
+                //verify there no more duplicates records or Check Exists Medical Test For Patient Admission
+                if (!dbMedicalTestAllocation.CheckExistsMedicalTestForPatientAdmission(patientDto))
+                {
+                    ViewBag.Message = CustomEnumMessage.GetStringValue(PatientMedicalTestError.AlreadyExistPatientMedicalTest);
+                    return Json(new { Message = "this Medical Test already Exists for this patient" });
+                }
+                // save details. if saved, result should send to view using JSON.
+                if (dbMedicalTestAllocation.InsertPatientMedicalTest(patientDto))
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationInsertedMsg);
+                else
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+            }
+            return Json(new { Message = "Data is not valid" });
+        }
+
+        /// <summary>
+        /// Get all medical test details of patients
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult ViewPatientMedicalTest()
+        {
+            if (Session["USERROLE"] == null)// checking the login state. if not login, then pass the error page.
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            // checking the permission.
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin ||
+               (UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Cashier)
+            {
+                IEnumerable<PatientMedicalTestDTO> patientMedicalTestDto = dbMedicalTestAllocation.ViewtPatientMedicalTest();
+                if (patientMedicalTestDto == null) // check have object, if no object then pass error page.
+                {
+                    ViewBag.Result = "No records";
+                    return View();
+                }
+                //mapping
+                IEnumerable<PatientMedicalTestModel> patientMedicalTestModel = patientMedicalTestDto.Select(m => new PatientMedicalTestModel
+              {
+                  Id = m.Id,
+                  MedicalTestId = m.MedicalTestId,
+                  NurseId = m.NurseId,
+                  NurseName = m.NurseName,
+                  MedicalTestDescription = m.MedicalTest,
+                  PatientDetailId = m.PatientDetailId,
+                  PatientName = m.PatientName
+              }).ToList();
+
+                return View(patientMedicalTestModel);
+            }
+            else
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        /// <summary>
+        /// Get Patient Medical Test details by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ActionResult Create(int? id)
+        {
+            dbMedicalTest = new HMSMedicalTestType();
+            dbNurse = new HMSNurse();
+            dbPatient = new PatientManager();
+
+            if (Session["USERROLE"] == null)// checking the login state. if not login, then pass the error page.
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            // checking the permission.
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin ||
+               (UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Cashier)
+            {
+                if (id == null)// check have id, if null then pass to error page.
+                {
+                    return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.NotFound) });
+                }
+
+                PatientMedicalTestModel patientMedicalTest = new PatientMedicalTestModel();
+                List<SelectListItem> medicalTestList = new List<SelectListItem>();
+                List<SelectListItem> nurseList = new List<SelectListItem>();
+                var nurses = dbNurse.ViewtNurse();  //Get Nurses
+                foreach (var n in nurses)
+                {
+                    nurseList.Add(new SelectListItem
+                    {
+                        Text = n.Name,
+                        Value = n.Id.ToString()
+                    });
+                }
+
+                var medicalTest = dbMedicalTest.ViewtMedicalTestType(); //Get Medical Test
+                foreach (var m in medicalTest)
+                {
+                    medicalTestList.Add(new SelectListItem
+                    {
+                        Value = m.Id.ToString(),
+                        Text = m.Description
+                    });
+                }
+
+                PatientAdmissionDTO patientDetatilDto = dbPatient.GetPatientDetailId(id);
+                PatientAdmissionDetailsModel patientDetailsModel = new PatientAdmissionDetailsModel     //mapping
+                {
+                    AdmitDate = patientDetatilDto.AdmitDate,
+                    IsDischarged = patientDetatilDto.IsDischarged,
+                    PatientDetailId = patientDetatilDto.PatientDetailId
+                };
+                patientMedicalTest.PatientDetailId = patientDetatilDto.PatientDetailId;
+                patientMedicalTest.PatientAdmissionDetails = patientDetailsModel;
+                patientMedicalTest.Nurse = nurseList;
+                patientMedicalTest.MedicalTestType = medicalTestList;
+                return View(patientMedicalTest);
+            }
+            else
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        /// <summary>
+        /// Get patient Medical test details by id for editing.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ActionResult Edit(int? id)
+        {
+            dbMedicalTest = new HMSMedicalTestType();
+            dbNurse = new HMSNurse();
+            if (Session["USERROLE"] == null)// checking the login state. if not login, then pass the error page.
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            // checking the permission.
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin ||
+               (UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Cashier)
+            {
+                if (id == null) // check have id, if null then pass to error page.
+                {
+                    return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.BadRequest) });
+                }
+
+                PatientMedicalTestModel patientMedicalTest = new PatientMedicalTestModel();
+                List<SelectListItem> medicalTestList = new List<SelectListItem>();
+                List<SelectListItem> nurseList = new List<SelectListItem>();
+                var nurses = dbNurse.ViewtNurse();                  // Get Nurses
+                foreach (var n in nurses)
+                {
+                    nurseList.Add(new SelectListItem
+                    {
+                        Text = n.Name,
+                        Value = n.Id.ToString()
+                    });
+                }
+
+                var medicalTest = dbMedicalTest.ViewtMedicalTestType(); // Get Medical Test
+                foreach (var m in medicalTest)
+                {
+                    medicalTestList.Add(new SelectListItem
+                    {
+                        Value = m.Id.ToString(),
+                        Text = m.Description
+                    });
+                }
+                // Get patient Medical test by id
+                PatientMedicalTestDTO patientMedicalDTO = dbMedicalTestAllocation.ViewtPatientMedicalTestById(id); 
+
+                patientMedicalTest.Id = patientMedicalDTO.Id;                       //mapping
+                patientMedicalTest.MedicalTestId = patientMedicalDTO.MedicalTestId;
+                patientMedicalTest.NurseId = patientMedicalDTO.NurseId;
+                patientMedicalTest.PatientDetailId = patientMedicalDTO.PatientDetailId;
+                patientMedicalTest.PatientName = patientMedicalDTO.PatientName;
+                patientMedicalTest.Nurse = nurseList;
+                patientMedicalTest.MedicalTestType = medicalTestList;
+                return View(patientMedicalTest);
+            }
+            else
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+        /// <summary>
+        /// Send details to edit.
+        /// </summary>
+        /// <param name="patientMedicalTest"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include = "Id,PatientDetailId,MedicalTestId,NurseId")] PatientMedicalTestModel patientMedicalTest)
+        {
+            if (ModelState.IsValid)  // check model validation
+            {
+                PatientMedicalTestDTO patientMedicalDto = new PatientMedicalTestDTO //mapping DTO to model
+                {
+                    Id = patientMedicalTest.Id,
+                    NurseId = patientMedicalTest.NurseId,
+                    PatientDetailId = patientMedicalTest.PatientDetailId,
+                    MedicalTestId = patientMedicalTest.MedicalTestId
+                };
+
+                //Check Exists Medical Test For PatientAdmission. purpose is avoid duplicated.
+                if (!dbMedicalTestAllocation.CheckExistsMedicalTestForPatientAdmission(patientMedicalDto))
+                {
+                    displayMessage = CustomEnumMessage.GetStringValue(PatientMedicalTestError.AlreadyExistPatientMedicalTest);
+                    return Json(new { Message = displayMessage });
+                }
+                // get state of the Patient Medical Test edited as a booleon value.
+                if (dbMedicalTestAllocation.EditPatientMedicalTest(patientMedicalDto))
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationUpdatedMsg);
+                else
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+
+                return Json(new { Message = displayMessage });
+
+            }
+
+            return View(patientMedicalTest);
+        }
+
+        /// <summary>
+        /// Get details by id to delete.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ActionResult Delete(int? id)
+        {
+            if (Session["USERROLE"] == null) // checking the login state. if not login, then pass the error page.
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            // checking the permission.
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin ||
+             (UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Cashier)
+            {
+                if (id == null) // check have id, if null then pass to error page.
+                {
+                    return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.BadRequest) });
+                }
+                if (!dbMedicalTestAllocation.ExistsPatientMedicalTest((int)id))
+                    return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = "Not exists Medical Test for patients" });
+
+                PatientMedicalTestDTO patientMedicalTest = dbMedicalTestAllocation.ViewtPatientMedicalTestById(id);
+
+                if (patientMedicalTest == null) // check have object, if no object then pass error page.
+                {
+                    return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.NotFound) });
+                }
+
+                PatientMedicalTestModel patientMedicalTestModel = new PatientMedicalTestModel           //mapping
+                {
+                    Id = patientMedicalTest.Id,
+                    MedicalTestDescription = patientMedicalTest.MedicalTest,
+                    MedicalTestId = patientMedicalTest.MedicalTestId,
+                    NurseId = patientMedicalTest.NurseId,
+                    NurseName = patientMedicalTest.NurseName,
+                    PatientName = patientMedicalTest.PatientName,
+                    PatientDetailId = patientMedicalTest.PatientDetailId
+
+                };
+                return View(patientMedicalTestModel);
+            }
+            else
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        /// <summary>
+        /// Send id to delete
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            //check Exists Patient Medical Test. if not exists ,pass error page.
+            if (!dbMedicalTestAllocation.ExistsPatientMedicalTest(id))
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.NotFound) });
+
+            // get state of the Patient Medical Test  deleted as a booleon value.
+            if (dbMedicalTestAllocation.DeletePatientMedicalTest(id))
+                displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationRemovedMsg);
+            else
+                displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+            return Json(new { Message = displayMessage });
+        }
+
+        /// <summary>
+        /// this is using for partial views
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult RenderPatientDetailsGrid(string name)
+        {
+            //Get details by name.
+            IEnumerable<PatientDTO> patientDetialsDTOList = dbMedicalTestAllocation.FindPatientDetails(name);
+
+            // checking the login state. if not login, then pass the error page.
+            if (patientDetialsDTOList == null)
+            {
+                ViewBag.Result = "null";
+            }
+
+            IEnumerable<PatientModel> PatientModel = patientDetialsDTOList.Select(m => new PatientModel     //mapping
+                  {
+                      Id = m.Id,
+                      Address = m.Address,
+                      Name = m.Name,
+                      NIC = m.NIC
+                  }).ToList();
+
+
+            return PartialView("_PatientMedicalTest", PatientModel);
+        }
+        #endregion
+    }
+}

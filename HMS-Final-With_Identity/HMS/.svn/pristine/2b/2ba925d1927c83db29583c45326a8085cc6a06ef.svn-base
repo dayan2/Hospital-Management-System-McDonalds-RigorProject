@@ -1,0 +1,81 @@
+﻿@model Mcd.HospitalManagement.Web.Models.DoctorDetailModel
+
+@{
+    ViewBag.Title = "Details";
+    <style>
+        dt {
+            margin-bottom: 20px;
+        }
+    </style>
+    int userId = (int)Session["USERID"];
+}
+
+
+<div class="container-fluid">   
+
+    <h2>My Profile</h2>
+
+    <div class="row">
+        <div class="col-xs-3">
+            <ol class="breadcrumb">
+                <li><a href="~/Doctor/HomePage">Home</a></li>
+                <li class="active">Profile</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-1">
+            <ul class="nav nav-pills" role="tablist">
+                <li role="presentation"><a href="~/Doctor/Index">My Patients</a></li>
+                <li role="presentation" class="active"><a href="~/Doctor/Details/@userId">Profile</a></li>
+                <li role="presentation"><a href="~/Doctor/RecommendDoctors">Recommended Doctors</a></li>
+            </ul>
+        </div>
+        <div class="col-xs-1"></div>
+        <div class="col-xs-3 ">
+            <a href="#" class="thumbnail">
+                <img src="http://organicthemes.com/demo/profile/files/2012/12/profile_img.png" alt="Profile Image">
+            </a>
+        </div>
+        <div class="col-xs-1"></div>
+        <div class="col-xs-6 ">
+            <h4></h4>
+            <hr />
+            <dl class="dl-horizontal">
+                <dt>
+                    @Html.DisplayNameFor(model => model.Name)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Name)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.DoctorSpecialityField)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.DoctorSpecialityField)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.PhoneNo)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.PhoneNo)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.WardId)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.WardId)
+                </dd>
+
+            </dl>
+        </div>
+    </div>
+</div>

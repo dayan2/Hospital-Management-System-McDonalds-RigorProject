@@ -1,0 +1,47 @@
+﻿using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business.DTO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public interface IUserManager
+    {
+        #region UserRole Function
+        void InsertUserRole(UserRoleDTO UserRole);
+
+        void EditUserRole(UserRoleDTO UserRole);
+
+        UserRoleDTO SelectUserRoleById(int UserRoleId);
+
+        UserRoleDTO SelectToDeleteUserRole(int UserRoleId);
+
+        void DeleteUserRole(int UserRoleId);
+
+        IEnumerable<UserRoleDTO> ViewtUserRole();
+
+        UserRoleDTO ViewtUserRoleById(int UserRoleId);
+
+        #endregion 
+
+        #region User Function
+        void InsertUser(UserDTO user);
+
+        void EditUser(UserDTO userdto);
+
+        void DeleteUser(int UserId);
+
+        IEnumerable<UserDTO> ViewtAllUser();
+
+        void AddNewUser();
+
+        UserDTO ViewtUserById(int id);
+
+        #endregion
+
+        UserDTO CheckUserAuthentication(string UserName,String Password);
+    }
+}

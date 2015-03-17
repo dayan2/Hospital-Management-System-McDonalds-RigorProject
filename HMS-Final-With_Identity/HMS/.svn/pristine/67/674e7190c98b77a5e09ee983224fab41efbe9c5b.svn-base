@@ -1,0 +1,245 @@
+﻿@model Mcd.HospitalManagement.Web.Models.DoctorModel
+
+@{
+    ViewBag.Title = "AddDoctor";
+    <link href="~/Content/Style.css" rel="stylesheet" />
+
+}
+<h3>Add Doctor</h3> 
+
+
+@using (Html.BeginForm("AddDoctor", "Doctor", FormMethod.Post, new { @id = "form" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4></h4>
+        <hr />
+        @Html.ValidationSummary(true)
+
+        <div class="form-group">
+            @*@Html.LabelFor(model => model.UserId, new { @class = "col-sm-2 control-label" })*@
+            <label class="col-sm-2 control-label"> User ID</label>
+            <div class="col-md-10">
+                @*@Html.TextBoxFor(model => model.UserId, new { @class = "form-control" })*@
+                @Html.DropDownListFor(model => model.UserId, (IEnumerable<SelectListItem>)ViewBag.userViewbag, new { @class = "btn-group-vertical" })
+                @Html.ValidationMessageFor(model => model.UserId)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, new { @class = "col-sm-2 control-label" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.Name, new { @class = "form-control", @name = "Name" })
+                @Html.ValidationMessageFor(model => model.Name)
+            </div>
+        </div>        
+
+        <div class="form-group">
+            @*@Html.LabelFor(model => model.DoctorSpecialityId, new { @class = "col-sm-2 control-label" })*@
+            <label class="col-sm-2 control-label"> Doctor Speciality ID</label>
+            <div class="col-md-10">
+                @*@Html.TextBoxFor(model => model.DoctorSpecialityId, new { @class = "form-control" })*@
+                @Html.DropDownListFor(model => model.DoctorSpecialityId, (IEnumerable<SelectListItem>)ViewBag.doctorSpecialitiesViewbag, 
+                new { @class = "btn-group-vertical" })
+                @Html.ValidationMessageFor(model => model.DoctorSpecialityId)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Charges, new { @class = "col-sm-2 control-label" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.Charges, new { @class = "form-control", @name = "Charges" })
+                @Html.ValidationMessageFor(model => model.Charges)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.WardId, new { @class = "col-sm-2 control-label" })
+            <div class="col-md-10">
+                @*@Html.TextBoxFor(model => model.WardId, new { @class = "form-control", @name = "WardId" })*@
+                @Html.DropDownListFor(model => model.WardId, (IEnumerable<SelectListItem>)ViewBag.wardViewbag, new { @class = "btn-group-vertical" })
+                @Html.ValidationMessageFor(model => model.WardId)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.PhoneNo, new { @class = "col-sm-2 control-label" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.PhoneNo, new { @class = "form-control", @name = "PhoneNo" })
+                @Html.ValidationMessageFor(model => model.PhoneNo)
+            </div>
+        </div>
+
+        
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-primary" id="submit" />
+                <a href="~/AdminHome/Index" class="btn btn-default">Exit</a>
+            </div>
+        </div>    
+
+    </div> @*End form-horizontal*@
+}
+
+
+@*<div>
+    @Html.ActionLink("Back to Menu", "HomePage")
+</div>*@
+
+@section Scripts {
+ 
+    <script type="text/javascript">
+
+        @*$(document).ready(function () {
+            $('#notificationSuccess').hide();
+            $('#notificationError').hide();
+
+            $('#submit').click(function () {
+                       
+            var modelDataJSON = JSON.parse(model);
+                var mod = $('#model').val();
+                alert(mod);
+                var modelDataJSON = '@Model';
+                alert(modelDataJSON);
+                var modelDataJSON = @Html.Raw(Json.Encode(Model));
+
+                //$('#myform').validate({ // initialize the plugin
+                //    rules: {
+                //        Name: {
+                //            required: true,
+                //            //email: true
+                //        },
+                //        Charges: {
+                //            required: true,
+                //            //minlength: 5
+                //        },
+                //        WardId: {
+                //            required: true,
+                //            //minlength: 5
+                //        },
+                //        PhoneNo: {
+                //            required: true,
+                //            //minlength: 5
+                //        }
+                //    }
+                //});
+
+
+                var jsonObj = $('#form').serialize();
+                //alert(jsonObj);
+
+                $.ajax({
+                    type: "POST",
+                    url: '../Doctor/AddDoctor',
+                    data: JSON.stringify({ "doctor": jsonObj }),
+                    success: function (data) {
+                        //alert(data.Message);
+                        $('#submit').hide();
+                        if (data.Message == "You have successfully inserted your record!") {
+                            $('#notificationSuccess').show();
+                            $('#messageSuccess').replaceWith(data.Message);
+                            $('#notificationSuccess').delay(3500).fadeOut(2500);
+
+                        }
+                        else {
+                            $('#notificationError').show();
+                            $('#messageError').replaceWith(data.Message);
+                            $('#notificationError').delay(3500).fadeOut(2500);
+                        }
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Error: " + errorThrown + " , Please try again");
+                    }
+                });
+                return false;
+
+            });
+
+        });*@  
+
+        $(document).ready(function () {
+
+            var jsonObj = $('#form').serialize();
+
+            //validation rules
+            $("#form").validate({
+                rules: {
+                    "Name": {
+                        required: true
+                    },
+                    "Charges": {
+                        required: true,
+                        number: true
+                    },
+                    "PhoneNo": {
+                        required: true,
+                        number: true
+
+                    },
+                    "WardId": {
+                        required: true,
+                        number: true
+                    }
+                },
+                //perform an AJAX post to ajax.php
+                submitHandler: function () {
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Content("~/Doctor/AddDoctor")',
+                        data: $('#form').serialize(),
+                        success: function (data) {
+                            //alert(data.Message);
+                            $('#submit').hide();
+                            TriggerMsg(data.Message);
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert("Error: " + errorThrown + " , Please try again");
+
+                        }
+                    });
+                    return false;
+
+                }
+            });
+        });
+        function TriggerMsg(value) {
+            alert(value);
+            return false;
+        } 
+
+        
+
+        //$(document).ready(function () {
+            
+        //    $('#submit').click(function () {
+
+        //        var jsonObj = $('#form').serialize();
+
+        //        $.ajax({
+        //            type: "POST",
+        //            url: "../Doctor/AddDoctor",
+        //            data: $('#form').serialize(),
+        //            success: function (data) {
+        //                TriggerMsg(data.Message);
+
+        //            },
+        //            error: function () {
+        //                alert("Error!!!!");
+        //            }
+        //        });
+        //        return false;
+        //    });
+        //});
+
+        //function TriggerMsg(value) {
+        //    alert(value);
+        //    return false;
+        //}        
+
+
+    </script>
+}

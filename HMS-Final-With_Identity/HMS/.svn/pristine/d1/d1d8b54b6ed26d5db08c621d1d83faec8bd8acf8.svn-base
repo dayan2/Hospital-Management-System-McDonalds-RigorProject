@@ -1,0 +1,45 @@
+﻿using Mcd.HospitalManagementSystem.Data;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    class UserRegistration
+    {
+        private LP_HMSDbEntities db = new LP_HMSDbEntities();
+        public void AddNewUser(User user)
+        {
+            db.Users.Add(user);
+            db.SaveChanges();
+        }
+
+        public List<User> ViewAllUser()
+        {
+            List<User> objUserRole = db.Users.ToList();
+            return objUserRole;
+        }
+
+        public void EditUser(User user)
+        {
+            db.Entry(user).State = EntityState.Modified;
+            db.SaveChanges();
+        }
+
+        public User ViewUserById(int Id)
+        {
+            User user = db.Users.Find(Id);
+            return user;
+        }
+
+        public void DeleteUser(int Id)
+        {
+            User user = db.Users.Find(Id);
+            db.Users.Remove(user);
+            db.SaveChanges();
+        }
+    }
+}

@@ -1,0 +1,20 @@
+﻿using Mcd.HospitalManagementSystem.Data;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business.DTO
+{
+public class BedDTO
+    {
+        public int Id { get; set; }
+        public Nullable<int> WardId { get; set; }
+        public string BedTicketNo { get; set; }
+
+        public Ward Ward { get; set; }
+        
+    }
+}

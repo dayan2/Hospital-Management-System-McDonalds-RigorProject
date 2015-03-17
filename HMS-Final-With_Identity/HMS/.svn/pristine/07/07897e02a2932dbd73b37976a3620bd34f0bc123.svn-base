@@ -1,0 +1,51 @@
+﻿@model IEnumerable<Mcd.HospitalManagement.Web.Models.BedDetailsModel>
+
+<h2>Bed Details</h2>
+
+<div class="row">
+    <div class="col-xs-3">
+        <ol class="breadcrumb">
+            <li><a href="~/AdminHome/Index">Home</a></li>
+            @*<li><a href="#">Library</a></li>*@
+            <li class="active">Bed Details</li>
+        </ol>
+    </div>
+</div>
+<div class="col-xs-1">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation" class="active"><a href="~/Bed/Index">Beds</a></li>
+        <li role="presentation" style="width: 150px"><a href="~/Bed/Create">Add New Bed</a></li>
+    </ul>
+</div>
+<div class="col-xs-1"></div>
+<div class="col-xs-10">
+    <table class="table table-condensed">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.BedTicketNo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WardNo)
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr class="warning">
+                <td>
+                    @Html.DisplayFor(modelItem => item.BedTicketNo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WardNo)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                </td>
+            </tr>
+        }
+
+    </table>
+</div>

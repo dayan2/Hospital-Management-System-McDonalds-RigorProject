@@ -1,0 +1,100 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Mcd.HospitalManagementSystem.Data;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class PatientManager : IPatientManager
+    {
+        #region private Variable
+        private MainPatientDetails patient;
+        private PatientAdmissionDetails patientAdmission;
+        #endregion
+
+        public PatientManager()
+        {
+            patient = new MainPatientDetails();
+            patientAdmission = new PatientAdmissionDetails();
+
+        }
+
+        #region public method
+        public void InsertPatient(PatientDTO PatientDTO)
+        {
+            patient.InsertPatient(PatientDTO);
+        }
+
+
+
+        public PatientDTO ViewPatientDetails(int? PatientID)
+        {
+            return patient.ViewPatientDetails(PatientID);
+        }
+        public IEnumerable<PatientDTO> ViewAllPatientDetails()
+        {
+            return patient.ViewAllPatientDetails();
+        }
+        public void EditPatient(PatientDTO PatientDTO)
+        {
+            patient.EditPatient(PatientDTO);
+        }
+        public void Deletepatient(int? PatientId)
+        {
+            patient.Deletepatient(PatientId);
+        }
+        public IEnumerable<PatientDTO> fillPatients()
+        {
+            return patientAdmission.FillPatients();
+        }
+        public void InsertPatientAdmissionDetails(PatientAdmissionDTO PatientAdmissionDTO)
+        {
+            patientAdmission.InsertPatientAdmissionDetails(PatientAdmissionDTO);
+        }
+        public void EditPatientAdmissionDetails(AllPatientDTO PatientAdmissionDTO)
+        {
+            patientAdmission.EditPatientAdmissionDetails(PatientAdmissionDTO);
+        }
+
+        public PatientAdmissionDTO ViewPatientAdmissionDetails(int? PatientID)
+        {
+            return patientAdmission.ViewPatientAdmissionDetails(PatientID);
+        }
+        public IEnumerable<PatientAdmissionDTO> viewAllAdmissionPatientDetails()
+        {
+            return patientAdmission.ViewAllAdmissionPatientDetails();
+        }
+        public void DeletePatientAdmissionDetails(int? PatientId)
+        {
+            patientAdmission.DeletePatientAdmissionDetails(PatientId);
+        }
+
+        public AllPatientDTO ViewPatientRelatedData(int? patientId)
+        {
+            return patientAdmission.viewPatientRelatedData(patientId);
+        }
+        public IEnumerable<AllPatientDTO> ViewAllPatientAdmissionDetails()
+        {
+            return patientAdmission.ViewAllPatientAdmissionDetails();
+        }
+        public bool CheckPatientAdmissionAvilabilty(int? patientID)
+        {
+            return patientAdmission.CheckPatientAdmissionAvilabilty(patientID);
+        }
+        public bool CheckPatientAvilability(string nic)
+        {
+            return patient.CheckPatientAvilability(nic);
+        }
+        public void InsertPatientFeedBack(PatientFeedbackDTO patientFeedbackDTO)
+        {
+            patientAdmission.InsertPatientFeedBack(patientFeedbackDTO);
+        }
+        public bool CheckRelationshipBetweenPatientAndPatientDetails(int? patientId)
+        {
+            return patientAdmission.CheckRelationshipBetweenPatientAndPatientDetails(patientId);
+        }
+        #endregion
+    }
+}

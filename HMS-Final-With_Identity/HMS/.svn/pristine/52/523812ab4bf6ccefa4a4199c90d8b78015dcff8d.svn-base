@@ -1,0 +1,164 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientFeedbackModel
+
+@{
+    ViewBag.Title = "EditPatientFeedBack";
+}
+
+<h2>Edit Feedback</h2>
+<div class="row">
+    <div class="col-xs-3">
+        <ol class="breadcrumb">
+            @if ((string)Session["USERROLE"] == "Admin")
+            {
+                <li><a href="~/AdminHome/Index">Home</a></li>
+            }
+            else
+            {
+                <li><a href="~/HomePage/HomePageForClerk">Home</a></li>
+            }
+            <li class="active">Edit Feedback Deatails</li>
+        </ol>
+    </div>
+</div>
+<div class="col-xs-2">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation" class="active"><a href="~/PatientFeedback/Create">Add Feedback</a></li>
+        <li role="presentation"><a href="~/Patient/Index">View Patient</a></li>
+        <li role="presentation"><a href="~/PatientAdmissionDetails/Index">Patient Details</a></li>
+        <li role="presentation" ><a href="~/DoctorRecommendation/Index">Recomended Doctors</a></li>
+
+    </ul>
+</div>
+
+<div class="col-xs-10">
+    @using (Html.BeginForm("EditPatientFeedBack", "EditPatientFeedBack", FormMethod.Post, new { @id = "form" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            <h4>Edit Feedback Details</h4>
+            <hr />
+            @Html.ValidationSummary(true)
+            @Html.HiddenFor(model => model.Id)
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.PatientName, "Patient Name", new { @class = "control-label col-md-2", style = "width: 150px;" })
+                <div class="col-md-10">
+                    @Html.DisplayFor(model => model.PatientName, new { @class = "form-control", @name = "PatientName", style = "width: 200px;" })
+                    @Html.HiddenFor(model=>model.PatientName)
+                    @Html.HiddenFor(model=>model.PatientId)
+                    @Html.ValidationMessageFor(model => model.PatientName)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.DoctorName, "Doctor Name", new { @class = "control-label col-md-2", style = "width: 150px;" })
+                <div class="col-md-10">
+
+                    @Html.DisplayFor(model => model.DoctorName, new { @class = "btn-group-vertical", @name = "DoctorName", style = "width: 200px;" })
+                    @Html.HiddenFor(model=>model.DoctorName)
+                    @Html.HiddenFor(model=>model.DoctorId)
+                    @Html.ValidationMessageFor(model => model.DoctorName)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.FeedbackDescription, "Feedback Description", new { @class = "control-label col-md-2", style = "width: 150px;" })
+                <div class="col-md-10">
+                    @Html.TextAreaFor(model => model.FeedbackDescription, new { @class = "btn-group-vertical", @name = "FeedbackDescription", maxlength = 150, style = "width: 200px;height:200px;" })
+                    @Html.ValidationMessageFor(model => model.FeedbackDescription)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.FeedbackDate, "Feedback Date", new { @class = "control-label col-md-2", style = "width: 150px;" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.FeedbackDate, new { @class = "form-control", @name = "FeedbackDate", style = "width: 200px;" })
+                    @Html.ValidationMessageFor(model => model.FeedbackDate)
+                </div>
+            </div>
+
+
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Save" class="btn btn-primary" id="submit" />
+                    @if ((string)Session["USERROLE"] == "Admin")
+                    {
+                        <a href="~/AdminHome/Index" class="btn btn-primary">Cancel</a>
+                    }
+                    else
+                    {
+                        <a href="~/HomePage/HomePageForClerk" class="btn btn-primary">Cancel</a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+
+
+    $(document).ready(function () {
+        $('#FeedbackDate').datepicker({
+            maxDate: new Date,
+        });
+
+
+        var jsonObj = $('#form').serialize();
+
+        //validation rules
+        $("#form").validate({
+            rules: {
+                "PatientName": {
+                    required: true
+                },
+                "DoctorName": {
+                    required: true
+                },
+                "Ward Number": {
+                    required: true
+                },
+                "FeedbackDescription": {
+                    required: true
+                },
+                "FeedbackDate": {
+                    required: true
+                }
+            },
+            //perform an AJAX post to ajax.php
+            submitHandler: function () {
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("EditPatientFeedBack")',
+                    data: $('#form').serialize(),
+                    success: function (data) {
+                        //alert(data.Message);
+                        $('#submit').hide();
+                        TriggerMsg(data.Message);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Error: " + errorThrown + " , Please try again");
+
+                    }
+                });
+                return false;
+
+            }
+        });
+
+
+    });
+    function TriggerMsg(value) {
+        alert(value);
+        return false;
+    }
+
+    </script>
+}

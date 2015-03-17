@@ -1,0 +1,27 @@
+﻿#region Using Directives
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+#endregion
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public interface INurse
+    {
+        void InsertNurse(NurseDTO Nurse);
+
+        void EditNurse(NurseDTO Nurse);
+
+        void DeleteNurse(int NurseId);
+
+        IEnumerable<NurseDTO> ViewtNurse();
+
+        NurseDTO ViewtNurseById(int? NurseId);
+
+        //void Dispose(bool disposing);
+
+        bool CheckExistsNurse(int? NurseId);
+    }
+}

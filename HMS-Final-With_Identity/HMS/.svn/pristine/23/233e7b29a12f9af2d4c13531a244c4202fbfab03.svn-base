@@ -1,0 +1,45 @@
+﻿@model Mcd.HospitalManagement.Web.Models.NurseModel
+@{
+    ViewBag.Title = "Details";
+}
+<div class="row">
+    <h2>Details</h2>
+    <div class="row">
+        <div class="col-xs-3">
+            <ol class="breadcrumb">
+                <li><a href="~/AdminHome/Index">Home</a></li>
+                <li class="active">Nurse Details</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="col-xs-1">
+        <ul class="nav nav-pills" role="tablist">
+            <li role="presentation"><a href="~/Nurses/Create">Create Nurse</a></li>
+            <li role="presentation"><a href="~/Nurses/Index">View Nurse</a></li>
+            <li role="presentation"><a href="~/PatientMedicalTests/ViewPatientMedicalTest">View Patient Medical Test</a></li>
+        </ul>
+    </div>
+    <div class="col-xs-11">
+        <h4>Nurse</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.WardNo)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.WardNo)
+            </dd>
+        </dl>
+    </div>
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id })
+        <a href="~/AdminHome/Index" class="btn btn-primary">Exit</a>
+    </p>
+</div>

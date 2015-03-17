@@ -1,0 +1,212 @@
+﻿#region Using Directives
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitalManagement.Web.Models;
+using Mcd.HospitalManagement.Web.Enums;
+#endregion
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class MedicalTestTypeController : Controller
+    {
+        #region Private Fields
+        private IHMSMedicalTestType dbMedical;
+        string displayMessage = string.Empty;
+        #endregion
+
+        #region Constructor Method
+        public MedicalTestTypeController()
+        {
+            dbMedical = new HMSMedicalTestType();
+        }
+        #endregion
+
+        #region Public Method
+
+        // GET: MedicalTestType
+        public ActionResult Index()
+        {
+            if (Session["USERROLE"] == null)
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+
+                var medicalTestType = dbMedical.ViewtMedicalTestType();
+                IEnumerable<MedicalTestTypeModel> medical = from c in medicalTestType
+                                                            select new MedicalTestTypeModel
+                                              {
+                                                  Id = c.Id,
+                                                  Description = c.Description
+                                              };
+                return View(medical);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        // GET: Medical_Test_Type/Details/5
+        public ActionResult Details(int? id)
+        {
+            if (Session["USERROLE"] == null)
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                if (id == null)
+                {
+                    return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.BadRequest) });
+                }
+                MedicalTestTypeDTO medicalTestTypeDto = dbMedical.ViewtMedicalTestTypeById(id);
+                if (medicalTestTypeDto == null)
+                {
+                    return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.NotFound) });
+                }
+                Mcd.HospitalManagement.Web.Models.MedicalTestTypeModel medicalTestType = new Mcd.HospitalManagement.Web.Models.MedicalTestTypeModel { Id = medicalTestTypeDto.Id, Description = medicalTestTypeDto.Description };
+
+                return View(medicalTestType);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        // GET: Medical_Test_Type/Create
+        public ActionResult Create()
+        {
+            if (Session["USERROLE"] == null)
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        // POST: Medical_Test_Type/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include = "Description")] MedicalTestTypeModel medicalTestType)
+        {
+            MedicalTestTypeDTO MedicalTypeDto = new MedicalTestTypeDTO { Id = medicalTestType.Id, Description = medicalTestType.Description };
+            if (ModelState.IsValid)
+            {
+                if (dbMedical.InsertMedicalTestType(MedicalTypeDto))
+                    //return RedirectToAction("Index");
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationInsertedMsg);
+                else
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+                return Json(new { Message = displayMessage });
+            }
+
+            return View(medicalTestType);
+        }
+
+        // GET: Medical_Test_Type/Edit/5
+        public ActionResult Edit(int? id)
+        {
+            if (Session["USERROLE"] == null)
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                if (id == null)
+                {
+                    return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.BadRequest) });
+                }
+                MedicalTestTypeDTO medicalTestTypeDTO = dbMedical.ViewtMedicalTestTypeById(id);
+                if (medicalTestTypeDTO == null)
+                {
+                    return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.NotFound) });
+                }
+                MedicalTestTypeModel medicalType = new MedicalTestTypeModel { Id = medicalTestTypeDTO.Id, Description = medicalTestTypeDTO.Description };
+                return View(medicalType);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        // POST: Medical_Test_Type/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include = "Id,Description")] MedicalTestTypeModel medicalTestType)
+        {
+            MedicalTestTypeDTO medicalTypeDto = new MedicalTestTypeDTO { Id = medicalTestType.Id, Description = medicalTestType.Description };
+            if (ModelState.IsValid)
+            {
+                if (dbMedical.EditMedicalTestType(medicalTypeDto))
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationUpdatedMsg);
+                else
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+                return Json(new { Message = displayMessage });
+                //return RedirectToAction("Index");
+            }
+            return View(medicalTestType);
+        }
+
+        // GET: Medical_Test_Type/Delete/5
+        public ActionResult Delete(int? id)
+        {
+            if (Session["USERROLE"] == null)
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                if (id == null)
+                {
+                    return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.BadRequest) });
+                }
+                MedicalTestTypeDTO medicalTestTypeDto = dbMedical.ViewtMedicalTestTypeById(id);
+                if (medicalTestTypeDto == null)
+                {
+                    return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.NotFound) });
+                }
+                MedicalTestTypeModel medicalType = new MedicalTestTypeModel { Id = medicalTestTypeDto.Id, Description = medicalTestTypeDto.Description };
+                return View(medicalType);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        // POST: Medical_Test_Type/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            if (dbMedical.DeleteMedicalTestType(id))
+                displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationRemovedMsg);
+            else
+                displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+            return Json(new { Message = displayMessage });
+        }
+
+        #endregion
+    }
+}

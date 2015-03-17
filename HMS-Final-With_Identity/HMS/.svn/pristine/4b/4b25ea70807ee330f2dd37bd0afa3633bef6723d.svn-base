@@ -1,0 +1,336 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitalManagement.Web.Models;
+using AutoMapper;
+using Mcd.HospitalManagement.Web.Enums;
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class UserRoleController : BaseController
+    {
+        #region constants
+        const string ACCESS_DENIED ="AccessDenied";
+        const string ERROR = "Error";
+        #endregion 
+
+        #region Private Fields
+        private IUserManager usermanager;
+        #endregion
+
+        #region Constructor
+        public UserRoleController()
+            : base()
+        {
+            usermanager = new UserManager();
+        }
+        #endregion
+
+        #region Public Methods
+       /// <summary>
+       /// Returning to the view
+       /// </summary>
+       /// <returns>returns user roles data to the Index view</returns>
+        public ActionResult Index()
+        {
+            //Check an user already logged on or not return to error page if not logged in
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            //Check user role that already logged on have permissions to this function 
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                //Get all user role data
+                IEnumerable<UserRoleDTO> lstuserrole = usermanager.ViewtUserRole();
+
+                //Map user role dto objects in to user role model objects
+                Mapper.CreateMap<UserRoleDTO, UserRoleModel>();
+                var modelList = Mapper.Map<IEnumerable<UserRoleDTO>, IEnumerable<UserRoleModel>>(lstuserrole);
+
+                return View(modelList);
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+       /// <summary>
+       /// View specific user role data
+       /// </summary>
+       /// <param name="id">user role id</param>
+       /// <returns>returns user role data to details view</returns>
+        public ActionResult Details(int? id)
+        {
+            //Check an user already logged on or not return to error page if not logged in
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            } 
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            //Get specific user role data by user role id
+            UserRoleDTO userrole = usermanager.ViewtUserRoleById(id);
+
+            //Map user role dto objects in to user role model objects
+            UserRoleModel UserRole = new UserRoleModel()
+            {
+                Role = userrole.Role,
+            };
+
+            if (userrole == null)
+            {
+                return HttpNotFound();
+            }
+            return View(UserRole);
+        }
+
+        /// <summary>
+        /// Redirect to Create view
+        /// </summary>
+        /// <returns>User role model object</returns>
+        public ActionResult Create()
+        {
+            //Check an user already logged on or not return to error page if not logged in
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            //Check user role that already logged on have permissions to this function
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                return View();
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+          
+        }
+
+       /// <summary>
+       /// Add new user role data
+       /// </summary>
+       /// <param name="userrole">user role model object</param>
+       /// <returns>return data to index view</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include = "Id,Role")] UserRoleModel userrole)
+        {
+            //Check user role that already logged on have permissions to this function
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                //Map user role dto objects in to user role model objects
+                UserRoleDTO UserRole = new UserRoleDTO()
+                {
+                    Role = userrole.Role,
+                };
+
+                if (ModelState.IsValid)
+                {
+                    string displayMessage = string.Empty;
+                    //Insert user role details and check successfulness of the function and return json result
+                    if (!usermanager.InsertUserRole(UserRole))
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(UserErrorMessage.AlreadyExistUserRole);
+                        return Json(new { Message=displayMessage});
+                    }
+                    //Return json result if unsuccessfull 
+                    else
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationInsertedMsg);
+                        return Json(new { Message = displayMessage });
+                    }
+                }
+
+                return View(userrole);
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+
+        }
+
+        /// <summary>
+        /// Redirect to Edit view with specific data 
+        /// </summary>
+        /// <param name="id">User Role Id</param>
+        /// <returns>User Role model object</returns>
+        public ActionResult Edit(int? id)
+        {
+            //Check an user already logged on or not return to error page if not logged in
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            } 
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+
+            }
+            //Check user role that already logged on have permissions to this function
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                //select user role details by id
+                UserRoleDTO userrole = usermanager.SelectUserRoleById(id);
+
+                //Map user role dto objects in to user role model objects
+                UserRoleModel UserRole = new UserRoleModel()
+                {
+                    Role = userrole.Role,
+                };
+                if (UserRole == null)
+                {
+                    return HttpNotFound();
+                }
+                return View(UserRole);
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        /// <summary>
+        /// Save modified user role data to table
+        /// </summary>
+        /// <param name="usrmodel">user role model data</param>
+        /// <returns>returns modified data</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include = "Id,Role")] UserRoleModel usrmodel)
+        {
+            //Check user role that already logged on have permissions to this function
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                //Map user role dto objects in to user role model objects
+                UserRoleDTO usrroledto = new UserRoleDTO()
+                {
+                    Id = usrmodel.Id,
+                    Role = usrmodel.Role
+                };
+
+                if (ModelState.IsValid)
+                {
+                    string displayMessage = string.Empty;
+                    //Edit user role details and check successfulness of the function and return json result
+                    if (!usermanager.EditUserRole(usrroledto))
+                    {
+                        displayMessage  = CustomEnumMessage.GetStringValue(UserErrorMessage.AlreadyExistUserRole);
+                        return Json(new { Message=displayMessage});
+                    }
+                    //Return json result if unsuccessfull 
+                    else
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationUpdatedMsg);
+                        return Json(new { Message = displayMessage });
+                    }
+                }
+                return View(usrmodel);
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+
+            }
+        }
+
+        /// <summary>
+        /// Select specific user role data to delete
+        /// </summary>
+        /// <param name="id">User role id</param>
+        /// <returns>specific user role data</returns>
+        public ActionResult Delete(int? id)
+        {
+            //Check an user already logged on or not return to error page if not logged in
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            } 
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            //Check user role that already logged on have permissions to this function
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                //Select user role by user role id
+                UserRoleDTO userrole = usermanager.SelectUserRoleById(id);
+
+                //Map user role dto objects in to user role model objects
+                UserRoleModel usrRoleModel = new UserRoleModel()
+                {
+                    Id = userrole.Id,
+                    Role = userrole.Role
+
+                };
+
+                if (userrole == null)
+                {
+                    return HttpNotFound();
+                }
+                return View(usrRoleModel);
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+
+            }
+        }
+
+        /// <summary>
+        /// Delete specific user role on confirm
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            //Check user role that already logged on have permissions to this function
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                string displayMessage = string.Empty;
+
+                //Delete user role details and check successfulness of the function and return json result
+                if (!usermanager.DeleteUserRole(id))
+                {
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+                    return Json(new { Message = displayMessage });
+                }
+                //Return json result if unsuccessfull 
+                else
+                {
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationRemovedMsg);
+                    return Json(new { Message = displayMessage });
+                }
+            
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        #endregion
+
+    }
+}

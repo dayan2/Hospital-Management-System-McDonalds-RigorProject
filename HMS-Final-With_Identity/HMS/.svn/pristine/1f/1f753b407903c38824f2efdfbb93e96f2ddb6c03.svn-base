@@ -1,0 +1,98 @@
+﻿@model Mcd.HospitalManagement.Web.Models.WardModel
+
+<h3>Add New Ward</h3> 
+<div class="col-xs-1">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation"><a href="~/Ward/Index">Ward</a></li>
+        <li role="presentation" class="active" style="width: 150px"><a href="~/Ward/Create">Add New Ward</a></li>
+    </ul>
+</div>
+<div class="col-xs-10">
+
+    @using (Html.BeginForm("Create", "Ward", FormMethod.Post, new { @id = "form" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            <hr />
+            @Html.ValidationSummary(true)
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.WardNo, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.WardNo, new { @class = "form-control", @name = "WardNo" })
+                    @Html.ValidationMessageFor(model => model.WardNo)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.WardFee, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.WardFee, new { @class = "form-control", @name = "WardFee" })
+                    @Html.ValidationMessageFor(model => model.WardFee)
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" id="submit" value="Create" class="btn btn-primary" />
+                    <a href="~/AdminHome/Index" id="cancel" class="btn btn-primary">Cancel</a>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+    </div> 
+
+    @section Scripts {
+
+        <script type="text/javascript">
+
+            $(document).ready(function () {
+
+                var jsonObj = $('#form').serialize();
+
+
+                //validation rules
+                $("#form").validate({
+                    rules: {
+                        "WardNo": {
+                            required: true
+                        }
+                        , "WardFee": {
+                            required: true
+                        }
+                    },
+                    //perform an AJAX post to ajax.php
+                    submitHandler: function () {
+                        $.ajax({
+                            type: "POST",
+                            url: '@Url.Content("~/Ward/Create")',
+                            data: $('#form').serialize(),
+                            success: function (data) {
+                                $('#submit').hide();
+                                $("#cancel").html('Exit');
+                                TriggerMsg(data.Message);
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                alert("Error: " + errorThrown + " , Please try again");
+
+                            }
+                        });
+                        return false;
+
+                    }
+                });
+            });
+
+
+            function TriggerMsg(value) {
+                alert(value);
+                return false;
+            }
+
+        </script>
+    }

@@ -1,0 +1,61 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientMedicalTestModel
+
+@{
+    ViewBag.Title = "Create Patient Medical Test";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Create</title>
+</head>
+<body>
+    @using (Html.BeginForm()) 
+    {
+        @Html.AntiForgeryToken()
+        
+        <div class="form-horizontal">
+            <h4>PatientMedicalTest</h4>
+            <hr />
+            @Html.ValidationSummary(true)
+    
+            <div class="form-group">
+                @Html.LabelFor(model => model.MedicalTestId, "MedicalTestId", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownList("MedicalTestId", String.Empty)
+                    @Html.ValidationMessageFor(model => model.MedicalTestId)
+                    @Html.HiddenFor(m=>m.PatientDetailId)
+                </div>
+            </div>
+    
+            <div class="form-group">
+                @Html.LabelFor(model => model.NurseId, "NurseId", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownList("NurseId", String.Empty)
+                    @Html.ValidationMessageFor(model => model.NurseId)
+                </div>
+            </div>
+    
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Create" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+    }
+    
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+</body>
+</html>
+
+@*@Html.DisplayName("Nurse") <br />
+@Html.DropDownListFor(m => m.Id, (IEnumerable<SelectListItem>)ViewBag.NurseId, "--Select Nurse--", new { @class = "btn-group-vertical", style = "width: 200px;", @id = "dropDownNurse" })
+@Html.ValidationMessageFor(model => model.NurseId)
+<br />
+@Html.DisplayName("Medical Test") <br />
+@Html.DropDownListFor(m => m.Id, (IEnumerable<SelectListItem>)ViewBag.MedicalTestId, "--Select MedicalTest--", new { @class = "btn-group-vertical", style = "width: 200px;", @id = "dropDownMedical" })
+@Html.ValidationMessageFor(model => model.MedicalTestId)*@

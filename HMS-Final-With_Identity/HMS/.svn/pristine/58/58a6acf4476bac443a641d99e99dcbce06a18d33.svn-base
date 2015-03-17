@@ -1,0 +1,109 @@
+﻿@model IEnumerable<Mcd.HospitalManagement.Web.Models.PatientDoctorModel>
+@{
+    ViewBag.Title = "FrontPage";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    <link href="~/Content/Style.css" rel="stylesheet" />
+}
+
+<h1>Home</h1>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-1">
+            <ul class="nav nav-pills" role="tablist">
+                <li role="presentation" class="active"><a href="~/Doctor/FrontPage">Home</a></li>
+                <li role="presentation"><a href="~/Doctor/Details/1">Profile</a></li>
+                <li role="presentation"><a href="~/Doctor/RecommendDoctors">Recommended Doctors</a></li>
+            </ul>
+        </div>
+        <div class="col-xs-1"></div>
+        <div class="col-xs-10">
+            <table class="table table-condensed">
+
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Id)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Gender)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.AdmitDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Bed)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Ward)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.IsDischarged)
+                    </th>
+                    <th></th>
+                </tr>
+
+                @foreach (var item in Model)
+                {
+                    <tr class="warning">
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Gender)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AdmitDate)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Bed)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Ward)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.IsDischarged)
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                    Action <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="#">Patient Profile</a></li>
+                                    <li><a href="~/Doctor/TransferDoctor/@item.Id">Transfer To Another Doctor</a></li>                                    
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                }
+
+            </table>
+            <nav class="formSelect">
+                <ul class="pagination">
+                    <li>
+                        <a href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li><a href="#">1</a></li>
+                    <li><a href="#">2</a></li>
+                    @*<li><a href="#">3</a></li>
+                        <li><a href="#">4</a></li>
+                        <li><a href="#">5</a></li>*@
+                    <li>
+                        <a href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+

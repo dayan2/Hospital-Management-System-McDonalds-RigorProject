@@ -1,0 +1,81 @@
+﻿@model IEnumerable<Mcd.HospitalManagement.Web.Models.PatientMedicalTestModel>
+
+@{
+    ViewBag.Title = "ViewPatientMedicalTest";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>View Patient Medical Test</h2>
+<div class="row">
+    <div class="col-xs-3">
+        <ol class="breadcrumb">
+            @if ((string)Session["USERROLE"] == "Admin")
+            {
+                <li><a href="~/AdminHome/Index">Home</a></li>
+            }
+            else
+            {
+                <li><a href="~/HomePage/HomePageForClerk">Home</a></li>
+            }
+
+            <li class="active">View Patient Medical Test</li>
+        </ol>
+    </div>
+</div>
+<div class="col-xs-2">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation" class="active"><a href="~/PatientMedicalTests/ViewPatientMedicalTest">View Patient Medical Test</a></li>
+        <li role="presentation"><a href="~/PatientMedicalTests/Index">Search Patient Medical Test Details</a></li>
+    </ul>
+</div>
+
+@if (ViewBag.Result == "No records")
+{
+    <p>@ViewBag.Result</p>
+}
+else
+{
+    <div class="col-xs-8">
+        <table class="table">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.PatientName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.MedicalTestDescription)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.NurseName)
+                </th>
+
+
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr class="warning">
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PatientName)
+                        @Html.HiddenFor(modelItem => item.MedicalTestId)
+                        @Html.HiddenFor(modelItem => item.PatientDetailId)
+                        @Html.HiddenFor(modelItem => item.NurseId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MedicalTestDescription)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.NurseName)
+                    </td>
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                        @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                    </td>
+                </tr>
+            }
+
+        </table>
+    </div>
+    <div class="col-xs-2"></div>
+}

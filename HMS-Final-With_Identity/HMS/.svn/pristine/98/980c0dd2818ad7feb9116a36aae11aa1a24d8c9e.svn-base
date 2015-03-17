@@ -1,0 +1,265 @@
+﻿@model IEnumerable<Mcd.HospitalManagement.Web.Models.DoctorDetailModel>
+@{
+    ViewBag.Title = "RecommendDoctors";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+    <link href="~/Content/Style.css" rel="stylesheet" />
+    int userId = (int)Session["USERID"];
+}
+<input type="hidden" name="" />
+@*<div class="container-fluid">*@
+
+<div class="row">
+    <div class="col-xs-7">
+        <h2>Recommend Doctors</h2>
+    </div>
+    <div class="col-xs-1" id="txtTempo">
+        Filter:
+    </div>
+
+    @*<form action="~/Doctor/RenderDoctorGrid">*@
+    <div class="col-xs-3">
+
+        <select id="filterDropdown" class="form-control formSelect">
+            <option value="0">All</option>
+            <option value="1">Dentists‎</option>
+            <option value="2">Physicians‎ </option>
+            <option value="3">Surgeons‎</option>
+            <option value="4">Radiologists‎</option>
+            <option value="5">Neurologists‎‎</option>
+            <option value="6">Neurosurgeons‎</option>
+        </select>
+
+        @*@Html.EditorFor(model => model.RecomendedDoctorId)
+            @Html.ValidationMessageFor(model => model.RecomendedDoctorId)*@
+        @*<div id="tempo">
+                @Html.DropDownList("filter", (IEnumerable<SelectListItem>)ViewBag.doctorViewbag, new { @id = "filterDropdown" })
+            </div>*@
+        @*@Html.DropDownListFor(model => model.RecomendedDoctorId, (IEnumerable<SelectListItem>)ViewBag.doctorViewbag, new { @class = "btn-group-vertical" })*@
+
+
+    </div>
+    @*<div class="col-xs-1">
+            <div id="tempo">
+                <button class="btn btn-info" id="btnSearch">Search</button>
+            </div>
+        </div>*@
+    @*</form>*@
+
+</div>
+
+<div class="row">
+    <div class="col-xs-3">
+        <ol class="breadcrumb">
+            <li><a href="~/Doctor/HomePage">Home</a></li>
+            @*<li><a href="#">Library</a></li>*@
+            <li class="active">Recommended Doctors</li>
+        </ol>
+    </div>
+</div>
+
+<div class="col-xs-1">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation"><a href="~/Doctor/HomePage">Home</a></li>
+        <li role="presentation"><a href="~/Doctor/Index">My Patients</a></li>
+        <li role="presentation"><a href="~/Doctor/Details/@userId">Profile</a></li>
+        <li role="presentation" class="active"><a href="~/Doctor/RecommendDoctors">Recommended Doctors</a></li>
+    </ul>
+</div>
+<div class="col-xs-1"></div>
+<div class="col-xs-10">
+    @*<table class="table table-condensed" id="niv">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.DoctorSpecialityField)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PhoneNo)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.WardId)
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr class="warning">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DoctorSpecialityField)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PhoneNo)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WardId)
+                    </td>
+
+
+
+                </tr>
+            }
+
+        </table>*@
+    <div id="tableHere">
+        @{Html.RenderPartial("DoctorDetails", Model);}
+
+    </div>
+    @*<nav class="formSelect">
+            <ul class="pagination">
+                <li>
+                    <a href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li><a href="#">1</a></li>
+                <li><a href="#">2</a></li>
+                <li><a href="#">3</a></li>
+                    <li><a href="#">4</a></li>
+                    <li><a href="#">5</a></li>
+                <li>
+                    <a href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>*@
+</div>
+@*</div>*@
+
+@section scripts{
+    <script type="text/javascript">
+
+        //(function () {
+
+        //    function LoadTable() {
+        //        $('#tableHere').empty()
+        //        //Creating A new table
+        //        var table = $('<table></table>').addClass("CSSTableGenerator");
+        //        var row = $('<tr></tr>').html('<td>' + "ID" + '</td>' +
+        //                                        '<td>' + "Doctor's Name" + '</td>' +
+        //                                        '<td>' + "Specialized Fields" + '</td>' +
+        //                                        '<td>' + "Phone Number" + '</td>' +
+        //                                        '<td>' + "Ward" + '</td>');
+        //        table.append(row);//Adding the header row
+
+        //        var value = $('#specialityfield').val();//Grabbing the value from the DropDownMenu
+        //        var path = null;
+
+        //        //Selecting the Json Method according to the DropDownMenu option
+        //        if (value == 0)
+        //            path = "getJsonAllDoctors";
+        //        if (value == 1)
+        //            path = "getJsonDentists";
+        //        if (value == 2)
+        //            path = "getJsonPhysicians";
+        //        if (value == 3)
+        //            path = "getJsonSurgeons";
+        //        if (value == 4)
+        //            path = "getJsonRadiologists";
+        //        if (value == 5)
+        //            path = "getJsonNeurologists";
+        //        if (value == 6)
+        //            path = "getJsonNeurosurgeons";
+
+        //        //looping through the Json file
+        //        $.getJSON("/Doctor/" + path, null, function (result) {
+        //            $.each(result, function (i, field) {
+
+        //                //creating rows to each item in the Json
+        //                var row1 = $('<tr></tr>')
+        //                    .html('<td>' + field.Id + '</td>'
+        //                            + '<td>' + field.Name + '</td>' +
+        //                            '<td>' + field.DoctorSpecialityField + '</td>' +
+        //                            '<td>' + field.PhoneNo + '</td>' +
+        //                            '<td>' + field.WardId + '</td>');
+
+
+        //                table.append(row1);//Adding each row to the table
+        //                $('#tableHere').append(table);//appending to the Div class
+        //            });
+        //            $("#tableHere").fadeIn(1000);
+        //        });
+
+        //    }
+
+        //    $(document).ready(function () {
+        //        LoadTable();//calling the method
+
+        //    });
+
+        //    //listening to the DropDownMenu changes
+        //    $('#specialityfield').change(function () {
+        //        $("#tableHere").fadeOut(1);
+        //        LoadTable();//calling the method
+
+        //    });
+
+        //}());
+
+
+
+        //listening to the DropDownMenu changes
+        //$('#specialityfield').change(function () {
+        //    //$("#tableHere").fadeOut(1);
+        //    //LoadTable();//calling the method
+        //    var filter = $('#specialityfield').val();//Grabbing the value from the DropDownMenu
+        //    ////alert("hello");
+        //    $.ajax({
+        //        type: "POST",
+        //        url: "/Doctor/RenderDoctorGrid",
+        //        data: filter,
+        //        success: function () {
+        //            alert(filter + "Done");
+        //        },
+        //        //contentType: "application/json",
+        //        //dataType: 'json',
+        //        error: function () {
+        //            alert("Error!!!");
+        //        }
+
+        //    });
+
+        //    //$.post("/Doctor/RenderDoctorGrid", $("#doctors").serialize())
+        //    //   .done(function (data) {
+        //    //       $("#data1").html(data);
+        //    //   });
+        //    //return false;
+        //});
+
+
+        //$('#specialityfield').change(function () {
+        //LoadTable();//calling the method
+        //var filter = $('#specialityfield').val();//Grabbing the value from the DropDownMenu
+        ////alert("hello");
+        //var filter = $('#specialityfield').val();
+        ////alert('out '+ filter);
+        //$.ajax({
+        //    type: "GET",
+        //    url: "../Doctor/RenderDoctorGrid.cshtml",
+        //    data: filter,
+        //    success: function (data) {
+        //        alert( " Done");
+        //    },
+        //    error: function () {
+        //        alert("Error!!!");
+        //    }
+
+        //});
+
+        //    var value = $('#specialityfield').val();
+        //    $.post("/Doctor/RenderDoctorGrid", { filter: value }, function () {
+        //        //alert(data);
+        //    });
+        //});
+
+
+
+    </script>
+}

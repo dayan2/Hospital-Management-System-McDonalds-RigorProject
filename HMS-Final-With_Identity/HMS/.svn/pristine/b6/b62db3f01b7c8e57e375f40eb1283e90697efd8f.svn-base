@@ -1,0 +1,194 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitaManagementSystem.Business.DTO;
+using Mcd.HospitalManagement.Web.Models;
+using AutoMapper;
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class UserController : Controller
+    {
+        private IUserManager usermanager;
+        public UserController()
+        {
+            usermanager = new UserManager();
+        }
+
+        private LP_HMSDbEntities db = new LP_HMSDbEntities();
+     
+        // GET: /User/
+        public ActionResult Index()
+        {
+
+            IEnumerable<UserDTO> user=usermanager.ViewtAllUser();
+
+            Mapper.CreateMap<UserDTO, UserModel>();
+            var modelList = Mapper.Map<IEnumerable<UserDTO>, IEnumerable<UserModel>>(user);
+
+            //var users = db.Users.Include(u => new User() { });
+            return View(modelList.ToList());
+        }
+
+        // GET: /User/Details/5
+        public ActionResult Details(int id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            UserDTO userdto = usermanager.ViewtUserById(id);
+
+            UserModel usermodel = new UserModel()
+            {
+                Id = userdto.Id,
+                UserName = userdto.UserName,
+                Password = userdto.Password,
+                UserRoleId = userdto.UserRoleId
+            };
+
+            if (usermodel == null)
+            {
+                return HttpNotFound();
+            }
+            return View(usermodel);
+        }
+
+        // GET: /User/Create
+        public ActionResult Create()
+        {
+            ViewBag.UserRoleId = new SelectList(db.UserRoles, "Id", "Role");
+            return View();
+        }
+
+        // POST: /User/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include = "Id,UserName,Password,UserRoleId")] UserModel usermodel)
+        {
+            UserDTO userdto = new UserDTO()
+            {
+                Id = usermodel.Id,
+                UserName = usermodel.UserName,
+                Password = usermodel.Password,
+                UserRoleId = usermodel.UserRoleId
+
+            };
+
+            if (ModelState.IsValid)
+            {
+                usermanager.InsertUser(userdto);
+                return RedirectToAction("Index");
+            }
+
+            ViewBag.UserRoleId = new SelectList(db.UserRoles, "Id", "Role", usermodel.UserRoleId);
+            return View(usermodel);
+        }
+
+        // GET: /User/Edit/5
+        public ActionResult Edit(int id)
+        {
+            usermanager = new UserManager();
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            UserDTO userdto=  usermanager.ViewtUserById(id);
+
+            UserModel usermodel = new UserModel()
+            {
+                Id = userdto.Id,
+                UserName = userdto.UserName,
+                Password = userdto.Password,
+                UserRoleId = userdto.UserRoleId
+            };
+
+            if (usermodel == null)
+            {
+                return HttpNotFound();
+            }
+            ViewBag.UserRoleId = new SelectList(db.UserRoles, "Id", "Role", usermodel.UserRoleId);
+            return View(usermodel);
+        }
+
+        // POST: /User/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include="Id,UserName,Password,UserRoleId")] UserModel user)
+        {
+            UserDTO userdto = new UserDTO()
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Password = user.Password,
+                UserRoleId = user.UserRoleId
+            };
+
+            if (ModelState.IsValid)
+            {
+                usermanager.EditUser(userdto);
+                return RedirectToAction("Index");
+            }
+            ViewBag.UserRoleId = new SelectList(db.UserRoles, "Id", "Role", user.UserRoleId);
+            return View(user);
+        }
+
+        // GET: /User/Delete/5
+        public ActionResult Delete(int id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            UserDTO userdto = usermanager.ViewtUserById(id);
+
+            UserModel usermodel = new UserModel()
+            {
+                Id = userdto.Id,
+                UserName = userdto.UserName,
+                Password = userdto.Password,
+                UserRoleId = userdto.UserRoleId
+            };
+
+            if (usermodel == null)
+            {
+                return HttpNotFound();
+            }
+            return View(usermodel);
+        }
+
+        // POST: /User/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+           
+            usermanager = new UserManager();
+
+            usermanager.DeleteUser(id);
+            return RedirectToAction("Index");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+    }
+}

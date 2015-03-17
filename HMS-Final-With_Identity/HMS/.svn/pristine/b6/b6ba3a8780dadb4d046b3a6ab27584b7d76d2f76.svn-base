@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Web;
+
+namespace Mcd.HospitalManagement.Web.Models
+{
+    public class DoctorRecommendationModel
+    {
+        [Required]
+        [Display(Name = "Recomended Doctor ID")]
+        public int Id { get; set; }
+
+        [Required(ErrorMessage = "Patient ID Reqiured")]
+        public int PatientId { get; set; }
+
+        [Required(ErrorMessage = "Recomended Doctor ID Reqiured")]
+        [Display(Name = "Recomended Doctor Id")]
+        public int? RecomendedDoctorId { get; set; }
+
+        [Required(ErrorMessage = "Current Doctor ID Reqiured")]
+        [Display(Name = "Current Doctor ID")]
+        public int? CurrentDoctorId { get; set; }
+
+        [Required(ErrorMessage = "Reason Reqiured")]
+        public string Reason { get; set; }
+        //public IEnumerable<DoctorModel> doctorModelList { get; set; }
+    }
+}

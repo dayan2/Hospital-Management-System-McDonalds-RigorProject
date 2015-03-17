@@ -1,0 +1,19 @@
+﻿using Mcd.HospitalManagementSystem.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class UserLogin
+    {
+        private LP_HMSDbEntities db = new LP_HMSDbEntities();
+        public User CheckAuthentication(String username, String password)
+        {
+            var checkeduser = await db.Users.FindAsync(username, password);
+            return checkeduser;
+        }
+    }
+}

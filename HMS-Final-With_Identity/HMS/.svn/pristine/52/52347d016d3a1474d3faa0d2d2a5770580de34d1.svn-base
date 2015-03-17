@@ -1,0 +1,14 @@
+﻿@model Mcd.HospitalManagement.Web.Models.InvoiceDetailsModel
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+@if (true) {
+    ViewBag.Message = "This option is not available";
+}
+else { 
+
+}
+}

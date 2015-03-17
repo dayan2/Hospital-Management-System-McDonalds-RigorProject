@@ -1,0 +1,24 @@
+﻿#region Using Directives
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+#endregion
+namespace Mcd.HospitaManagementSystem.Business
+{
+   public interface IWards
+   {
+       #region Ward Manager Function
+       bool InsertWard(WardDTO ward);
+
+       bool EditWard(WardDTO ward);
+
+       bool DeleteWard(int wardId);
+
+       IEnumerable<WardDTO> ViewWardDetails();
+
+       WardDTO ViewWardById(int? wardId);
+       #endregion
+   }
+}

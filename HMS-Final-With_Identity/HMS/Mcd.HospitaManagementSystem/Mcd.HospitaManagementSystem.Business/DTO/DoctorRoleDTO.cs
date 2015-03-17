@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class DoctorRoleDTO
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int DoctorSpecialityId { get; set; }
+        public decimal? Charges { get; set; }
+        public string PhoneNo { get; set; }
+        public int WardId { get; set; }
+        public int UserId { get; set; }
+        public string SpecializeArea { get; set; }
+
+		
+
+        //public DoctorSpecialityDTO DoctorSpeciality { get; set; }
+        //public UserDTO User { get; set; }
+        //public WardDTO Ward { get; set; }
+        //public ICollection<DoctorRecommendationDTO> DoctorRecomendations { get; set; }
+        //public ICollection<DoctorRecomendation> DoctorRecomendations1 { get; set; }
+        //public ICollection<PatientDetail> PatientDetails { get; set; }
+        //public ICollection<PatientFeedbackDTO> PatientFeedbacks { get; set; }
+    }
+}

@@ -1,0 +1,21 @@
+﻿@model Mcd.HospitalManagement.Web.Models.UserRoleModel
+
+<h3>User Role Details</h3> 
+
+
+<div>
+	<hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Role)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Role)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Back to List", "Index")
+</p>

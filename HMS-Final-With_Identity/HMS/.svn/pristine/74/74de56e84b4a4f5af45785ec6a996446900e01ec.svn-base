@@ -1,0 +1,199 @@
+﻿using Mcd.HospitalManagementSystem.Data;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class DoctorDetails
+    {
+        private LP_HMSDbEntities context;
+        public DoctorDetails()
+        {
+            this.context = new LP_HMSDbEntities();
+        }
+        public DoctorDetails(LP_HMSDbEntities context)
+        {
+            this.context = context;
+        }
+        public IEnumerable<DoctorRoleDTO> GetDoctors()
+        {
+            try
+            {
+                var doctorList = context.Doctors.ToList();
+                IEnumerable<DoctorRoleDTO> DTOlist = from c in doctorList
+                                                     select new DoctorRoleDTO
+                                                     {
+                                                         Id = c.Id,
+                                                         Name = c.Name,
+                                                         DoctorSpecialityId = c.DoctorSpecialityId,
+                                                         PhoneNo = c.PhoneNo,
+                                                         WardId = c.WardId,
+                                                         Charges = c.Charges
+                                                     };
+                //IList<DoctorRoleDTO> DTOlist = entityObjectsList.Select(d=>return new DoctorRoleDTO{
+                //Id=d.
+                //};
+                return DTOlist;
+            }
+            catch(Exception e)
+            {
+                throw new Exception("Failed To Retrieve Doctors From The Context", e);
+            }
+
+
+        }
+        public DoctorRoleDTO GetDoctorsById(int id)
+        {
+            try
+            {
+                var doctor = context.Doctors.Find(id);
+
+                DoctorRoleDTO dto = new DoctorRoleDTO
+                {
+                    Id = doctor.Id,
+                    Name = doctor.Name,
+                    Charges = doctor.Charges,
+                    DoctorSpecialityId = doctor.DoctorSpecialityId,
+                    PhoneNo = doctor.PhoneNo,
+                    WardId = doctor.WardId
+                };
+                return dto;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Failed To Retrieve Doctors By Id Parameters", e);
+            }
+
+        }
+        public void AddDoctor(DoctorRoleDTO doctor)
+        {
+            try
+            {
+                Doctor doctorObj = new Doctor
+                {
+                    Id = doctor.Id,
+                    Name = doctor.Name,
+                    DoctorSpecialityId = doctor.DoctorSpecialityId,
+                    Charges = doctor.Charges,
+                    PhoneNo = doctor.PhoneNo,
+                    WardId = doctor.WardId,
+                    UserId = 6
+                };
+                context.Doctors.Add(doctorObj);
+                context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Failed To Add Doctor element", e);
+            }
+
+        }
+
+        public void RemoveDoctor(int id)
+        {
+            try
+            {
+                var doctor = context.Doctors.Find(id);
+                //if (doctor != null)
+                //{
+                context.Doctors.Remove(doctor);
+                context.SaveChanges();
+                //}
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Failed To Remove Doctor element", e);
+            }
+
+        }
+
+        public void UpdateDoctor(DoctorRoleDTO doctor)
+        {
+            try
+            {
+                Doctor doctorObj = new Doctor
+                {
+                    Id = doctor.Id,
+                    Name = doctor.Name,
+                    DoctorSpecialityId = doctor.DoctorSpecialityId,
+                    Charges = doctor.Charges,
+                    PhoneNo = doctor.PhoneNo,
+                    WardId = doctor.WardId,
+                    UserId = 6
+                };
+                context.Entry(doctorObj).State = EntityState.Modified;
+                context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Failed To Update Doctor element", e);
+            }
+
+        }
+        public void TransferDoctor(DoctorRecommendationDTO doctor)
+        {
+            try
+            {
+                DoctorRecomendation doctorObj = new DoctorRecomendation
+                {
+                    Id = doctor.Id,
+                    Reason = doctor.Reason,
+                    CurrentDoctorId = doctor.CurrentDoctorId,
+                    RecomendedDoctorId = doctor.RecomendedDoctorId
+                };
+                context.DoctorRecomendations.Add(doctorObj);
+                context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Failed To Transfer Patient", e);
+            }
+        }
+
+        public IEnumerable<DoctorSpecialityDTO> GetAllDoctorSpecialityTypes()
+        {
+            try
+            {
+                var doctorList = context.DoctorSpecialities.ToList();
+                IEnumerable<DoctorSpecialityDTO> DTOlist = from c in doctorList
+                                                           select new DoctorSpecialityDTO
+                                                     {
+                                                         DoctorSpecialityId = c.DoctorSpecialityId,
+                                                         SpecializeArea = c.SpecializeArea
+                                                     };
+                return DTOlist;
+
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Failed To Get Doctor Details", e);
+            }
+        }
+        public IEnumerable<DoctorRoleDTO> GetDoctorsBySpecialityId(int id)
+        {
+            try
+            {
+                var doctorList = context.Doctors.Where(e => e.DoctorSpecialityId == id);
+                IEnumerable<DoctorRoleDTO> doctorDTOlist = from c in doctorList
+                                                     select new DoctorRoleDTO
+                                                     {
+                                                         Id = c.Id,
+                                                         Name = c.Name,
+                                                         DoctorSpecialityId = c.DoctorSpecialityId,
+                                                         PhoneNo = c.PhoneNo,
+                                                         WardId = c.WardId,
+                                                         Charges = c.Charges
+                                                     };
+                return doctorDTOlist;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Failed To Get Doctor Details", e);
+            }
+        }
+    }
+}

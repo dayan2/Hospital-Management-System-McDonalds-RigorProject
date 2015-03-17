@@ -1,0 +1,28 @@
+﻿@model IEnumerable<Mcd.HospitalManagement.Web.Models.PatientFeedbackModel>
+
+<div class="col-xs-10">
+        <div class="form-horizontal">
+            <hr />
+           @* @Html.ValidationSummary(true)*@
+
+            <div class="form-group">
+
+                <div id="DoctorSection" class="col-md-10">
+                    <select id="DoctorDrp">
+                        @Html.Label("Doctor Name", new { @class = "control-label col-md-2" })
+                        @foreach (var item in Model)
+                        {
+                            <option value=@item.DoctorId> @item.DoctorName</option>
+
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="InsertFeedBack" class="btn btn-info" id="btnSubmit" />
+                </div>
+            </div>
+        </div>
+</div>
+

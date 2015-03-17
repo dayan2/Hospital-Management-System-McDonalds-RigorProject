@@ -1,0 +1,78 @@
+﻿@model IEnumerable<Mcd.HospitalManagement.Web.Models.PatientAdmissionDetailsModel>
+
+
+@{
+    ViewBag.Title = "Index";
+}
+
+
+<h2>View Patient Admission Details Model</h2>
+   <br />
+<div class="col-xs-2">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation"><a href="~/PatientAdmissionDetails/CreatePatientAdmission">Admission</a></li>
+        <li role="presentation" class="active"><a href="~/Patient/Index">View Patient</a></li>
+        <li role="presentation"><a href="~/PatientFeedback/Index">FeedBack Details</a></li>
+
+      
+
+    </ul>
+</div>
+
+<div class="col-xs-10">
+
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayName("Admit Date")
+            </th>
+            <th>
+                @Html.DisplayName("Discharged Status")
+            </th>
+            <th>
+                @Html.DisplayName("BedTicket No")
+            </th>
+            <th>
+                @Html.DisplayName("Doctor Name")
+            </th>
+            <th>
+                @Html.DisplayName("Patient Name")
+            </th>
+            <th>
+                @Html.DisplayName("Ward No")
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr class="warning">
+                <td>
+                    @Html.DisplayFor(modelItem => item.AdmitDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsDischarged)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BedTicketNo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DoctorName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WardNo)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "EditPatientAdmission", new { id = item.PatientDetailId }) |
+                    @Html.ActionLink("Details", "DetailsPatientAdmission", new { id = item.PatientDetailId }) |
+                    @Html.ActionLink("Delete", "DeletePatientAdmission", new { id = item.PatientDetailId })
+                </td>
+            </tr>
+        }
+
+    </table>
+
+</div>

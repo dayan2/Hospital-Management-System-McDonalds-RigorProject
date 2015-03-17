@@ -1,0 +1,36 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Mcd.HospitaManagementSystem.Business.DTO;
+using Mcd.HospitalManagementSystem.Data;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+  public  interface IPatientManager
+    {
+      void InsertPatient(PatientDTO PatientDTO);
+      void EditPatient(PatientDTO PatientDTO);
+      PatientDTO ViewPatientDetails(int? PatientID);
+      IEnumerable<PatientDTO> ViewAllPatientDetails();
+      void Deletepatient(int? PatientId);
+      IEnumerable<PatientDTO> FillPatients();
+     // void InsertPatientAdmissionDetails(PatientAdmissionDTO PatientAdmissionDTO);
+
+
+
+
+
+
+
+
+      IEnumerable<PatientAdmissionDTO> ViewAllAdmissionPatientDetails();
+
+      void InsertPatientAdmissionDetails(PatientAdmissionDTO patientAdmissionDTO);
+
+      PatientAdmissionDTO ViewPatientAdmissionDetails(int? id);
+
+      void EditPatientAdmissionDetails(PatientAdmissionDTO patientAdmissionDTO);
+    }
+}

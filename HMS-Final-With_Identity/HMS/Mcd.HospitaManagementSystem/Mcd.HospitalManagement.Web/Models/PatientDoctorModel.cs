@@ -1,0 +1,47 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Web;
+
+namespace Mcd.HospitalManagement.Web.Models
+{
+    public class PatientDoctorModel
+    {
+        //[Required]
+        //public int Id { get; set; }
+        //[Required]
+        //[Display(Name = "Name")]
+        //public string Name { get; set; }
+        //[Required]
+        //[Display(Name = "Gender")]
+        //public string Gender { get; set; }
+        //[Required]
+        //[Display(Name = "Admitted Date")]
+        //public string AdmitDate { get; set; }
+        //[Required]
+        //[Display(Name = "IsDischarged")]
+        //public int IsDischarged { get; set; }
+        //[Required]
+        //public int Bed { get; set; }
+        //[Required]
+        //public int Ward { get; set; }
+
+        [Required]
+        public int Id { get; set; }
+        [Required]
+        public string Name { get; set; }
+        [Required]
+        public string Gender { get; set; }
+        [Required]
+        [Display(Name = "Admitted Date")]
+        public DateTime? AdmitDate { get; set; }
+        [Required]
+        [Display(Name = "IsDischarged")]
+        public bool? IsDischarged { get; set; }
+        [Required]
+        public int? Bed { get; set; }
+        [Required]
+        public int? Ward { get; set; }
+    }
+}

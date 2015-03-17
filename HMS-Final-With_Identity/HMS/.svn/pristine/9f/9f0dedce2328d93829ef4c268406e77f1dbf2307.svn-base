@@ -1,0 +1,157 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientAdmissionDetailsModel
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+<div class="col-xs-2">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation"><a href="~/PatientAdmissionDetails/CreatePatientAdmission">Admission</a></li>
+        <li role="presentation"><a href="~/Patient/Index">View Patient</a></li>
+        <li role="presentation"><a href="~/PatientFeedback/Index">FeedBack Details</a></li>
+        <li role="presentation" class="active"><a href="~/DoctorRecommendation/Index">Recomended Doctors</a></li>
+
+    </ul>
+</div>
+
+<div class="col-xs-10">
+    @using (Html.BeginForm("EditPatientAdmission", "EditPatientAdmission", FormMethod.Post, new { @id = "form" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            <h4>Patient_Detail</h4>
+            <hr />
+            @Html.ValidationSummary(true)
+            @Html.HiddenFor(model => model.PatientDetailId)
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.AdmitDate, "Admit Date", new { @class = "control-label col-md-2", style = "width: 150px;" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.AdmitDate, new { @class = "form-control", @name = "AdmitDate", @id = "AdmitDate" })
+                    @Html.ValidationMessageFor(model => model.AdmitDate)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.BedId, "Bed Name", new { @class = "control-label col-md-2", style = "width: 150px;" })
+                <div class="col-md-10">
+
+                    @Html.DropDownListFor(model => model.BedId, (IEnumerable<SelectListItem>)ViewBag.BedId, new { @class = "btn-group-vertical", @name = "Bed Number", @id = "BedTicketNo" })
+                    @Html.ValidationMessageFor(model => model.BedId)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.WardId, "Ward Name", new { @class = "control-label col-md-2", style = "width: 150px;" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.WardId, (IEnumerable<SelectListItem>)ViewBag.WardId, new { @class = "btn-group-vertical", @name = "Ward Number",@id= "WardNo"})
+                    @Html.ValidationMessageFor(model => model.WardId)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.DoctorId, "Doctor Name", new { @class = "control-label col-md-2", style = "width: 150px;" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.DoctorId, (IEnumerable<SelectListItem>)ViewBag.DoctorId, new { @class = "btn-group-vertical", @name = "Doctor Name", @id = "DoctorName" })
+                    @Html.ValidationMessageFor(model => model.DoctorId)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.PatientId, "Patient Name", new { @class = "control-label col-md-2", style = "width: 150px;" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.PatientId, (IEnumerable<SelectListItem>)ViewBag.PatientId, new { @class = "btn-group-vertical", @name = "Patient Name", @id = "Name" })
+                    @Html.ValidationMessageFor(model => model.PatientId)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.IsDischarged, "Discharged Status", new { @class = "control-label col-md-2", style = "width: 150px;" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.IsDischarged, new { @class = "btn-group-vertical", @name = "Discharged Status", @id = "IsDischarged" })
+                    @Html.ValidationMessageFor(model => model.IsDischarged)
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Save" class="btn btn-info" id="submit" />
+                    <a href="~/HomePage/HomePageForClerk" class="btn btn-default">Cancel</a>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+</div>
+    @section Scripts {
+      <script type="text/javascript">
+
+          $(document).ready(function () {
+              $('#AdmitDate').datepicker({
+                  changeMonth: true,
+                  changeYear: true
+              });
+
+
+              var jsonObj = $('#form').serialize();
+
+              //validation rules
+              $("#form").validate({
+                  rules: {
+                      "AdmitDate": {
+                          required: true
+                      },
+                      "BedTicketNo": {
+                          required: true
+                      },
+                      "WardNo": {
+                          required: true
+                      },
+                      "DoctorName": {
+                          required: true
+                      },
+                      "Name": {
+                          required: true
+                      },
+                      "IsDischarged": {
+                          required: true
+                      }
+                  },
+                  //perform an AJAX post to ajax.php
+                  submitHandler: function () {
+
+                      $.ajax({
+                          type: "POST",
+                          url: '@Url.Action("EditPatientAdmission")',
+                          data: $('#form').serialize(),
+                          success: function (data) {
+                              //alert(data.Message);
+                              $('#submit').hide();
+                              TriggerMsg(data.Message);
+                          },
+                          error: function (jqXHR, textStatus, errorThrown) {
+                              alert("Error: " + errorThrown + " , Please try again");
+
+                          }
+                      });
+                      return false;
+
+                  }
+              });
+
+
+          });
+          function TriggerMsg(value) {
+              alert(value);
+              return false;
+          }
+
+
+</script>
+    }

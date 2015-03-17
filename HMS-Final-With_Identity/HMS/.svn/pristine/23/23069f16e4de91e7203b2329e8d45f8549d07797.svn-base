@@ -1,0 +1,82 @@
+﻿using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitaManagementSystem.Business.DTO;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class HMSInvoice : IHMSInvoice
+    {
+        private LP_HMSDbEntities db = new LP_HMSDbEntities();
+
+
+        public void InsertInvoice(InvoiceDTO InvoiceDTO)
+        {
+            Invoice Invoice = new Invoice { Id = InvoiceDTO.Id, InvoiceDate=InvoiceDTO.InvoiceDate, PatientDetailId=InvoiceDTO.PatientDetailId };
+            db.Invoices.Add(Invoice);
+            db.SaveChanges();
+
+        }
+
+        public void EditInvoice(InvoiceDTO InvoiceDTO)
+        {
+            Invoice Invoice = new Invoice { Id = InvoiceDTO.Id, InvoiceDate = InvoiceDTO.InvoiceDate, PatientDetailId = InvoiceDTO.PatientDetailId };
+            db.Entry(Invoice).State = EntityState.Modified;
+            db.SaveChanges();
+        }
+
+        public void DeleteInvoice(int InvoiceId)
+        {
+            Invoice Invoice = db.Invoices.Find(InvoiceId);
+            db.Invoices.Remove(Invoice);
+            db.SaveChanges();
+        }
+
+        public IEnumerable<InvoiceDTO> ViewtInvoice()
+        {
+            var Invoices = db.Invoices.ToList();
+            IEnumerable<InvoiceDTO> InvoiceList = from c in Invoices
+                                              select new InvoiceDTO
+                                              {
+                                                  Id = c.Id,
+                                                  InvoiceDate=c.InvoiceDate,
+                                                  PatientDetailId=c.PatientDetailId
+                                              };
+
+            return InvoiceList;
+        }
+
+        //public InvoiceDTO ViewtInvoiceById(int InvoiceId)
+        //{
+
+        //}
+
+
+        public InvoiceDTO ViewtInvoiceById(int? InvoiceId)
+        {
+            Invoice Invoice = db.Invoices.Find(InvoiceId);
+
+            InvoiceDTO InvoiceDTO = new InvoiceDTO
+            {
+                Id = Invoice.Id,
+                InvoiceDate = Invoice.InvoiceDate,
+                PatientDetailId = Invoice.PatientDetailId
+            };
+            return InvoiceDTO;
+        }
+
+
+        void IHMSInvoice.Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+        }
+    }
+}

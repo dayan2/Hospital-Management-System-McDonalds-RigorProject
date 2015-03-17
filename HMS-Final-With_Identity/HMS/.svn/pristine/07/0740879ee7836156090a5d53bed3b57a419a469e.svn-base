@@ -1,0 +1,82 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Mcd.HospitaManagementSystem.Business.DTO;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitalManagementSystem.Data;
+using AutoMapper;
+using System.Data.Entity;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class MainPatientDetails
+    {
+       private LP_HMSDbEntities db = new LP_HMSDbEntities();
+       Patient patient;
+       PatientDetail objPatientDetails;
+       PatientDTO patientDTO;
+       public void InsertPatient(PatientDTO patientDTO)
+       {
+           patient = new Patient
+              {
+                  Name = patientDTO.Name,
+                 NIC=patientDTO.NIC,
+                 Address=patientDTO.Address,
+                 Gender=patientDTO.Gender,
+                 MobileNo=patientDTO.MobileNo,
+              };
+           db.Patients.Add(patient);
+           db.SaveChanges();
+       }
+       public PatientDTO ViewPatientDetails(int? patientID)
+       {
+           patient = db.Patients.Find(patientID);
+           patientDTO = new PatientDTO()
+           {
+               Id=patient.Id,
+               Name=patient.Name,
+               NIC=patient.NIC,
+               Address=patient.Address,
+               Gender=patient.Gender,
+               MobileNo=patient.MobileNo,
+               
+           };
+           return patientDTO;
+       }
+     public  IEnumerable<PatientDTO> ViewAllPatientDetails()
+       {
+           IList<Patient> patient = db.Patients.ToList();
+           Mapper.CreateMap<Patient, PatientDTO>();
+           var patientList = Mapper.Map<IEnumerable<Patient>, IEnumerable<PatientDTO>>(patient);
+           return patientList;
+       }
+     public void EditPatient(PatientDTO patientDTO)
+     {
+         patient = new Patient()
+         {
+             Id=patientDTO.Id,
+             Name = patientDTO.Name,
+             NIC = patientDTO.NIC,
+             Address = patientDTO.Address,
+             Gender = patientDTO.Gender,
+             MobileNo = patientDTO.MobileNo,
+         };
+
+         db.Entry(patient).State = EntityState.Modified;
+         db.SaveChanges();
+     }
+     public void Deletepatient(int? PatientId)
+     {
+
+         patient = db.Patients.Find(PatientId);
+         db.Patients.Remove(patient );
+         db.SaveChanges();
+
+     }
+
+    
+   
+    }
+}

@@ -1,0 +1,107 @@
+﻿@model Mcd.HospitalManagement.Web.Models.InvoiceDetailsModel
+
+@{
+    ViewBag.Title = "Create";
+}
+<div class="container-fluid">
+    <div class="row">
+        <h2>Create</h2>
+
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+                <h4>Invoice</h4>
+                <hr />
+                @Html.ValidationSummary(true)
+
+                <div class="col-md-9">
+                    <div class="form-group">
+
+
+                        <table class="table table-striped">
+                            <tr>
+
+                                <td>
+                                    @Html.HiddenFor(model => model.PatientDetailId)
+                                    @Html.LabelFor(model => model.PatientName, "Patient Name")
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(model => model.PatientName)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+
+                                    @Html.Label("Invoice Date")
+                                </td>
+                                <td>
+                                   @* @Html.TextBoxFor(model => model.InvoiceDate)*@
+                                    @Html.TextBoxFor(model => model.InvoiceDate, new { @id = "InvoiceDate", @class = "date-picker InvoiceDate", style = "width: 200px;", })
+                                    @* @Html.HiddenFor(model=>model.InvoiceDate)*@
+
+                                    @Html.ValidationMessageFor(model => model.InvoiceDate)
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td>@Html.Label("Word No")</td>
+                                <td>@Html.DisplayFor(model => model.WardNo)</td>
+                            </tr>
+                            <tr>
+                                <td>@Html.Label("Admit Date")</td>
+                                <td>@Html.DisplayFor(model => model.AdmitDate)</td>
+                            </tr>
+                            <tr>
+                                <td>@Html.Label("Word Fee")</td>
+                                <td>@Html.DisplayFor(model => model.WardFee)</td>
+                            </tr>
+                            <tr>
+                                <td>@Html.Label("Doctor Name")</td>
+                                <td>@Html.DisplayFor(model => model.DoctorName)</td>
+                            </tr>
+                            <tr>
+                                <td>@Html.Label("Doctor Fee")</td>
+                                <td>@Html.DisplayFor(model => model.DoctorCharges)</td>
+                            </tr>
+                            <tr>
+                                <td>@Html.Label("Total Fee")</td>
+                                <td>@Html.DisplayFor(model => model.TotalFee)</td>
+                            </tr>
+                        </table>
+
+                    </div>
+                    <div class="col-md-1"></div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Save Invoice" class="btn btn-default" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#InvoiceDate').datepicker({
+                changeMonth: true,
+                changeYear: true
+            });
+        });
+
+
+        //function dateTime(ctrl) {
+        //    $('#' + ctrl + '').datetimepicker();
+        //}
+</script>

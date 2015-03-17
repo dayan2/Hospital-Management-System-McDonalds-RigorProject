@@ -1,0 +1,58 @@
+C:\Duminda\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.Net4.dll
+C:\Duminda\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\Mcd.HospitalManagementSystem.Data.dll.config
+C:\Duminda\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\Mcd.HospitalManagementSystem.Data.dll
+C:\Duminda\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\Mcd.HospitalManagementSystem.Data.pdb
+C:\Duminda\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.dll
+C:\Duminda\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\EntityFramework.dll
+C:\Duminda\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\EntityFramework.SqlServer.dll
+C:\Duminda\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.pdb
+C:\Duminda\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.xml
+C:\Duminda\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.Net4.pdb
+C:\Duminda\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\EntityFramework.xml
+C:\Duminda\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\EntityFramework.SqlServer.xml
+C:\Duminda\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\obj\Debug\Mcd.HospitalManagementSystem.Data.dll
+C:\Duminda\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\obj\Debug\Mcd.HospitalManagementSystem.Data.pdb
+C:\Users\Ewerdney\Desktop\Current Project\Virtusa\HMS-1700h-13Feb2015\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.Net4.dll
+C:\Users\Ewerdney\Desktop\Current Project\Virtusa\HMS-1700h-13Feb2015\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\Mcd.HospitalManagementSystem.Data.dll.config
+C:\Users\Ewerdney\Desktop\Current Project\Virtusa\HMS-1700h-13Feb2015\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\Mcd.HospitalManagementSystem.Data.dll
+C:\Users\Ewerdney\Desktop\Current Project\Virtusa\HMS-1700h-13Feb2015\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\Mcd.HospitalManagementSystem.Data.pdb
+C:\Users\Ewerdney\Desktop\Current Project\Virtusa\HMS-1700h-13Feb2015\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.dll
+C:\Users\Ewerdney\Desktop\Current Project\Virtusa\HMS-1700h-13Feb2015\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\EntityFramework.dll
+C:\Users\Ewerdney\Desktop\Current Project\Virtusa\HMS-1700h-13Feb2015\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\EntityFramework.SqlServer.dll
+C:\Users\Ewerdney\Desktop\Current Project\Virtusa\HMS-1700h-13Feb2015\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.pdb
+C:\Users\Ewerdney\Desktop\Current Project\Virtusa\HMS-1700h-13Feb2015\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.xml
+C:\Users\Ewerdney\Desktop\Current Project\Virtusa\HMS-1700h-13Feb2015\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.Net4.pdb
+C:\Users\Ewerdney\Desktop\Current Project\Virtusa\HMS-1700h-13Feb2015\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\EntityFramework.xml
+C:\Users\Ewerdney\Desktop\Current Project\Virtusa\HMS-1700h-13Feb2015\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\EntityFramework.SqlServer.xml
+C:\Users\Ewerdney\Desktop\Current Project\Virtusa\HMS-1700h-13Feb2015\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\obj\Debug\Mcd.HospitalManagementSystem.Data.dll
+C:\Users\Ewerdney\Desktop\Current Project\Virtusa\HMS-1700h-13Feb2015\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\obj\Debug\Mcd.HospitalManagementSystem.Data.pdb
+C:\Users\Ewerdney\Desktop\Current Project\Virtusa\HMS-1700h-13Feb2015\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\obj\Debug\Mcd.HospitalManagementSystem.Data.csprojResolveAssemblyReference.cache
+C:\Neranjan\New Location\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.Net4.dll
+C:\Neranjan\New Location\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\Mcd.HospitalManagementSystem.Data.dll.config
+C:\Neranjan\New Location\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\Mcd.HospitalManagementSystem.Data.dll
+C:\Neranjan\New Location\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\Mcd.HospitalManagementSystem.Data.pdb
+C:\Neranjan\New Location\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.dll
+C:\Neranjan\New Location\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\EntityFramework.dll
+C:\Neranjan\New Location\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\EntityFramework.SqlServer.dll
+C:\Neranjan\New Location\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.pdb
+C:\Neranjan\New Location\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.xml
+C:\Neranjan\New Location\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.Net4.pdb
+C:\Neranjan\New Location\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\EntityFramework.xml
+C:\Neranjan\New Location\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\EntityFramework.SqlServer.xml
+C:\Neranjan\New Location\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\obj\Debug\Mcd.HospitalManagementSystem.Data.dll
+C:\Neranjan\New Location\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\obj\Debug\Mcd.HospitalManagementSystem.Data.pdb
+C:\Neranjan\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.Net4.dll
+C:\Neranjan\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\Mcd.HospitalManagementSystem.Data.dll.config
+C:\Neranjan\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\Mcd.HospitalManagementSystem.Data.dll
+C:\Neranjan\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\Mcd.HospitalManagementSystem.Data.pdb
+C:\Neranjan\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.dll
+C:\Neranjan\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\EntityFramework.dll
+C:\Neranjan\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\EntityFramework.SqlServer.dll
+C:\Neranjan\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.pdb
+C:\Neranjan\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.xml
+C:\Neranjan\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\AutoMapper.Net4.pdb
+C:\Neranjan\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\EntityFramework.xml
+C:\Neranjan\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\bin\Debug\EntityFramework.SqlServer.xml
+C:\Neranjan\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\obj\Debug\Mcd.HospitalManagementSystem.Data.dll
+C:\Neranjan\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\obj\Debug\Mcd.HospitalManagementSystem.Data.pdb
+C:\Neranjan\Project\HMS\Mcd.HospitaManagementSystem\Mcd.HospitalManagementSystem.Data\obj\Debug\Mcd.HospitalManagementSystem.Data.csprojResolveAssemblyReference.cache

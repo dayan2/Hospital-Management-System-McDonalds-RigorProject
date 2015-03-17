@@ -1,0 +1,109 @@
+﻿@model Mcd.HospitalManagement.Web.Models.NurseModel
+@{
+    ViewBag.Title = "Create";
+}
+
+    <h2>Create</h2>
+    <div class="row">
+        <div class="col-xs-3">
+            <ol class="breadcrumb">
+                <li><a href="~/AdminHome/Index">Home</a></li>
+                <li class="active">Nurse Create</li>
+            </ol>
+        </div>
+    </div>
+<div class="row">
+    <div class="col-xs-1">
+        <ul class="nav nav-pills" role="tablist">
+            <li role="presentation" class="active"><a href="~/Nurses/Create">Create Nurse</a></li>
+            <li role="presentation"><a href="~/Nurses/Index">View Nurse</a></li>
+            <li role="presentation"><a href="~/PatientMedicalTests/ViewPatientMedicalTest">View Patient Medical Test</a></li>
+        </ul>
+    </div>
+    <div class="col-xs-11">
+        @using (Html.BeginForm("Create", "Nurses", FormMethod.Post, new { @id = "form" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+                <h4>Nurse</h4>
+                <hr />
+                @Html.ValidationSummary(true)
+
+                <div class="col-md-9">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.WardId, "WardId", htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.DropDownList("WardId", String.Empty)
+                            @Html.ValidationMessageFor(model => model.WardId)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.Name, new { @name = "Name" })
+                            @Html.ValidationMessageFor(model => model.Name)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Create" class="btn btn-primary" id="submit" />
+                            <a href="~/AdminHome/Index" class="btn btn-primary">Exit</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            var jsonObj = $('#form').serialize();
+
+            //validation rules
+            $("#form").validate({
+                rules: {
+                    "Name": {
+                        required: true
+                    },
+                    "WardId": {
+                        required: true
+                    }
+
+                },
+                //perform an AJAX post
+                submitHandler: function () {
+
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Content("~/Nurses/Create")',
+                        data: $('#form').serialize(),
+                        success: function (data) {
+
+                            $('#submit').hide();
+                        
+                            msg(data.Message);
+                            
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert("Error: " + errorThrown + " , Please try again");
+                        }
+                    });
+                    return false;
+                }
+            });
+        });
+
+        function msg(value) {
+            alert(value);
+            return false;
+        }
+    </script>
+}

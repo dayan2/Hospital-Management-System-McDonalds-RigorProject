@@ -1,0 +1,168 @@
+﻿#region Using Directives
+using log4net;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+#endregion
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class BaseController : Controller
+    {
+
+        #region Protected Methods
+        /// <summary>
+        /// Catch exception when sub classes return  
+        /// </summary>
+        /// <param name="filterContext">ExceptionContext type Exception detailed object</param>
+        /// 
+        protected override void OnException(ExceptionContext filterContext)
+        {
+            //Log error detail into a file when exception occur
+            log4net.Config.XmlConfigurator.Configure();
+            ILog logErr = LogManager.GetLogger("HandleErrorApender");
+            logErr.Error(filterContext.Exception.Message);
+
+            //Get error status code
+            var statusCode = (int)HttpStatusCode.InternalServerError;
+            if (filterContext.Exception is HttpException)
+            {
+                statusCode = ((HttpException)filterContext.Exception).GetHttpCode();
+
+            }
+
+            else if (filterContext.Exception is UnauthorizedAccessException)
+            {
+                //to prevent login prompt in IIS
+                //which will appear when returning 401.
+                statusCode = (int)HttpStatusCode.Forbidden;
+            }
+
+
+
+            // Prepare the response code.
+            filterContext.ExceptionHandled = true;
+            filterContext.HttpContext.Response.Clear();
+            filterContext.HttpContext.Response.TrySkipIisCustomErrors = true;
+
+            RedirectToErrorPage(filterContext);
+
+        }
+
+      
+     
+        private void RedirectToErrorPage(ExceptionContext filterContext)
+        {
+            //Get exception type
+            System.Type ExceptionType = filterContext.Exception.GetType();
+
+            //if (filterContext.HttpContext.Request.IsAjaxRequest())
+            //{
+            //    ViewData["ErrorMessage"] = filterContext.Exception.Message;
+            //    this.View("AccessDenied", "Error", "test");
+            //}
+
+            //if (filterContext.HttpContext.Request.IsAjaxRequest())
+            //{
+            //    filterContext.Result = new JavaScriptResult { Script = "window.top.location.href ='" + Url.Action("AccessDenied", "Error") + "';" };
+            //}
+
+            //string actionName = filterContext.RouteData.Values["action"].ToString();
+            //Type controllerType = filterContext.Controller.GetType();
+            //var method = controllerType.GetMethod(actionName);
+            //var returnType = method.ReturnType;
+
+            //if (returnType.Equals(typeof(JsonResult)))
+            //{
+            //    filterContext.Result = new JsonResult()
+            //    {
+            //        Data = "Return data here"
+            //    };
+            //}
+
+
+            //Check if it is Db exception or application exception
+            if (ExceptionType.Name == "DbUpdateException")
+            {
+                ViewData["ErrorMessage"] = filterContext.Exception.InnerException.Message;
+                this.View("DatabaseException", filterContext.Exception).ExecuteResult(this.ControllerContext);
+
+            }
+            else
+            {
+                ViewData["ErrorMessage"] = filterContext.Exception.Message;
+                this.View("AccessDenied", "Error", "test");
+            }
+        }
+        #endregion
+
+        #region Public methods
+        /// <summary>
+        /// Get view that need to be view when exception occur
+        /// </summary>
+        /// <param name="filterContext">ExceptionContext type Exeption details object</param>
+        /// <param name="statusCode">int type Status code</param>
+        /// <returns></returns>
+        public virtual ActionResult CreateActionResult(ExceptionContext filterContext, int statusCode)
+        {
+            //Get controller and request context
+            var ctx = new ControllerContext(filterContext.RequestContext, filterContext.Controller);
+            //Get status code type according to status code
+            var statusCodeName = ((HttpStatusCode)statusCode).ToString();
+
+            //Get view according to status code
+            var viewName = SelectFirstView(ctx, string.Format("{0}", "~/Views/Error.cshtml"),
+                                           "~/Views/Shared/Error.cshtml",
+                                           statusCodeName,
+                                           "Error");
+            //Get controller details
+            var controllerName = (string)filterContext.RouteData.Values["controller"];
+
+            //Get action details
+            var actionName = (string)filterContext.RouteData.Values["action"];
+
+            //Get Exception, controllerName, actionName to the model
+            var model = new HandleErrorInfo(filterContext.Exception, controllerName, actionName);
+
+            //Returns result
+            var result = new ViewResult
+            {
+                ViewName = viewName,
+                ViewData = new ViewDataDictionary<HandleErrorInfo>(model),
+            };
+            result.ViewBag.StatusCode = statusCode;
+            return result;
+        }
+        #endregion
+
+        #region private methods
+        /// <summary>
+        /// Select First View that need to be display
+        /// </summary>
+        /// <param name="ctx">ControllerContext type detailed object</param>
+        /// <param name="viewNames">view Names</param>
+        /// <returns></returns>
+        private string SelectFirstView(ControllerContext ctx, params string[] viewNames)
+        {
+            return viewNames.First(view => ViewExists(ctx, view));
+        }
+
+        /// <summary>
+        /// Check if view is exsits or not
+        /// </summary>
+        /// <param name="ctx">ControllerContext type detailed object</param>
+        /// <param name="name">view name</param>
+        /// <returns></returns>
+        private bool ViewExists(ControllerContext ctx, string name)
+        {
+            var result = ViewEngines.Engines.FindView(ctx, name, null);
+            return result.View != null;
+        }
+        #endregion
+
+    }
+}

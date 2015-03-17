@@ -1,0 +1,561 @@
+﻿#region Using Directives
+using Mcd.HospitalManagement.Web.Models;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitalManagement.Web.Enums;
+#endregion
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class PatientAdmissionDetailsController : Controller
+    {
+        #region Private Variable
+        private IPatientManager patientManager;
+        private PatientAdmissionDetailsModel patientAdmissionDetails;
+        private PatientModel patient;
+        private IWards wards;
+        private IDoctorManager doctors;
+        private IBedManager bedDetails;
+        private string displayMessage;
+        private bool confirmationResult;
+        #endregion
+
+        public PatientAdmissionDetailsController()
+        {
+            patientManager = new PatientManager();
+            wards = new WardDetails();
+            doctors = new DoctorManager();
+            bedDetails = new BedManager();
+        }
+        // GET: /PatientAdmissionDetails/
+        public ActionResult Index()
+        {
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            //view all the all patientAddmission details
+            IEnumerable<AllPatientDTO> patientAdmissionDTO = patientManager.ViewAllPatientAdmissionDetails();
+            IEnumerable<PatientAdmissionDetailsModel> patientAdmissionDetails = patientAdmissionDTO.Select(x => new PatientAdmissionDetailsModel
+            {
+                PatientDetailId = x.PatientDetailId,
+                PatientId = x.PatientId,
+                Address = x.Address,
+                MobileNo = x.MobileNo,
+                AdmitDate = x.AdmitDate,
+                Name = x.Name,
+                WardNo = x.WardNo,
+                WardId = x.WardId,
+                BedTicketNo = x.BedTicketNo,
+                BedId = x.BedId,
+                DoctorName = x.DoctorName,
+                DoctorId = x.DoctorId,
+                IsDischarged = x.IsDischarged,
+            }).ToList();
+
+            return View(patientAdmissionDetails);
+
+        }
+
+        //// GET: /PatientAdmissionDetails/Details/5
+        public ActionResult DetailsPatientAdmission(int? id)
+        {
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            //view patient admission details according to patient id
+            AllPatientDTO patientAdmissionDTO = patientManager.ViewPatientRelatedData(id);
+            patientAdmissionDetails = new PatientAdmissionDetailsModel()
+            {
+                PatientId = patientAdmissionDTO.PatientId,
+                PatientDetailId = patientAdmissionDTO.PatientDetailId,
+                Address = patientAdmissionDTO.Address,
+                MobileNo = patientAdmissionDTO.MobileNo,
+                AdmitDate = patientAdmissionDTO.AdmitDate,
+                Name = patientAdmissionDTO.Name,
+                WardNo = patientAdmissionDTO.WardNo,
+                WardId = patientAdmissionDTO.WardId,
+                BedTicketNo = patientAdmissionDTO.BedTicketNo,
+                BedId = patientAdmissionDTO.BedId,
+                DoctorName = patientAdmissionDTO.DoctorName,
+                DoctorId = patientAdmissionDTO.DoctorId,
+                IsDischarged = patientAdmissionDTO.IsDischarged,
+
+
+
+
+            };
+
+            if (patientAdmissionDetails == null)
+            {
+                return HttpNotFound();
+            }
+            return View(patientAdmissionDetails);
+        }
+
+        // GET: /PatientAdmissionDetails/Create
+        public ActionResult CreatePatientAdmission()
+        {
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin || (UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Cashier)
+            {
+                //get patient details
+                patient = new PatientModel();
+                var patients = patientManager.fillPatients();
+                IEnumerable<PatientModel> PList = from c in patients
+                                                  select new PatientModel
+                                                  {
+                                                      Id = c.Id,
+                                                      Name = c.Name,
+                                                  };
+
+                //get ward Details
+
+
+                var wardList = wards.ViewWardDetails();
+                IEnumerable<WardModel> wardDetailList = from w in wardList
+                                                        select new WardModel
+                                                               {
+                                                                   Id = w.Id,
+                                                                   WardNo = w.WardNo,
+                                                               };
+
+
+                //get doctor details
+
+                var doctorList = doctors.GetDoctors();
+                IEnumerable<DoctorModel> doctorDetailList = from d in doctorList
+                                                            select new DoctorModel
+                                                                           {
+                                                                               Id = d.Id,
+                                                                               Name = d.Name
+                                                                           };
+
+
+                //get beds details
+
+                var bedList = bedDetails.ViewAllBed();
+                IEnumerable<BedModel> bedDetailList = from d in bedList
+                                                      select new BedModel
+                                                                             {
+                                                                                 Id = d.Id,
+                                                                                 BedTicketNo = d.BedTicketNo
+                                                                             };
+
+
+                //set the default discharge status for patient admission details
+                patientAdmissionDetails = new PatientAdmissionDetailsModel() { IsDischarged = false };
+
+
+                ViewBag.BedId = new SelectList(bedDetailList, "Id", "BedTicketNo");
+                ViewBag.DoctorId = new SelectList(doctorDetailList, "Id", "Name");
+                ViewBag.PatientId = new SelectList(PList, "Id", "Name");
+                ViewBag.WardId = new SelectList(wardDetailList, "Id", "WardNo");
+                return View(patientAdmissionDetails);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+
+        // POST: /PatientAdmissionDetails/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreatePatientAdmission(PatientAdmissionDetailsModel patientdetail)
+        {
+            PatientAdmissionDTO patientAdmissionDTO = new PatientAdmissionDTO()
+            {
+                PatientDetailId = patientdetail.PatientDetailId,
+                AdmitDate = patientdetail.AdmitDate,
+                BedId = patientdetail.BedId,
+                WardId = patientdetail.WardId,
+                DoctorId = patientdetail.DoctorId,
+                PatientId = patientdetail.PatientId,
+                IsDischarged = patientdetail.IsDischarged
+            };
+            if (ModelState.IsValid)
+            {
+                //check the dischage status...if discharge status true only can insert
+                if (patientManager.CheckPatientAdmissionAvilabilty(patientAdmissionDTO.PatientId))
+                {
+
+                    //insert patient admissiondetails 
+                    confirmationResult = patientManager.InsertPatientAdmissionDetails(patientAdmissionDTO);
+                    displayMessage = string.Empty;
+                    if (confirmationResult == true)
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationInsertedMsg);
+                    else
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+
+                    return Json(new { Message = displayMessage });
+
+                }
+                else
+                {
+
+                    displayMessage = CustomEnumMessage.GetStringValue(PatientErrorMessage.AlreadyAdmittedPatient);
+                    return Json(new { Message = displayMessage });
+
+
+                }
+            }
+            //get patient details
+            patient = new PatientModel();
+            var patients = patientManager.fillPatients();
+            IEnumerable<PatientModel> PList = from c in patients
+                                              select new PatientModel
+                                              {
+                                                  Id = c.Id,
+                                                  Name = c.Name,
+                                              };
+
+            //get ward Details
+
+
+            var wardList = wards.ViewWardDetails();
+            IEnumerable<WardModel> wardDetailList = from w in wardList
+                                                    select new WardModel
+                                                    {
+                                                        Id = w.Id,
+                                                        WardNo = w.WardNo,
+                                                    };
+
+
+            //get doctor details
+
+            var doctorList = doctors.GetDoctors();
+            IEnumerable<DoctorModel> doctorDetailList = from d in doctorList
+                                                        select new DoctorModel
+                                                        {
+                                                            Id = d.Id,
+                                                            Name = d.Name
+                                                        };
+
+
+            //get beds details
+
+            var bedList = bedDetails.ViewAllBed();
+            IEnumerable<BedModel> bedDetailList = from d in bedList
+                                                  select new BedModel
+                                                  {
+                                                      Id = d.Id,
+                                                      BedTicketNo = d.BedTicketNo
+                                                  };
+
+
+            ViewBag.BedId = new SelectList(bedDetailList, "Id", "BedTicketNo");
+            ViewBag.DoctorId = new SelectList(doctorDetailList, "Id", "Name");
+            ViewBag.PatientId = new SelectList(PList, "Id", "Name");
+            ViewBag.WardId = new SelectList(wardDetailList, "Id", "WardNo");
+
+
+            return View();
+        }
+
+        // GET: /PatientAdmissionDetails/Edit/5
+        public ActionResult EditPatientAdmission(int? id)
+        {
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin || (UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Cashier)
+            {
+
+                if (id == null)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                }
+
+                //view patientadmission details according to id
+                AllPatientDTO patientAdmissionDTO = patientManager.ViewPatientRelatedData(id);
+                patientAdmissionDetails = new PatientAdmissionDetailsModel()
+                {
+                    PatientId = patientAdmissionDTO.PatientId,
+                    PatientDetailId = patientAdmissionDTO.PatientDetailId,
+                    Address = patientAdmissionDTO.Address,
+                    MobileNo = patientAdmissionDTO.MobileNo,
+                    AdmitDate = patientAdmissionDTO.AdmitDate,
+                    Name = patientAdmissionDTO.Name,
+                    WardNo = patientAdmissionDTO.WardNo,
+                    WardId = patientAdmissionDTO.WardId,
+                    BedTicketNo = patientAdmissionDTO.BedTicketNo,
+                    BedId = patientAdmissionDTO.BedId,
+                    DoctorName = patientAdmissionDTO.DoctorName,
+                    DoctorId = patientAdmissionDTO.DoctorId,
+                    IsDischarged = patientAdmissionDTO.IsDischarged,
+
+
+
+
+                };
+
+                if (patientAdmissionDetails == null)
+                {
+                    return HttpNotFound();
+                }
+
+                //get patient details
+                patient = new PatientModel();
+                var patients = patientManager.fillPatients();
+                IEnumerable<PatientModel> PList = from c in patients
+                                                  select new PatientModel
+                                                  {
+                                                      Id = c.Id,
+                                                      Name = c.Name,
+                                                  };
+
+                //get ward Details
+
+
+                var wardList = wards.ViewWardDetails();
+                IEnumerable<WardModel> wardDetailList = from w in wardList
+                                                        select new WardModel
+                                                        {
+                                                            Id = w.Id,
+                                                            WardNo = w.WardNo,
+                                                        };
+
+
+                //get doctor details
+
+                var doctorList = doctors.GetDoctors();
+                IEnumerable<DoctorModel> doctorDetailList = from d in doctorList
+                                                            select new DoctorModel
+                                                            {
+                                                                Id = d.Id,
+                                                                Name = d.Name
+                                                            };
+
+
+                //get beds details
+
+                var bedList = bedDetails.ViewAllBed();
+                IEnumerable<BedModel> bedDetailList = from d in bedList
+                                                      select new BedModel
+                                                      {
+                                                          Id = d.Id,
+                                                          BedTicketNo = d.BedTicketNo
+                                                      };
+
+
+
+
+                ViewBag.BedId = new SelectList(bedDetailList, "Id", "BedTicketNo");
+                ViewBag.DoctorId = new SelectList(doctorDetailList, "Id", "Name");
+                ViewBag.PatientId = new SelectList(PList, "Id", "Name");
+                ViewBag.WardId = new SelectList(wardDetailList, "Id", "WardNo");
+                return View(patientAdmissionDetails);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        //// POST: /PatientAdmissionDetails/Edit/5
+        //// To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        //// more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost, ActionName("EditPatientAdmission")]
+        ////[HttpPost]
+        ////[ValidateAntiForgeryToken]
+        public ActionResult EditPatient(PatientAdmissionDetailsModel patientDetail)
+        {
+            AllPatientDTO patientAdmissionDTO = new AllPatientDTO()
+            {
+                PatientDetailId = patientDetail.PatientDetailId,
+                AdmitDate = patientDetail.AdmitDate,
+                BedId = patientDetail.BedId,
+                WardId = patientDetail.WardId,
+                DoctorId = patientDetail.DoctorId,
+                PatientId = patientDetail.PatientId,
+                IsDischarged = patientDetail.IsDischarged,
+
+
+
+            };
+            if (ModelState.IsValid)
+            {
+
+                //edit patientAdmissiondetails
+                confirmationResult = patientManager.EditPatientAdmissionDetails(patientAdmissionDTO);
+                displayMessage = string.Empty;
+                if (confirmationResult == true)
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationUpdatedMsg);
+                else
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+
+                return Json(new { Message = displayMessage });
+
+
+            }
+
+            //get patient details
+            patient = new PatientModel();
+            var patients = patientManager.fillPatients();
+            IEnumerable<PatientModel> PList = from c in patients
+                                              select new PatientModel
+                                              {
+                                                  Id = c.Id,
+                                                  Name = c.Name,
+                                              };
+
+            //get ward Details
+
+
+            var wardList = wards.ViewWardDetails();
+            IEnumerable<WardModel> wardDetailList = from w in wardList
+                                                    select new WardModel
+                                                    {
+                                                        Id = w.Id,
+                                                        WardNo = w.WardNo,
+                                                    };
+
+
+            //get doctor details
+
+            var doctorList = doctors.GetDoctors();
+            IEnumerable<DoctorModel> doctorDetailList = from d in doctorList
+                                                        select new DoctorModel
+                                                        {
+                                                            Id = d.Id,
+                                                            Name = d.Name
+                                                        };
+
+
+            //get beds details
+
+            var bedList = bedDetails.ViewAllBed();
+            IEnumerable<BedModel> bedDetailList = from d in bedList
+                                                  select new BedModel
+                                                  {
+                                                      Id = d.Id,
+                                                      BedTicketNo = d.BedTicketNo
+                                                  };
+            ViewBag.BedId = new SelectList(bedDetailList, "Id", "BedTicketNo");
+            ViewBag.DoctorId = new SelectList(doctorDetailList, "Id", "Name");
+            ViewBag.PatientId = new SelectList(PList, "Id", "Name");
+            ViewBag.WardId = new SelectList(wardDetailList, "Id", "WardNo");
+
+            return View(patientDetail);
+        }
+
+        // GET: /PatientAdmissionDetails/Delete/5
+        public ActionResult DeletePatientAdmission(int? id)
+        {
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin || (UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Cashier)
+            {
+                if (id == null)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                }
+
+                //view patient admission details according to id
+                AllPatientDTO patientAdmissionDTO = patientManager.ViewPatientRelatedData(id);
+                patientAdmissionDetails = new PatientAdmissionDetailsModel()
+                {
+                    AdmitDate = patientAdmissionDTO.AdmitDate,
+                    PatientId = patientAdmissionDTO.PatientId,
+                    PatientDetailId = patientAdmissionDTO.PatientDetailId,
+                    Address = patientAdmissionDTO.Address,
+                    MobileNo = patientAdmissionDTO.MobileNo,
+                    Name = patientAdmissionDTO.Name,
+                    WardNo = patientAdmissionDTO.WardNo,
+                    WardId = patientAdmissionDTO.WardId,
+                    BedTicketNo = patientAdmissionDTO.BedTicketNo,
+                    BedId = patientAdmissionDTO.BedId,
+                    DoctorName = patientAdmissionDTO.DoctorName,
+                    DoctorId = patientAdmissionDTO.DoctorId,
+                    IsDischarged = patientAdmissionDTO.IsDischarged,
+
+
+
+
+                };
+                if (patientAdmissionDetails == null)
+                {
+                    return HttpNotFound();
+                }
+                return View(patientAdmissionDetails);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        //// POST: /PatientAdmissionDetails/Delete/5
+        [HttpPost, ActionName("DeletePatientAdmission")]
+        //[ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int? id)
+        {
+            //view patient details according to id to check relationships
+            var avilability = patientManager.ViewPatientAdmissionDetails(id);
+            patientAdmissionDetails = new PatientAdmissionDetailsModel()
+            {
+                AdmitDate = avilability.AdmitDate,
+                PatientDetailId = avilability.PatientDetailId,
+                WardId = avilability.WardId,
+                BedId = avilability.BedId,
+                DoctorId = avilability.DoctorId,
+                IsDischarged = avilability.IsDischarged,
+
+
+
+
+            };
+            if (patientAdmissionDetails != null)
+            {
+                displayMessage = CustomEnumMessage.GetStringValue(PatientErrorMessage.valideteRelationship);
+                return Json(new { Message = displayMessage });
+
+            }
+            else
+            {
+
+                //delete patient admission details
+                confirmationResult = patientManager.DeletePatientAdmissionDetails(id);
+                displayMessage = string.Empty;
+                if (confirmationResult == true)
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationRemovedMsg);
+                else
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+
+                return Json(new { Message = displayMessage });
+
+
+
+            }
+
+
+
+
+        }
+
+
+    }
+}

@@ -1,0 +1,353 @@
+﻿#region Using Directives
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitalManagement.Web.Models;
+using Mcd.HospitalManagement.Web.Enums;
+#endregion
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    /// <summary>
+    /// This controller handling Nurse related all details
+    /// </summary>
+    public class NursesController : BaseController
+    {
+        #region Constant
+        const string ERROR_TYPE = "AccessDenied";
+        const string ERROR_MSG = "Error";
+        #endregion
+
+        #region Private Fields
+        INurse dbNurse;
+        IWards dbWard;
+        string displayMessage = string.Empty;
+        #endregion
+
+        #region Constructor_Method
+        public NursesController()
+            : base()
+        {
+            this.dbNurse = new HMSNurse();
+        }
+        #endregion
+
+        #region Public Methods
+        /// <summary>
+        ///  view all nurses datails
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult Index()
+        {
+            if (Session["USERROLE"] == null)// checking the login state. if not login, then pass the error page.
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            // checking the permission.
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                IEnumerable<NurseDTO> nurseDto = dbNurse.ViewtNurse(); //get nurse details
+                IEnumerable<NurseModel> nurseModel = DTOLToModelListMapper(nurseDto);// mapping nurse datials Dto to model.
+                return View(nurseModel);
+            }
+            else
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        /// <summary>
+        /// Get nurse details by nurse id.
+        /// </summary>
+        /// <param name="id">Nurse Id</param>
+        /// <returns></returns>
+        public ActionResult Details(int? id)
+        {
+            dbWard = new WardManager();
+            if (Session["USERROLE"] == null)// checking the login state. if not login, then pass the error page.
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            // checking the permission.
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                if (id == null)// check have any nurse id, if no one then pass error page.
+                {
+                    return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.BadRequest) });
+                }
+
+                if (dbNurse.CheckExistsNurse(id) == false)
+                {
+                    return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.NotFound) });
+                }
+                NurseDTO nurseDto = dbNurse.ViewtNurseById(id); //Get nurse details by id
+                NurseModel Nurse = DTOToModelMapper(nurseDto); // mapping Dto to Model
+
+                WardDTO wardDto = dbWard.ViewWardById((int)nurseDto.WardId); //Get ward details by ward id
+                WardModel wordModel = new WardModel
+                {
+                    Id = wardDto.Id,
+                    WardNo = wardDto.WardNo
+                };
+                Nurse.Ward = wordModel;
+                return View(Nurse);
+            }
+            else
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        /// <summary>
+        /// Get Ward details and nurse details to ready for making nurse.
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult Create()
+        {
+            dbWard = new WardManager();
+            if (Session["USERROLE"] == null)// checking the login state. if not login, then pass the error page.
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            // checking the permission.
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                NurseModel nurseModel = new NurseModel();
+                IEnumerable<WardDTO> wardList = dbWard.ViewWardDetails();
+
+                nurseModel.Wards = wardList.Select(m => new WardModel
+                {
+                    Id = m.Id,
+                    WardNo = m.WardNo
+                }).ToList();
+
+                ViewBag.WardId = new SelectList(wardList, "Id", "WardNo");
+                return View(nurseModel);
+            }
+            else
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        /// <summary>
+        /// Send nurse details to save
+        /// </summary>
+        /// <param name="nurse">nurse details model</param>
+        /// <returns></returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include = "Id,Name,WardId")] NurseModel nurse)
+        {
+            NurseDTO nurseDto = ModelToDTOMapper(nurse);
+            if (ModelState.IsValid)
+            {
+                // save details. if saved succues, result should send to view using JSON.
+                if (dbNurse.InsertNurse(nurseDto))
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationInsertedMsg);
+                else
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+                return Json(new { Message = displayMessage });
+            }
+            return View(nurse);
+        }
+
+
+        /// <summary>
+        ///  Get nurse details by nurse id and sent to the view
+        /// </summary>
+        /// <param name="id">nurse id</param>
+        /// <returns>nurseModel</returns>
+        public ActionResult Edit(int? id)
+        {
+            dbWard = new WardManager();
+            if (Session["USERROLE"] == null)// checking the login state. if not login, then pass the error page.
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            // checking the permission.
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                if (id == null) // check have any invoice id, if no one then pass error page.
+                {
+                    return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.BadRequest) });
+                }
+                NurseDTO nurseDto = dbNurse.ViewtNurseById(id);// Get nurse details by nurse id.
+                if (nurseDto == null) // check have object, if no object then pass error page.
+                {
+                    return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.NotFound) });
+                }
+
+                IEnumerable<WardDTO> wardList = dbWard.ViewWardDetails();
+
+                NurseModel nurseModel = DTOToModelMapper(nurseDto);//mapping details Dto to Model.
+
+                ViewBag.WardId = new SelectList(wardList, "Id", "WardNo", nurseModel.WardId);
+                nurseModel.Wards = wardList.Select(m => new WardModel
+                {
+                    Id = m.Id,
+                    WardNo = m.WardNo
+                }).ToList();
+                return View(nurseModel);
+            }
+            else
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        /// <summary>
+        /// Send nurse detials to save to business layer.
+        /// </summary>
+        /// <param name="nurse"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include = "Id,Name,WardId")] NurseModel nurse)
+        {
+            NurseDTO nurseDto = new NurseDTO { Id = nurse.Id, Name = nurse.Name, WardId = nurse.WardId };
+            if (ModelState.IsValid) // check model validation
+            {
+                if (dbNurse.EditNurse(nurseDto))// get state of the nurse edited as a booleon value.
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationUpdatedMsg);
+                else
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+                return Json(new { Message = displayMessage });
+            }
+            return View(nurse);
+        }
+
+        /// <summary>
+        /// Get nurse details for deleting by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ActionResult Delete(int? id)
+        {
+            if (Session["USERROLE"] == null)// checking the login state. if not login, then pass the error page.
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            // checking the permission.
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                if (id == null)// check have any invoice id, if no one then pass error page.
+                {
+                    return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.BadRequest) });
+                }
+                NurseDTO nurseDto = dbNurse.ViewtNurseById(id); //Get nurse details by id
+                if (nurseDto == null) // check have object, if no object then pass error page.
+                {
+                    return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.NotFound) });
+                }
+                NurseModel Nurse = new NurseModel       // mapping
+                {
+                    Id = nurseDto.Id,
+                    Name = nurseDto.Name,
+                    WardId = nurseDto.WardId,
+                    WardNo = nurseDto.WardNo
+                };
+
+                return View(Nurse);
+            }
+            else
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        /// <summary>
+        /// Remove Nurse by id
+        /// </summary>
+        /// <param name="nurseId"></param>
+        /// <returns></returns>
+        public ActionResult DeleteConfirmed(int nurseId)
+        {
+            if (Session["USERROLE"] == null) // checking the login state. if not login, then pass the error page.
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                NurseDTO nurse = dbNurse.ViewtNurseById(nurseId);//Get nurse details by id
+                if (nurse == null) // check have object, if no object then pass error page.
+                {
+                    return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.NotFound) });
+                }
+
+                if (dbNurse.DeleteNurse(nurseId))
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationRemovedMsg);
+                else
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+                return Json(new { Message = displayMessage });
+                // return RedirectToAction("Index");
+            }
+            else
+            {
+                return RedirectToAction(ERROR_TYPE, ERROR_MSG, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        #endregion
+
+        #region Private Methods
+        private NurseDTO ModelToDTOMapper(NurseModel nurseModel)
+        {
+            NurseDTO nurseDto = new NurseDTO
+            {
+                Id = nurseModel.Id,
+                Name = nurseModel.Name,
+                WardId = nurseModel.WardId,
+                WardNo = nurseModel.WardNo
+            };
+            return nurseDto;
+        }
+
+
+        // Nurse model to Nurse DTO to mapping data
+        private NurseModel DTOToModelMapper(NurseDTO nurseDto)
+        {
+            NurseModel nurseModel = new NurseModel
+            {
+                Id = nurseDto.Id,
+                Name = nurseDto.Name,
+                WardId = nurseDto.WardId,
+                WardNo = nurseDto.WardNo
+            };
+            return nurseModel;
+        }
+
+        // Nurse DTO  to Nurse model to mapping data
+        private IEnumerable<NurseModel> DTOLToModelListMapper(IEnumerable<NurseDTO> NurseDtoList)
+        {
+            IEnumerable<NurseModel> NurseModelList = NurseDtoList.Select(m => new NurseModel
+            {
+                Id = m.Id,
+                Name = m.Name,
+                WardId = m.WardId,
+                WardNo = m.WardNo
+            }).ToList();
+            return NurseModelList;
+        }
+        // From Nurse DTO List  to Nurse model List to mapping data
+        private IEnumerable<NurseDTO> ModelToDTOListMapper(IEnumerable<NurseModel> NurseModelList)
+        {
+            IEnumerable<NurseDTO> NurseDtoList = NurseModelList.Select(m => new NurseDTO
+            {
+                Id = m.Id,
+                Name = m.Name,
+                WardId = m.WardId,
+                WardNo = m.WardNo
+            }).ToList();
+            return NurseDtoList;
+        }
+
+
+        #endregion
+    }
+}

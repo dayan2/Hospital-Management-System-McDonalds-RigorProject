@@ -1,0 +1,156 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitalManagement.Web.Models;
+using Mcd.HospitaManagementSystem.Business.DTO;
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class InvoicesController : Controller
+    {
+        IHMSInvoice dbInvoice;
+        public InvoicesController()
+        {
+            dbInvoice = new HMSInvoice();
+        }
+        // GET: Invoices
+        public ActionResult Index()
+        {
+            //var invoices = db.Invoices.Include(i => i.PatientDetail);
+            //return View(invoices.ToList());
+            var invoices = dbInvoice.ViewtInvoice();
+            IEnumerable<InvoiceModel> invoice = from c in invoices
+                                            select new InvoiceModel
+                                            {
+                                                Id = c.Id,
+                                                InvoiceDate=c.InvoiceDate,
+                                                PatientDetailId= c.PatientDetailId,
+                                                // Ward = new Ward { Id = 1, WardNo = "Ward1" }
+
+                                            };
+            return View(invoice);
+        }
+
+        // GET: Invoices/Details/5
+        public ActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            InvoiceDTO invoiceDto = dbInvoice.ViewtInvoiceById(id);
+            if (invoiceDto == null)
+            {
+                return HttpNotFound();
+            }
+
+            InvoiceModel InvoiceModel = new InvoiceModel { Id=invoiceDto.Id, InvoiceDate=invoiceDto.InvoiceDate, PatientDetailId=invoiceDto.PatientDetailId };
+            return View(InvoiceModel);
+        }
+
+        // GET: Invoices/Create
+        public ActionResult Create()
+        {
+
+            List<PatientDetail> patientDetails = new List<PatientDetail> { new PatientDetail { PatientDetailId = 1 } };
+            ViewBag.PatientDetailId = new SelectList(patientDetails, "PatientDetailId", "PatientDetailId");
+            return View();
+        }
+
+        // POST: Invoices/Create
+       
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include = "Id,PatientDetailId,InvoiceDate")] InvoiceModel invoiceModel)
+        {
+            if (ModelState.IsValid)
+            {
+                InvoiceDTO invoiceDto = new InvoiceDTO { Id=invoiceModel.Id, InvoiceDate = invoiceModel.InvoiceDate, PatientDetailId=invoiceModel.PatientDetailId };
+                dbInvoice.InsertInvoice(invoiceDto);
+                return RedirectToAction("Index");
+            }
+
+           //ViewBag.PatientDetailId = new SelectList(db.PatientDetails, "PatientDetailId", "PatientDetailId", invoice.PatientDetailId);
+            return View(invoiceModel);
+        }
+
+        // GET: Invoices/Edit/5
+        public ActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            InvoiceDTO invoiceDto = dbInvoice.ViewtInvoiceById(id);
+            if (invoiceDto == null)
+            {
+                return HttpNotFound();
+            }
+            InvoiceModel InvoiceModel = new InvoiceModel { Id = invoiceDto.Id, InvoiceDate = invoiceDto.InvoiceDate, PatientDetailId = invoiceDto.PatientDetailId };
+           // ViewBag.PatientDetailId = new SelectList(db.PatientDetails, "PatientDetailId", "PatientDetailId", invoice.PatientDetailId);
+            return View(InvoiceModel);
+        }
+
+        // POST: Invoices/Edit/5
+     
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include = "Id,PatientDetailId,InvoiceDate")] InvoiceModel invoiceModel)
+        {
+            InvoiceDTO invoiceDto = new InvoiceDTO { Id = invoiceModel.Id, InvoiceDate = invoiceModel.InvoiceDate, PatientDetailId = invoiceModel.PatientDetailId };
+            if (ModelState.IsValid)
+            {
+                dbInvoice.EditInvoice(invoiceDto);
+                return RedirectToAction("Index");
+            }
+            //ViewBag.PatientDetailId = new SelectList(db.PatientDetails, "PatientDetailId", "PatientDetailId", invoice.PatientDetailId);
+            return View(invoiceModel);
+        }
+
+        // GET: Invoices/Delete/5
+        public ActionResult Delete(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            InvoiceDTO invoiceDto = dbInvoice.ViewtInvoiceById(id);
+            if (invoiceDto == null)
+            {
+                return HttpNotFound();
+            }
+            InvoiceModel InvoiceModel = new InvoiceModel { Id = invoiceDto.Id, InvoiceDate = invoiceDto.InvoiceDate, PatientDetailId = invoiceDto.PatientDetailId };
+            return View(InvoiceModel);
+        }
+
+        // POST: Invoices/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            InvoiceDTO invoiceDto = dbInvoice.ViewtInvoiceById(id);
+            if (invoiceDto == null)
+            {
+                return HttpNotFound();
+            }
+            dbInvoice.DeleteInvoice(id);
+            return RedirectToAction("Index");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                dbInvoice.Dispose(disposing);
+            }
+            base.Dispose(disposing);
+        }
+    }
+}

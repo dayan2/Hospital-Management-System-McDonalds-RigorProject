@@ -1,0 +1,472 @@
+﻿
+#region Using Directives
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitalManagement.Web.Models;
+using AutoMapper;
+using Mcd.HospitalManagement.Web.Enums;
+using Mcd.HospitalManagement.Web;
+#endregion
+
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class UserController : BaseController
+    {
+
+        #region Constants
+        const string INDEX = "Index";
+        const string ADMINHOME = "AdminHome";
+        const string ACCESSDENIED = "AccessDenied";
+        const string ERROR = "Error";
+        const string USER_DETAILS_PARTIAL = "UserDetailsPartial";
+        #endregion
+
+        #region Private Fields
+        private IUserManager usermanager;
+        private LP_HMSDbEntities db = new LP_HMSDbEntities();
+        private IUserManager userManager;
+        #endregion
+
+        #region Constructor
+        
+        public UserController()
+            : base()
+        {
+            usermanager = new UserManager();
+           
+        }
+
+        public UserController(IUserManager userManager)
+        {
+            this.userManager = userManager;
+
+        }
+        #endregion
+
+        #region Public Methods
+        
+        /// <summary>
+        /// View all users data in index view
+        /// </summary>
+        /// <returns>All system user data </returns>
+        public ActionResult Index()
+        {
+            //Check an user already logged on or not
+            if (Session["USERROLE"] == null)
+            {
+                return RedirectToAction(ACCESSDENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            } 
+            //Check user role that already logged on have permissions to this function 
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+            //Get all users data
+            IEnumerable<UserDTO> user = usermanager.ViewtAllUser();
+
+            //Map user dto objects in to user model objects
+            var users = from c in user
+                        select new UserModel
+                        {
+                            Id = c.Id,
+                            UserName = c.UserName,
+                            Password = c.Password,
+                            UserRole =c.UserRole,
+                            UserRoleType = c.UserRoleType,
+                            UserRoleId = c.UserRoleId
+                        };
+           
+            return View(users);
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESSDENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        /// <summary>
+        /// Select specific user by id 
+        /// </summary>
+        /// <param name="id">User id</param>
+        /// <returns>specific user data</returns>
+        public ActionResult Details(int id)
+        {
+            //Check an user already logged on or not
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction(ACCESSDENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            } 
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            //Get specific user details
+            UserDTO userdto = usermanager.ViewtUserById(id);
+
+            //Map user dto objects in to user model objects
+            UserModel usermodel = new UserModel()
+            {
+                Id = userdto.Id,
+                UserName = userdto.UserName,
+                Password = userdto.Password,
+                UserRoleType = userdto.UserRoleType,
+                UserRoleId = userdto.UserRoleId
+            };
+
+            if (usermodel == null)
+            {
+                return HttpNotFound();
+            }
+            return View(usermodel);
+        }
+
+        /// <summary>
+        /// Redirect to create view 
+        /// </summary>
+        /// <param name="Id">User Id</param>
+        /// <returns>User model data</returns>
+        public ActionResult Create(int? Id)
+        {
+            //Check an user already logged on or not
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction(ACCESSDENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            //Check user role that already logged on 
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                ViewBag.UserRoleId = new SelectList(db.UserRoles, "Id", "Role");
+                return View();
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESSDENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+           
+        }
+
+        /// <summary>
+        /// Add new user to the user table
+        /// </summary>
+        /// <param name="usermodel">new user model data</param>
+        /// <returns>Newly added user role data</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include = "Id,UserName,Password,UserRoleId,ConfirmPassword")] UserModel usermodel)
+        {
+            //Check user role that already logged on have permissions to this function 
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                //Map user dto objects in to user model objects
+                UserDTO userdto = new UserDTO()
+                {
+                    Id = usermodel.Id,
+                    UserName = usermodel.UserName,
+                    Password = usermodel.Password,
+                    UserRoleId = usermodel.UserRoleId,
+                    ConfirmPassword = usermodel.ConfirmPassword
+
+                };
+
+                if (ModelState.IsValid)
+                {
+                    string displayMessage = string.Empty;
+                    //Insert user details and check successfulness of the function and return json result
+                    if (!usermanager.InsertUser(userdto))
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(UserErrorMessage.AlreadyExistUser);
+                        return Json(new { Message = displayMessage });
+                    }
+                    //Return json result if unsuccessfull 
+                    else
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationInsertedMsg);
+                        return Json(new { Message = displayMessage });
+                    }
+                }
+                ViewBag.UserRoleId = new SelectList(db.UserRoles, "Id", "Role", usermodel.UserRoleId);
+                return View(usermodel);
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESSDENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        /// <summary>
+        /// Select specific user to edit
+        /// </summary>
+        /// <param name="id">Specific users id</param>
+        /// <returns>Selected user to modified</returns>
+        public ActionResult Edit(int id)
+        {
+            //Check an user already logged on or not
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction(ACCESSDENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            //Check user role that already logged on have permissions to this function 
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                usermanager = new UserManager();
+                if (id == null)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                }
+                //Get Specific User by id 
+                UserDTO userdto = usermanager.ViewtUserById(id);
+
+                //Map user dto objects in to user model objects
+                UserModel usermodel = new UserModel()
+                {
+                    Id = userdto.Id,
+                    UserName = userdto.UserName,
+                    Password = userdto.Password,
+                    UserRoleId = userdto.UserRoleId
+                };
+
+                if (usermodel == null)
+                {
+                    return HttpNotFound();
+                }
+                ViewBag.UserRoleId = new SelectList(db.UserRoles, "Id", "Role", usermodel.UserRoleId);
+                return View(usermodel);
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESSDENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+      
+        /// <summary>
+        /// Added modified users data to the table 
+        /// </summary>
+        /// <param name="user">User view model data</param>
+        /// <returns>Modified users data</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include = "Id,UserName,Password,UserRoleId,ConfirmPassword")] UserModel user)
+        {
+            //Check user role that already logged on have permissions to this function
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                //Map user dto objects in to user model objects
+                UserDTO userdto = new UserDTO()
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Password = user.Password,
+                    UserRoleId = user.UserRoleId,
+                    ConfirmPassword = user.ConfirmPassword
+                };
+
+                if (ModelState.IsValid)
+                {
+                    string displayMessage = string.Empty;
+                    //Insert updated user to the table and return json result on success
+                    if (!usermanager.EditUser(userdto))
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(UserErrorMessage.AlreadyExistUser);
+                        return Json(new { Message = displayMessage });
+                    }
+                    // Return json error result on failure
+                    else
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationUpdatedMsg);
+                        return Json(new { Message=displayMessage});
+                     
+                    }
+                }
+                ViewBag.UserRoleId = new SelectList(db.UserRoles, "Id", "Role", user.UserRoleId);
+                return View(user);
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESSDENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        /// <summary>
+        /// Select specific data to modified
+        /// </summary>
+        /// <param name="id">Specific users id</param>
+        /// <returns></returns>
+        public ActionResult Delete(int id)
+        {
+            //Check an user already logged on or not
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction(ACCESSDENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            } 
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            //Check user role that already logged on have permissions to this function
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                //Return specific user by user id
+                UserDTO userdto = usermanager.ViewtUserById(id);
+
+                //Map user dto objects in to user model objects
+                UserModel usermodel = new UserModel()
+                {
+                    Id = userdto.Id,
+                    UserName = userdto.UserName,
+                    Password = userdto.Password,
+                    UserRoleId = userdto.UserRoleId
+                };
+
+                if (usermodel == null)
+                {
+                    return HttpNotFound();
+                }
+                return View(usermodel);
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESSDENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        /// <summary>
+        /// Delete user specific user data on confirmation
+        /// </summary>
+        /// <param name="id">Selected user id to be deleted</param>
+        /// <returns>Nothing</returns>
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            //Check user role that already logged on have permissions to this function
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                usermanager = new UserManager();
+                string displayMessage = string.Empty;
+
+                //Delete user by user id and return json result on success
+                if (!usermanager.DeleteUser(id))
+                {
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+                    return Json(new { Message = displayMessage });
+                }
+                //return json result on deletion failure
+                else
+                {
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationRemovedMsg);
+                    return Json(new { Message = displayMessage });
+                }
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESSDENIED, ERROR, new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+       /// <summary>
+       /// Get selected users data according to user role for display in partial view
+       /// </summary>
+       /// <param name="filterId">User role id</param>
+       /// <returns>Selected users data</returns>
+        public ActionResult RenderFilteredUserGrid(int? filterId)
+        {
+            if (filterId == 0)
+            {
+                //Get all users 
+                IEnumerable<UserDTO> user = usermanager.ViewtAllUser();
+
+                //Map user dto objects in to user model objects
+                var users = from c in user
+                            select new UserModel
+                            {
+                                Id = c.Id,
+                                UserName = c.UserName,
+                                Password = c.Password,
+                                UserRoleType = c.UserRoleType,
+                                UserRoleId = c.UserRoleId
+                            };
+
+                //return data to partial view
+                return PartialView(USER_DETAILS_PARTIAL, users);
+
+            }
+
+            if (filterId == 1)
+            {
+                //Get all users that have admin user role type
+                IEnumerable<UserDTO> user = usermanager.ViewtUserByUserRoleId(CustomEnumMessage.GetStringValue(UserRoleEnum.Admin));
+
+                //Map user dto objects in to user model objects
+                var users = from c in user
+                            select new UserModel
+                            {
+                                Id = c.Id,
+                                UserName = c.UserName,
+                                Password = c.Password,
+                                UserRoleType = c.UserRoleType,
+                                UserRoleId = c.UserRoleId
+                            };
+
+                //return data to partial view
+                return PartialView(USER_DETAILS_PARTIAL, users);
+          
+            }
+
+            if (filterId == 2)
+            {
+                //Get all users that have Doctor user role type
+                IEnumerable<UserDTO> user = usermanager.ViewtUserByUserRoleId(CustomEnumMessage.GetStringValue(UserRoleEnum.Doctor));
+
+                //Map user dto objects in to user model objects
+                var users = from c in user
+                            select new UserModel
+                            {
+                                Id = c.Id,
+                                UserName = c.UserName,
+                                Password = c.Password,
+                                UserRoleType = c.UserRoleType,
+                                UserRoleId = c.UserRoleId
+                            };
+
+                //return data to partial view
+                return PartialView(USER_DETAILS_PARTIAL, users);
+            }
+            if (filterId == 3)
+            {
+                //Get all users that have Cashier user role type
+                IEnumerable<UserDTO> user = usermanager.ViewtUserByUserRoleId(CustomEnumMessage.GetStringValue(UserRoleEnum.Cashier));
+
+                //Map user dto objects in to user model objects
+                var users = from c in user
+                            select new UserModel
+                            {
+                                Id = c.Id,
+                                UserName = c.UserName,
+                                Password = c.Password,
+                                UserRoleType = c.UserRoleType,
+                                UserRoleId = c.UserRoleId
+                            };
+                //return data to partial view
+                return PartialView(USER_DETAILS_PARTIAL, users);
+            }
+            return null;
+        }
+        #endregion
+
+    }
+}

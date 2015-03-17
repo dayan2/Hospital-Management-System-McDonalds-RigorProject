@@ -1,0 +1,186 @@
+﻿#region Using Directives
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitalManagement.Web.Models;
+using Mcd.HospitalManagement.Web.Enums;
+
+#endregion
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class PatientFeedbackController : Controller
+    {
+        #region private variables
+        private IDoctorManager doctors;
+        private IPatientManager patientManager;
+        private PatientModel patient;
+        private PatientFeedbackModel patientFeedBack;
+        private string displayMessage;
+        private bool confirmationResult;
+        #endregion
+
+        public PatientFeedbackController()
+        {
+            patientManager = new PatientManager();
+
+            doctors = new DoctorManager();
+
+        }
+
+        // GET: /PatientFeedback/
+        public ActionResult Index()
+        {
+            IEnumerable<PatientFeedbackDTO> patientFeedBacksDTO = patientManager.ViewAllPatientFeedbackDetails();
+            IEnumerable<PatientFeedbackModel> patientFeedBackDetails = patientFeedBacksDTO.Select(x => new PatientFeedbackModel
+            {
+                Id = x.Id,
+                PatientDetailId = x.PatientDetailId,
+                DoctorId = x.DoctorId,
+                DoctorName = x.DoctorName,
+                FeedbackDate = x.FeedbackDate,
+                FeedbackDescription = x.FeedbackDescription,
+                PatientName = x.PatientName
+            }).ToList();
+
+            return View(patientFeedBackDetails);
+        }
+        public ActionResult FeedbackDetails(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            PatientFeedbackDTO patientFeedbackDTO = patientManager.ViewAllPatientFeedbackDetailsAccordingToId(id);
+            patientFeedBack = new PatientFeedbackModel()
+            {
+
+
+                Id = patientFeedbackDTO.Id,
+                DoctorId = patientFeedbackDTO.DoctorId,
+                DoctorName = patientFeedbackDTO.DoctorName,
+                PatientId = patientFeedbackDTO.PatientId,
+                PatientName = patientFeedbackDTO.PatientName,
+                FeedbackDate = patientFeedbackDTO.FeedbackDate,
+                FeedbackDescription = patientFeedbackDTO.FeedbackDescription,
+                PatientDetailId = patientFeedbackDTO.PatientDetailId
+
+
+
+
+            };
+
+            if (patientFeedBack == null)
+            {
+                return HttpNotFound();
+            }
+            return View(patientFeedBack);
+        }
+
+        // GET: /PatientFeedback/Create
+        public ActionResult Create()
+        {
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin || (UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Cashier)
+            {
+                //get patient details
+                patient = new PatientModel();
+                var patients = patientManager.fillPatients();
+                IEnumerable<PatientFeedbackModel> patientsList = patients.Select(c => new PatientFeedbackModel
+
+                                                  {
+                                                      PatientId = c.Id,
+                                                      PatientName = c.Name,
+                                                  }).ToList();
+
+
+
+                //ViewBag.PatientId = new SelectList(patientsList, "Id", "Name");
+                return View(patientsList);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        // POST: /PatientFeedback/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        public ActionResult GetDoctorsById(int PatientId)
+        {
+
+
+            if (String.IsNullOrEmpty(PatientId.ToString()))
+            {
+                throw new ArgumentNullException("PatientId");
+            }
+
+            var doctors = patientManager.ViewDoctorAccordingToPatientId(PatientId);
+            IEnumerable<PatientFeedbackModel> doctorList = doctors.Select(x => new PatientFeedbackModel
+
+                                                    {
+                                                        DoctorId = (int)x.DoctorId,
+                                                        DoctorName = x.DoctorName
+
+                                                    }).ToList();
+
+            return PartialView("PatientFeedBackDetails", doctorList);
+
+        }
+
+        [HttpPost]
+        public ActionResult InsertFeedBack(string patientId, string doctorId, string feedbackDate, string feedBackDescription)
+        {
+
+
+            var patientDetailId = patientManager.GetPatientDetailId(Int32.Parse(patientId));
+
+            var patientFeedBack = new PatientFeedbackDTO()
+            {
+
+                DoctorId = int.Parse(doctorId),
+                PatientDetailId = patientDetailId.PatientDetailId,
+                FeedbackDate = Convert.ToDateTime(feedbackDate),
+                FeedbackDescription = feedBackDescription
+
+            };
+
+            if (ModelState.IsValid)
+            {
+                patientManager.InsertPatientFeedBack(patientFeedBack);
+                
+                //displayMessage = string.Empty;
+                //if (confirmationResult == true)
+                //    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationInsertedMsg);
+                //else
+                //    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+
+                //return Json(new { Message = displayMessage });
+            }
+            else
+            {
+
+            }
+
+
+
+            return View();
+        }
+
+
+  
+
+
+
+    }
+}

@@ -1,0 +1,355 @@
+﻿using Mcd.HospitalManagement.Web.Models;
+using Mcd.HospitaManagementSystem.Business;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitaManagementSystem.Business.DTO;
+
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class PatientAdmissionDetailsController : Controller
+    {
+
+        private IPatientManager patientManager;
+        PatientAdmissionDetailsModel patientAdmissionDetails;
+        PatientModel patient;
+        private IWards wards;
+        WardDetailsModel wardDetailsModel;
+        DoctorModel doctorModel;
+        BedModel bedModel;
+
+
+        
+        public PatientAdmissionDetailsController()
+        {
+            patientManager = new PatientManager();
+            wards = new WardDetails();
+        }
+        // GET: /PatientAdmissionDetails/
+        public ActionResult Index()
+        {
+            patientAdmissionDetails = new PatientAdmissionDetailsModel();
+            var patients = patientManager.ViewAllAdmissionPatientDetails();
+            IEnumerable<PatientAdmissionDetailsModel> admissionList = from admission in patients
+                                                              select new PatientAdmissionDetailsModel
+                                              {
+                                                       PatientDetailId=admission.PatientDetailId,
+                                                       AdmitDate=admission.AdmitDate,
+                                                       BedId=admission.BedId,
+                                                       WardId=admission.WardId,
+                                                       DoctorId=admission.DoctorId,
+                                                       PatientId=admission.PatientId,
+                                                       IsDischarged=admission.IsDischarged,
+                                                       
+                                                       
+                                              };
+             
+
+            patientAdmissionDetails.PatientAdmissonDetails = admissionList;
+            return View(patientAdmissionDetails);
+           
+        }
+
+        //// GET: /PatientAdmissionDetails/Details/5
+        public ActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            PatientAdmissionDTO patientAdmissionDTO = patientManager.ViewPatientAdmissionDetails(id);
+            patientAdmissionDetails = new PatientAdmissionDetailsModel()
+            {
+
+                PatientDetailId = patientAdmissionDTO.PatientDetailId,
+                AdmitDate = patientAdmissionDTO.AdmitDate,
+                BedId = patientAdmissionDTO.BedId,
+                WardId = patientAdmissionDTO.WardId,
+                DoctorId = patientAdmissionDTO.DoctorId,
+                PatientId = patientAdmissionDTO.PatientId,
+                IsDischarged = patientAdmissionDTO.IsDischarged,
+            };
+
+            if (patientAdmissionDetails == null)
+            {
+                return HttpNotFound();
+            }
+            return View(patientAdmissionDetails);
+        }
+
+        // GET: /PatientAdmissionDetails/Create
+        public ActionResult Create()
+        {
+            //get patient details
+            patient = new PatientModel();
+            var patients = patientManager.FillPatients();
+            IEnumerable<PatientModel> PList = from c in patients
+                                         select new PatientModel
+                                         {
+                                             Id = c.Id,
+                                             Name = c.Name,
+                                         };
+
+            //get ward Details
+
+            wardDetailsModel = new WardDetailsModel();
+            var wardList = wards.ViewWardDetails();
+            IEnumerable<WardDetailsModel> wardDetailList = from w in wardList
+                                                           select new WardDetailsModel
+                                                           {
+                                                               Id = w.Id,
+                                                               WardNo = w.WardNo,
+                                                           };
+
+
+            //get doctor details
+            //test data
+            List<DoctorModel> doctorList = new List<DoctorModel> { new DoctorModel { Id = 5, Name = "Senevirathne" } };
+            IEnumerable<DoctorModel> doctorDetailsList = doctorList;
+
+            //get beds details
+            //test data
+            List<BedModel> bedModelList = new List<BedModel>{new BedModel { Id = 1, BedTicketNo ="1" }};
+            IEnumerable<BedModel> bedDetailList = bedModelList;
+
+
+            ViewBag.BedId = new SelectList(bedDetailList, "Id", "BedTicketNo");
+            ViewBag.DoctorId = new SelectList(doctorDetailsList, "Id", "Name");
+            ViewBag.PatientId = new SelectList(PList, "Id", "Name");
+            ViewBag.WardId = new SelectList(wardDetailList, "Id", "WardNo");
+            return View();
+        }
+
+        // POST: /PatientAdmissionDetails/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include = "PatientDetailId,AdmitDate,BedId,WardId,DoctorId,PatientId,IsDischarged")] PatientAdmissionDetailsModel patientdetail)
+        {
+            PatientAdmissionDTO patientAdmissionDTO = new PatientAdmissionDTO()
+            {
+                PatientDetailId = patientdetail.PatientDetailId,
+                AdmitDate = patientdetail.AdmitDate,
+                BedId = patientdetail.BedId,
+                WardId = patientdetail.WardId,
+                DoctorId = patientdetail.DoctorId,
+                PatientId = patientdetail.PatientId,
+                IsDischarged = patientdetail.IsDischarged
+            };
+            if (ModelState.IsValid)
+            {
+                patientManager.InsertPatientAdmissionDetails(patientAdmissionDTO);
+                return RedirectToAction("Index");
+            }
+
+            //get patient details
+            patient = new PatientModel();
+            var patients = patientManager.FillPatients();
+            IEnumerable<PatientModel> PList = from c in patients
+                                              select new PatientModel
+                                              {
+                                                  Id = c.Id,
+                                                  Name = c.Name,
+                                              };
+
+            //get ward Details
+
+            wardDetailsModel = new WardDetailsModel();
+            var wardList = wards.ViewWardDetails();
+            IEnumerable<WardDetailsModel> wardDetailList = from w in wardList
+                                                           select new WardDetailsModel
+                                                           {
+                                                               Id = w.Id,
+                                                               WardNo = w.WardNo,
+                                                           };
+
+
+            //get doctor details
+            //test data
+            List<DoctorModel> doctorList = new List<DoctorModel> { new DoctorModel { Id = 5, Name = "Senevirathne" } };
+            IEnumerable<DoctorModel> doctorDetailsList = doctorList;
+
+            //get beds details
+            //test data
+            List<BedModel> bedModelList = new List<BedModel> { new BedModel { Id = 1, BedTicketNo = "1" } };
+            IEnumerable<BedModel> bedDetailList = bedModelList;
+
+
+            ViewBag.BedId = new SelectList(bedDetailList, "Id", "BedTicketNo");
+            ViewBag.DoctorId = new SelectList(doctorDetailsList, "Id", "Name");
+            ViewBag.PatientId = new SelectList(PList, "Id", "Name");
+            ViewBag.WardId = new SelectList(wardDetailList, "Id", "WardNo");
+            return View(patientdetail);
+        }
+
+        // GET: /PatientAdmissionDetails/Edit/5
+        public ActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            PatientAdmissionDTO patientAdmissionDTO = patientManager.ViewPatientAdmissionDetails(id);
+            patientAdmissionDetails = new PatientAdmissionDetailsModel()
+            {
+
+                PatientDetailId = patientAdmissionDTO.PatientDetailId,
+                AdmitDate = patientAdmissionDTO.AdmitDate,
+                BedId = patientAdmissionDTO.BedId,
+                WardId = patientAdmissionDTO.WardId,
+                DoctorId = patientAdmissionDTO.DoctorId,
+                PatientId = patientAdmissionDTO.PatientId,
+                IsDischarged = patientAdmissionDTO.IsDischarged,
+            };
+
+            if (patientAdmissionDetails == null)
+            {
+                return HttpNotFound();
+            }
+          
+            //get patient details
+            patient = new PatientModel();
+            var patients = patientManager.FillPatients();
+            IEnumerable<PatientModel> PList = from c in patients
+                                              select new PatientModel
+                                              {
+                                                  Id = c.Id,
+                                                  Name = c.Name,
+                                              };
+
+            //get ward Details
+
+            wardDetailsModel = new WardDetailsModel();
+            var wardList = wards.ViewWardDetails();
+            IEnumerable<WardDetailsModel> wardDetailList = from w in wardList
+                                                           select new WardDetailsModel
+                                                           {
+                                                               Id = w.Id,
+                                                               WardNo = w.WardNo,
+                                                           };
+
+
+            //get doctor details
+            //test data
+            List<DoctorModel> doctorList = new List<DoctorModel> { new DoctorModel { Id = 5, Name = "Senevirathne" } };
+            IEnumerable<DoctorModel> doctorDetailsList = doctorList;
+
+            //get beds details
+            //test data
+            List<BedModel> bedModelList = new List<BedModel> { new BedModel { Id = 1, BedTicketNo = "1" } };
+            IEnumerable<BedModel> bedDetailList = bedModelList;
+
+
+            ViewBag.BedId = new SelectList(bedDetailList, "Id", "BedTicketNo");
+            ViewBag.DoctorId = new SelectList(doctorDetailsList, "Id", "Name");
+            ViewBag.PatientId = new SelectList(PList, "Id", "Name");
+            ViewBag.WardId = new SelectList(wardDetailList, "Id", "WardNo");
+            return View(patientAdmissionDetails);
+ 
+        }
+
+        //// POST: /PatientAdmissionDetails/Edit/5
+        //// To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        //// more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include = "Patient_Detail_Id,AdmitDate,BedId,WardId,DoctorId,PatientId,IsDischarged")] PatientAdmissionDetailsModel patientDetail)
+        {
+            PatientAdmissionDTO patientAdmissionDTO = new PatientAdmissionDTO() {
+                PatientDetailId = patientDetail.PatientDetailId,
+                AdmitDate = patientDetail.AdmitDate,
+                BedId = patientDetail.BedId,
+                WardId = patientDetail.WardId,
+                DoctorId = patientDetail.DoctorId,
+                PatientId = patientDetail.PatientId, 
+                IsDischarged = patientDetail.IsDischarged,
+            };
+            if (ModelState.IsValid)
+            {
+                patientManager.EditPatientAdmissionDetails(patientAdmissionDTO);
+                return RedirectToAction("Index");
+            }
+            //get patient details
+            patient = new PatientModel();
+            var patients = patientManager.FillPatients();
+            IEnumerable<PatientModel> PList = from c in patients
+                                              select new PatientModel
+                                              {
+                                                  Id = c.Id,
+                                                  Name = c.Name,
+                                              };
+
+            //get ward Details
+
+            wardDetailsModel = new WardDetailsModel();
+            var wardList = wards.ViewWardDetails();
+            IEnumerable<WardDetailsModel> wardDetailList = from w in wardList
+                                                           select new WardDetailsModel
+                                                           {
+                                                               Id = w.Id,
+                                                               WardNo = w.WardNo,
+                                                           };
+
+
+            //get doctor details
+            //test data
+            List<DoctorModel> doctorList = new List<DoctorModel> { new DoctorModel { Id = 5, Name = "Senevirathne" } };
+            IEnumerable<DoctorModel> doctorDetailsList = doctorList;
+
+            //get beds details
+            //test data
+            List<BedModel> bedModelList = new List<BedModel> { new BedModel { Id = 1, BedTicketNo = "1" } };
+            IEnumerable<BedModel> bedDetailList = bedModelList;
+
+
+            ViewBag.BedId = new SelectList(bedDetailList, "Id", "BedTicketNo");
+            ViewBag.DoctorId = new SelectList(doctorDetailsList, "Id", "Name");
+            ViewBag.PatientId = new SelectList(PList, "Id", "Name");
+            ViewBag.WardId = new SelectList(wardDetailList, "Id", "WardNo");
+            return View(patientDetail);
+        }
+
+        //// GET: /PatientAdmissionDetails/Delete/5
+        //public ActionResult Delete(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+        //    }
+        //    Patient_Detail patient_detail = db.Patient_Detail.Find(id);
+        //    if (patient_detail == null)
+        //    {
+        //        return HttpNotFound();
+        //    }
+        //    return View(patient_detail);
+        //}
+
+        //// POST: /PatientAdmissionDetails/Delete/5
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult DeleteConfirmed(int id)
+        //{
+        //    Patient_Detail patient_detail = db.Patient_Detail.Find(id);
+        //    db.Patient_Detail.Remove(patient_detail);
+        //    db.SaveChanges();
+        //    return RedirectToAction("Index");
+        //}
+
+        //protected override void Dispose(bool disposing)
+        //{
+        //    if (disposing)
+        //    {
+        //        db.Dispose();
+        //    }
+        //    base.Dispose(disposing);
+        //}
+    }
+}

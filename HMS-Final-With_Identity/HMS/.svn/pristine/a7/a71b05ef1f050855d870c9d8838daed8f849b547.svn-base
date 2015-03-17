@@ -1,0 +1,24 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Mcd.HospitaManagementSystem.Business.DTO;
+using Mcd.HospitalManagementSystem.Data;
+using AutoMapper;
+namespace Mcd.HospitaManagementSystem.Business
+{
+ public class WardDetails:IWards
+    {
+     private LP_HMSDbEntities db = new LP_HMSDbEntities();
+     Ward wards;
+     WardDTO wardDto;
+     public IEnumerable<WardDTO> ViewWardDetails()
+     {
+         IList<Ward> ward = db.Wards.ToList();
+         Mapper.CreateMap<Ward, WardDTO>();
+         var wardList = Mapper.Map<IEnumerable<Ward>, IEnumerable<WardDTO>>(ward);
+         return wardList;
+     }
+    }
+}

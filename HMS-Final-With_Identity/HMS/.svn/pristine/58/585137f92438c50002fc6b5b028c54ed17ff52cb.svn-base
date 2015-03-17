@@ -1,0 +1,149 @@
+﻿@{
+    ViewBag.Title = "AdminHome";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+<h2>Home</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Heroic Features - Start Bootstrap Template</title>
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/heroic-features.css" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <hr>
+        <!-- Title -->
+        <!-- /.row -->
+        <!-- Page Features -->
+        <div class="row text-center">
+            <div class="col-md-3 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="~/Images/UserIcon.jpg" style="height: 100px" />
+                    <div class="caption">
+                        <h3>User</h3>
+                        <p>This option allows you to view System User Details</p>
+                        <p>
+                            <a href="~/User/Index" class="btn btn-primary">View</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="~/Images/UserRoleIcon.png" style="height:100px" />
+                    <div class="caption">
+                        <h3>User Role</h3>
+                        <p>This option allows you to view System User Role Details</p>
+                        <p>
+                            <a href="~/UserRole/Index" class="btn btn-primary">View</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="~/Images/DoctorIcon.jpg" style="height: 100px" />
+                    <div class="caption">
+                        <h3>Doctor</h3>
+                        <p>This option allows you to view Doctor Details</p>
+                        <p>
+                            <a href="~/Doctor/GetDoctors" class="btn btn-primary">View</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="~/Images/WardIcon.gif" style="height: 100px" />
+                    <div class="caption">
+                        <h3>Ward</h3>
+                        <p>This option allows you to view Ward Details</p>
+                        <p>
+                            <a href="~/Ward/Index" class="btn btn-primary">View</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <br />
+        <div class="row text-center">
+            <div class="col-md-3 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="~/Images/BedIcon.jpg" style="height: 100px" />
+                    <div class="caption">
+                        <h3>Bed Details</h3>
+                        <p>This option allows you to view Bed Details</p>
+                        <p>
+                            <a href="~/Bed/Index" class="btn btn-primary">View</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="~/Images/NurseIcon.jpg" style="height: 100px" />
+                    <div class="caption">
+                        <h3>Nurse</h3>
+                        <p>This option allows you to view Nurse Details</p>
+                        <p>
+                            <a href="~/Nurses/Index" class="btn btn-primary">View</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="~/Images/laboratory_icon.jpg" style="height: 100px" />
+                    <div class="caption">
+                        <h3>Medical Test</h3>
+                        <p>This option allows you to view Medical Test Details</p>
+                        <p>
+                            <a href="~/MedicalTestType/Index" class="btn btn-primary">View</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="~/Images/Patent.jpg" style="height: 100px" />
+                    <div class="caption">
+                        <h3>Patient</h3>
+                        <p>This option allows you to view Patient Test Details</p>
+                        <p>
+                            <a href="~/Patient/Index" class="btn btn-primary">View</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.row -->
+        <hr>
+        <!-- Footer -->
+    </div>
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+</body>
+</html>
+
+

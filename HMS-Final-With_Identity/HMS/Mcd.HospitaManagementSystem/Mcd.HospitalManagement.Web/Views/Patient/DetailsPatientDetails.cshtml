@@ -1,0 +1,87 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+<br />
+<div class="row">
+    <div class="col-xs-3">
+        <ol class="breadcrumb">
+            @if ((string)Session["USERROLE"] == "Admin")
+            {
+                <li><a href="~/AdminHome/Index">Home</a></li>
+            }
+            else
+            {
+                <li><a href="~/HomePage/HomePageForClerk">Home</a></li>
+            }
+            <li class="active">Patient Details</li>
+        </ol>
+    </div>
+</div>
+<div class="col-xs-2">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation" class="active"><a href="~/Patient/CreatePatientDetails">Add Patient</a></li>
+        <li role="presentation"><a href="~/PatientAdmissionDetails/Index">Patient Details</a></li>
+        <li role="presentation"><a href="~/PatientFeedback/Index">FeedBack Details</a></li>
+        <li role="presentation"><a href="~/DoctorRecommendation/Index">Recomended Doctors</a></li>
+
+    </ul>
+</div>
+<br />
+<br />
+<div class="col-xs-10">
+    <div>
+        <h4>Patient</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayName("Patient Name")
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayName("NIC")
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.NIC)
+            </dd>
+
+            <dt>
+                @Html.DisplayName("Address")
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Address)
+            </dd>
+
+            <dt>
+                @Html.DisplayName("Gender")
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Gender)
+            </dd>
+
+            <dt>
+                @Html.DisplayName("Mobile No")
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.MobileNo)
+            </dd>
+
+        </dl>
+    </div>
+    
+    <p>
+        @Html.ActionLink("Edit", "EditPatientDetails", new { id = Model.Id }) |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+    </div>

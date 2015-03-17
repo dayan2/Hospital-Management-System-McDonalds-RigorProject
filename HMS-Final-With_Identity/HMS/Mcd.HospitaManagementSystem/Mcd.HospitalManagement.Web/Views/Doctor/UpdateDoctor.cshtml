@@ -1,0 +1,132 @@
+﻿@model Mcd.HospitalManagement.Web.Models.DoctorModel
+
+@{
+    ViewBag.Title = "UpdateDoctor";
+    <link href="~/Content/Style.css" rel="stylesheet" />
+}
+
+<h2>UpdateDoctor</h2> 
+
+
+@using (Html.BeginForm("UpdateDoctor", "Doctor", FormMethod.Post, new { @id = "form" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>DoctorModel</h4>
+        <hr />
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.UserId)
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.Name, new { @class = "form-control" , @name="Name"})
+                @Html.ValidationMessageFor(model => model.Name)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DoctorSpecialityId, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.DoctorSpecialityId, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.DoctorSpecialityId)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Charges, new { @class = "control-label col-md-2", @name = "Charges" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.Charges, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Charges)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.WardId, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.WardId, new { @class = "form-control", @name = "WardId" })
+                @Html.ValidationMessageFor(model => model.WardId)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.PhoneNo, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.PhoneNo, new { @class = "form-control", @name = "PhoneNo" })
+                @Html.ValidationMessageFor(model => model.PhoneNo)
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-primary" id="submit" />
+                <a href="~/AdminHome/Index" class="btn btn-primary">Exit</a>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+
+    <script type="text/javascript">       
+
+        $(document).ready(function () {
+
+            var jsonObj = $('#form').serialize();
+
+            //validation rules
+            $("#form").validate({
+                rules: {
+                    "Name": {
+                        required: true
+                    },
+                    "Charges": {
+                        required: true,
+                        number: true
+                    },
+                    "PhoneNo": {
+                        required: true,
+                        number: true
+
+                    },
+                    "WardId": {
+                        required: true,
+                        number: true
+                    }
+                },
+                //perform an AJAX post to ajax.php
+                submitHandler: function () {
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Content("~/Doctor/UpdateDoctor")',
+                        data: $('#form').serialize(),
+                        success: function (data) {
+
+                            $('#submit').hide();
+                            TriggerMsg(data.Message);
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert("Error: " + errorThrown + " , Please try again");
+
+                        }
+                    });
+                    return false;
+
+                }
+            });
+        });
+        function TriggerMsg(value) {
+            alert(value);
+            return false;
+        }
+
+
+    </script>
+
+
+}

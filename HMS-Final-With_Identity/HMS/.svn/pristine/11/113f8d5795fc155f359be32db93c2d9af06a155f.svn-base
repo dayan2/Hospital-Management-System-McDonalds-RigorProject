@@ -1,0 +1,66 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientAdmissionDetailsModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Patient_Detail</h4>
+	<hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.AdmitDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AdmitDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IsDischarged)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.IsDischarged)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BedTicketNo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BedTicketNo)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DoctorName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DoctorName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.WardNo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.WardNo)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "EditPatientAdmission", new { id = Model.PatientDetailId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

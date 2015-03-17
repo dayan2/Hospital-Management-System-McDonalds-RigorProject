@@ -1,0 +1,349 @@
+﻿#region Using Directives
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business;
+using AutoMapper;
+using Mcd.HospitalManagement.Web.Models;
+using Mcd.HospitalManagement.Web.Enums;
+#endregion
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class WardController : BaseController
+    {
+        #region constant
+        const string ACCESS_DENIED = "AccessDenied";
+        const string ERROR = "Error";
+
+        #endregion
+
+
+        #region Private Fields
+        private IWards wardManager;
+        #endregion
+
+
+        #region Constructor
+        public WardController()
+            : base()
+        {
+            wardManager = new WardManager();
+        }
+        #endregion
+
+        #region Public Methods
+        /// <summary>
+        /// View all ward details
+        /// </summary>
+        /// <returns>Ward type data model</returns>
+        public ActionResult Index()
+        {
+            //Check an user already logged on or not return to error page if not logged in
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ERRORMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            //Check user role that already logged on have permissions to this function 
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                //Get all ward details 
+                IEnumerable<WardDTO> ward = wardManager.ViewWardDetails();
+
+                //Map ward dto objects in to ward model objects
+                var wardModel = from wd in ward
+                                select new WardModel()
+                                {
+                                    Id = wd.Id,
+                                    WardFee = wd.WardFee,
+                                    WardNo = wd.WardNo
+                                };
+
+                return View(wardModel);
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {     
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ERRORMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+
+            }
+        }
+
+        /// <summary>
+        /// Get specific ward details
+        /// </summary>
+        /// <param name="id">ward id</param>
+        /// <returns>Ward type view data model</returns>
+        public ActionResult Details(int? id)
+        {
+            //Check an user already logged on or not return to error page if not logged in
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ERRORMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            } 
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            //Get ward details by ward id
+            WardDTO wardDto = wardManager.ViewWardById(id);
+
+            //Map ward dto objects in to ward model objects
+            WardModel ward = new WardModel()
+            {
+                Id = wardDto.Id,
+                WardFee = wardDto.WardFee,
+                WardNo = wardDto.WardNo
+            };
+
+            if (ward == null)
+            {
+                return HttpNotFound();
+            }
+            return View(ward);
+        }
+
+        /// <summary>
+        /// Redirect to adding ward data details
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult Create()
+        {
+            //Check an user already logged on or not return to error page if not logged in
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ERRORMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            }
+            //Check user role that already logged on have permissions to this function 
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                return View();
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ERRORMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        /// <summary>
+      /// Add new ward detail to the table
+      /// </summary>
+      /// <param name="wardModel">Ward type data model</param>
+      /// <returns>ward view data model</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include = "Id,WardNo,WardFee")] WardModel wardModel)
+        {
+            //Check an user already logged on or not return to error page if not logged in
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ERRORMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+            //Check user role that already logged on have permissions to this function
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                //Map ward model objects in to ward dto objects
+                WardDTO wardDto = new WardDTO()
+                {
+                    WardFee = wardModel.WardFee,
+                    WardNo = wardModel.WardNo
+                };
+                if (ModelState.IsValid)
+                {
+                    string displayMessage = string.Empty;
+                    //Insert ward details and check successfulness of the function and return json result
+                    if (!wardManager.InsertWard(wardDto))
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+                        return Json(new { Message = displayMessage });
+                    }
+                    //Return json result if unsuccessfull 
+                    else
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationInsertedMsg);
+                        return Json(new { Message = displayMessage });
+                    }
+                }
+
+                return View(wardModel);
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ERRORMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+
+            }
+        }
+
+        /// <summary>
+        /// Select specific ward to modify
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ActionResult Edit(int? id)
+        {
+            //Check an user already logged on or not return to error page if not logged in
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ERRORMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            } 
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            //Check user role that already logged on have permissions to this function
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                //Get ward details by ward id
+                WardDTO wardDto = wardManager.ViewWardById(id);
+
+                //Map ward dto objects in to ward model objects
+                WardModel ward = new WardModel()
+                {
+                    Id = wardDto.Id,
+                    WardFee = wardDto.WardFee,
+                    WardNo = wardDto.WardNo
+                };
+
+                if (ward == null)
+                {
+                    return HttpNotFound();
+                }
+                return View(ward);
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ERRORMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+            
+        }
+
+        /// <summary>
+      /// Add modified data to ward table 
+      /// </summary>
+      /// <param name="wardDto"></param>
+      /// <returns></returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include = "Id,WardNo,WardFee")] WardDTO wardDto)
+        {
+            //Check user role that already logged on have permissions to this function
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                if (ModelState.IsValid)
+                {
+                    string displayMessage = string.Empty;
+
+                    //Edit ward details and check successfulness of the function and return json result
+                    if (!wardManager.EditWard(wardDto))
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+                        return Json(new { Message = displayMessage });
+                    }
+                    //Return json result if unsuccessfull 
+                    else
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationUpdatedMsg);
+                        return Json(new { Message = displayMessage });
+                    }
+                }
+                return View(wardDto);
+
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ERRORMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+
+            }
+        }
+
+        /// <summary>
+        /// Select specific ward data to delete
+        /// </summary>
+        /// <param name="id">ward id</param>
+        /// <returns>ward view data model</returns>
+        public ActionResult Delete(int? id)
+        {
+            //Check an user already logged on or not return to error page if not logged in
+            if ((string)Session["USERROLE"] == null)
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ERRORMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.InvalidLogin) });
+            } 
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            //Check user role that already logged on have permissions to this function
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                //Get specific ward details by ward id
+                WardDTO wardDto = wardManager.ViewWardById(id);
+
+                //Map ward dto objects in to ward model objects
+                WardModel ward = new WardModel()
+                {
+                    Id = wardDto.Id,
+                    WardFee = wardDto.WardFee,
+                    WardNo = wardDto.WardNo
+                };
+
+                if (ward == null)
+                {
+                    return HttpNotFound();
+                }
+                return View(ward);
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ERRORMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        /// <summary>
+       /// Delte specific ward ,odel on delete
+       /// </summary>
+       /// <param name="id">Ward id</param>
+       /// <returns>ward model</returns>
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            //Check user role that already logged on have permissions to this function
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+
+                string displayMessage = string.Empty;
+                //Delete ward details and check successfulness of the function and return json result
+                if (!wardManager.DeleteWard(id))
+                {
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+                    return Json(new { Message = displayMessage });
+                }
+                //Return json result if unsuccessfull 
+                else
+                {
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationRemovedMsg);
+                    return Json(new { Message = displayMessage });
+                }
+            }
+            //Redirect to error page if user role dont have access to this function
+            else
+            {
+                return RedirectToAction(ACCESS_DENIED, ERROR, new { ERRORMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+
+            }
+        }
+        #endregion
+
+    }
+}

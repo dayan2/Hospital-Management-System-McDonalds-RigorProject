@@ -1,0 +1,352 @@
+﻿using Mcd.HospitalManagement.Web.Models;
+using Mcd.HospitaManagementSystem.Business;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class DoctorController : Controller
+    {
+        private IDoctorManager repo;
+        #region Constructors
+        public DoctorController()
+        {
+            this.repo = new DoctorManager();
+        }
+        public DoctorController(IDoctorManager repo)
+        {
+            this.repo = repo;
+        }
+        #endregion
+
+        #region ActionMethods
+
+        public ActionResult Index()
+        {
+            return View();
+        }
+        public ActionResult GetDoctors()
+        {
+            IEnumerable<DoctorModel> doctorList = RetrieveDoctors();
+            //IEnumerable<DoctorModel> doctorList = GetFakeDoctorsList();
+            return View(doctorList);
+        }
+        public ActionResult FrontPage()
+        {
+            IEnumerable<PatientDoctorModel> patientsList = RetrieveFakePatients();
+            return View(patientsList);
+        }
+        [HttpGet]
+        public ActionResult AddDoctor()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult AddDoctor(DoctorModel doctor)
+        {
+            DoctorRoleDTO model = new DoctorRoleDTO
+            {
+                Id = doctor.Id,
+                Name = doctor.Name,
+                Charges = doctor.Charges,
+                DoctorSpecialityId = doctor.DoctorSpecialityId,
+                PhoneNo = doctor.PhoneNo,
+                WardId = doctor.WardId
+            };
+            repo.AddDoctor(model);
+            return RedirectToAction("GetDoctors", "Doctor");
+        }
+
+        [HttpGet]
+        public ActionResult UpdateDoctor(int id)
+        {
+            //DoctorRoleDTO DTOObj = repo.GetDoctorsById(id);
+            //DoctorModel doctor = new DoctorModel
+            //{
+            //    Id = DTOObj.Id,
+            //    Name = DTOObj.Name,
+            //    Charges = DTOObj.Charges,
+            //    DoctorSpecialityId = DTOObj.DoctorSpecialityId,
+            //    PhoneNo = DTOObj.PhoneNo,
+            //    WardId = DTOObj.WardId
+            //};
+            DoctorModel doctor = new DoctorModel { Id = 1, Name = "Neranjan Mendis", PhoneNo = "093457234", DoctorSpecialityId = 1, WardId = 1, Charges = 29000 };
+            return View(doctor);
+        }
+        [HttpPost]
+        public ActionResult UpdateDoctor(DoctorModel doctor)
+        {
+            DoctorRoleDTO model = new DoctorRoleDTO
+            {
+                Id = doctor.Id,
+                Name = doctor.Name,
+                Charges = doctor.Charges,
+                DoctorSpecialityId = doctor.DoctorSpecialityId,
+                PhoneNo = doctor.PhoneNo,
+                WardId = doctor.WardId
+            };
+            repo.UpdateDoctor(model);
+            return RedirectToAction("GetDoctors", "Doctor");
+        }
+
+        [HttpGet]
+        public ActionResult RemoveDoctor(int id)
+        {
+            //DoctorRoleDTO doctorDTO = repo.GetDoctorsById(id);
+            //DoctorModel doctorObj = new DoctorModel
+            //{
+            //    Id = doctorDTO.Id,
+            //    Name = doctorDTO.Name,
+            //    Charges = doctorDTO.Charges,
+            //    DoctorSpecialityId = doctorDTO.DoctorSpecialityId,
+            //    PhoneNo = doctorDTO.PhoneNo,
+            //    WardId = doctorDTO.WardId
+            //};
+            DoctorModel doctorObj = new DoctorModel { Id = 1, Name = "Neranjan Mendis", PhoneNo = "093457234", DoctorSpecialityId = 1, WardId = 1, Charges = 29000 };
+            
+            return View(doctorObj);
+        }
+        [HttpPost]
+        public ActionResult RemoveDoctor(DoctorRoleDTO doctor)
+        {
+            repo.RemoveDoctor(doctor.Id);
+            return RedirectToAction("GetDoctors", "Doctor");
+        }
+
+        [HttpGet]
+        public ActionResult Details(int id)
+        {
+            //DoctorRoleDTO doctorDTOObj = repo.GetDoctorsById(id);
+            //DoctorModel doctor = new DoctorModel
+            //{
+            //    Id = doctorDTOObj.Id,
+            //    Name = doctorDTOObj.Name,
+            //    Charges = doctorDTOObj.Charges,
+            //    DoctorSpecialityId = doctorDTOObj.DoctorSpecialityId,
+            //    PhoneNo = doctorDTOObj.PhoneNo,
+            //    WardId = doctorDTOObj.WardId
+            //};
+            DoctorDetailModel doctor = new DoctorDetailModel { Id = 1, Name = "Neranjan Mendis", PhoneNo = "093457234", DoctorSpecialityField = "Neurosurgeons", WardId = 1 };
+            return View(doctor);
+        }        
+        [HttpGet]
+        public ActionResult TransferDoctor(int? id)
+        {
+            //IEnumerable<DoctorModel> doctorList = RetrieveDoctors();
+            IEnumerable<DoctorModel> doctorList = GetFakeDoctorsList();
+            List<SelectListItem> doctorReturningValues = new List<SelectListItem>();
+            foreach (var i in doctorList)
+            {
+                doctorReturningValues.Add(new SelectListItem
+                {
+                    Text = i.Name,
+                    Value = i.Id.ToString()
+                });
+            }            
+            ViewBag.doctorViewbag = doctorReturningValues.ToList();
+
+            //creating an object because we need to use the patient id
+            DoctorRecommendationModel doctorObj = new DoctorRecommendationModel
+            {
+                Id = (int)id
+            };
+            return View(doctorObj);
+        }
+        [HttpPost]
+        public ActionResult TransferDoctor(DoctorRecommendationModel doctor)
+        {
+            DoctorRecommendationDTO doctorDTO = new DoctorRecommendationDTO
+            {
+                Id = doctor.Id,
+                CurrentDoctorId = doctor.CurrentDoctorId,
+                Reason = doctor.Reason,
+                RecomendedDoctorId = doctor.RecomendedDoctorId
+            };
+            
+            repo.TransferDoctor(doctorDTO);
+            return RedirectToAction("FrontPage", "Doctor");
+        }
+        public ActionResult RecommendDoctors()
+        {
+            //IEnumerable<DoctorModel> doctorList = RetrieveDoctors();
+            IEnumerable<DoctorModel> doctorList = GetFakeDoctorsList();
+            return View(doctorList);
+        }
+        #endregion
+
+        #region JsonMethods
+
+        public JsonResult getJsonDentists()
+        {
+            //IEnumerable<DoctorSpecialityDTO> dentistsDTO = GetAllDoctorSpecialityTypes();
+            //IEnumerable<DoctorRoleDTO> dentistsDTO = repo.GetDoctorsBySpecialityId(1);
+            List<DoctorDetailModel> dentists = new List<DoctorDetailModel> 
+            { 
+                new DoctorDetailModel{Id = 1, Name = "Neranjan Mendis - Dentists", DoctorSpecialityField = "Dentists", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Dayan Mendis - Dentists", DoctorSpecialityField = "Dentists", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Ewerdney Mendis - Dentists", DoctorSpecialityField = "Dentists", PhoneNo= "0786904432", WardId = 1}                
+            };
+            return Json(dentists, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult getJsonAllDoctors()
+        {
+            List<DoctorDetailModel> all = new List<DoctorDetailModel> 
+            { 
+                new DoctorDetailModel{Id = 1, Name = "Neranjan Mendis - Dentists", DoctorSpecialityField = "Dentists", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Dayan Mendis - Dentists", DoctorSpecialityField = "Dentists", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Ewerdney Mendis - Dentists", DoctorSpecialityField = "Dentists", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Neranjan Mendis - Neurosurgeons", DoctorSpecialityField = "Neurosurgeons", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Dayan Mendis - Neurosurgeons", DoctorSpecialityField = "Neurosurgeons", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Ewerdney Mendis - Neurosurgeons", DoctorSpecialityField = "Neurosurgeons", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Neranjan Mendis - physicians", DoctorSpecialityField = "physicians", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Dayan Mendis - physicians", DoctorSpecialityField = "physicians", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Ewerdney Mendis - physicians", DoctorSpecialityField = "physicians", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Neranjan Mendis - surgeons", DoctorSpecialityField = "surgeons", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Dayan Mendis - surgeons", DoctorSpecialityField = "surgeons", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Ewerdney Mendis - surgeons", DoctorSpecialityField = "surgeons", PhoneNo= "0786904432", WardId = 1}
+
+            };
+            return Json(all, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult getJsonPhysicians()
+        {
+            List<DoctorDetailModel> physicians = new List<DoctorDetailModel> 
+            { 
+                new DoctorDetailModel{Id = 1, Name = "Neranjan Mendis - physicians", DoctorSpecialityField = "physicians", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Dayan Mendis - physicians", DoctorSpecialityField = "physicians", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Ewerdney Mendis - physicians", DoctorSpecialityField = "physicians", PhoneNo= "0786904432", WardId = 1}                
+            };
+            return Json(physicians, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult getJsonSurgeons()
+        {
+            List<DoctorDetailModel> surgeons = new List<DoctorDetailModel> 
+            { 
+                new DoctorDetailModel{Id = 1, Name = "Neranjan Mendis - surgeons", DoctorSpecialityField = "surgeons", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Dayan Mendis - surgeons", DoctorSpecialityField = "surgeons", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Ewerdney Mendis - surgeons", DoctorSpecialityField = "surgeons", PhoneNo= "0786904432", WardId = 1}                
+            };
+            return Json(surgeons, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult getJsonRadiologists()
+        {
+            List<DoctorDetailModel> radiologists = new List<DoctorDetailModel> 
+            { 
+                new DoctorDetailModel{Id = 1, Name = "Neranjan Mendis - Radiologists", DoctorSpecialityField = "Radiologists", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Dayan Mendis - Radiologists", DoctorSpecialityField = "Radiologists", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Ewerdney Mendis - Radiologists", DoctorSpecialityField = "Radiologists", PhoneNo= "0786904432", WardId = 1}                
+            };
+            return Json(radiologists, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult getJsonNeurologists()
+        {
+            List<DoctorDetailModel> neurologists = new List<DoctorDetailModel> 
+            { 
+                new DoctorDetailModel{Id = 1, Name = "Neranjan Mendis - Neurologists", DoctorSpecialityField = "Neurologists", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Dayan Mendis - Neurologists", DoctorSpecialityField = "Neurologists", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Ewerdney Mendis - Neurologists", DoctorSpecialityField = "Neurologists", PhoneNo= "0786904432", WardId = 1}                
+            };
+            return Json(neurologists, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult getJsonNeurosurgeons()
+        {
+            List<DoctorDetailModel> neurosurgeons = new List<DoctorDetailModel> 
+            { 
+                new DoctorDetailModel{Id = 1, Name = "Neranjan Mendis - Neurosurgeons", DoctorSpecialityField = "Neurosurgeons", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Dayan Mendis - Neurosurgeons",DoctorSpecialityField = "Neurosurgeons", PhoneNo= "0786904432", WardId = 1},
+                new DoctorDetailModel{Id = 1, Name = "Ewerdney Mendis - Neurosurgeons",DoctorSpecialityField = "Neurosurgeons", PhoneNo= "0786904432", WardId = 1}                
+            };
+            return Json(neurosurgeons, JsonRequestBehavior.AllowGet);
+        }
+        #endregion
+
+
+        #region private Methods
+        private IEnumerable<DoctorModel> RetrieveDoctors()
+        {
+            IEnumerable<DoctorRoleDTO> list = repo.GetDoctors();
+            IEnumerable<DoctorModel> dlist = from c in list
+                                             select new DoctorModel
+                                             {
+                                                 Id = c.Id,
+                                                 Name = c.Name,
+                                                 Charges = c.Charges,
+                                                 PhoneNo = c.PhoneNo,
+                                                 DoctorSpecialityId = c.DoctorSpecialityId,
+                                                 WardId = c.WardId
+                                             };
+            return dlist;
+        }
+        private IEnumerable<DoctorModel> GetFakeDoctorsList()
+        {
+            List<DoctorModel> list = new List<DoctorModel>
+            {
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 1, Name = "Neranjan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1},
+                new DoctorModel{Id = 2, Name = "Dayan Mendis", Charges = 12000, DoctorSpecialityId = 1, PhoneNo= "0786904432", WardId = 1}
+            };
+            IEnumerable<DoctorModel> plist = list;
+            return plist;
+        }
+        private IEnumerable<PatientDoctorModel> RetrieveFakePatients()
+        {
+            List<PatientDoctorModel> list = new List<PatientDoctorModel>
+            {
+                new PatientDoctorModel{Id = 2, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Neranjan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+                new PatientDoctorModel{Id = 1, AdmitDate = "20-10-2015", Bed = 1, Gender = "Male", Name = "Dayan mendis", IsDischarged = 1 , Ward = 1},
+            };
+            IEnumerable<PatientDoctorModel> plist = list;
+            return plist;
+        }
+        #endregion
+    }
+}

@@ -1,0 +1,41 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Mcd.HospitalManagementSystem.Data;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+  public  interface IPatientManager
+    {
+      void InsertPatient(PatientDTO patientDTO);
+      void EditPatient(PatientDTO patientDTO);
+      PatientDTO ViewPatientDetails(int? patientID);
+      IEnumerable<PatientDTO> ViewAllPatientDetails();
+      void Deletepatient(int? patientId);
+      IEnumerable<PatientDTO> fillPatients();
+      AllPatientDTO ViewPatientRelatedData(int? patientId);
+      void InsertPatientAdmissionDetails(PatientAdmissionDTO patientAdmissionDTO);
+  
+      PatientAdmissionDTO ViewPatientAdmissionDetails(int? patientID);
+      IEnumerable<PatientAdmissionDTO> viewAllAdmissionPatientDetails();
+
+      void DeletePatientAdmissionDetails(int? patientId);
+
+
+      void EditPatientAdmissionDetails(AllPatientDTO patientAdmissionDTO);
+
+      IEnumerable<AllPatientDTO >ViewAllPatientAdmissionDetails();
+
+      bool CheckPatientAdmissionAvilabilty(int? patientID);
+      bool CheckPatientAvilability(string nic);
+      void InsertPatientFeedBack(PatientFeedbackDTO patientFeedbackDto);
+      bool CheckRelationshipBetweenPatientAndPatientDetails(int? patientId);
+      IList<DoctorDetailDTO> ViewDoctorFeedback(int?id);
+      PatientAdmissionDTO getPatientDetailId(int? patientId);
+      IEnumerable<AllPatientDTO> ViewDoctorAccordingToPatientId(int patientId);
+      IEnumerable<PatientFeedbackDTO> ViewAllPatientFeedbackDetails();
+      PatientFeedbackDTO ViewAllPatientFeedbackDetailsAccordingToId(int? patientFeedBackId);
+    }
+}

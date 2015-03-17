@@ -1,0 +1,89 @@
+﻿using AutoMapper;
+using Mcd.HospitalManagementSystem.Data;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class WardRegistration
+    {
+        private LP_HMSDbEntities db = new LP_HMSDbEntities();
+        Ward wards;
+        WardDTO wardDto;
+
+        public IEnumerable<WardDTO> viewAllWard()
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                IEnumerable<Ward> ward = db.Wards.ToList();
+
+                Mapper.CreateMap<Ward, WardDTO>();
+                var wardList = Mapper.Map<IEnumerable<Ward>, IEnumerable<WardDTO>>(ward);
+                return wardList;
+            }
+        }
+
+        public WardDTO viewWardById(int wardId)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                Ward ward = db.Wards.Find(wardId);
+
+                WardDTO wardDto = new WardDTO()
+                {
+                    Id = ward.Id,
+                    WardFee = ward.WardFee,
+                    WardNo = ward.WardNo
+                };
+
+                return wardDto;
+            }
+
+        }
+        public void createWard(WardDTO wardDto)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                Ward ward = new Ward()
+                {
+                    WardFee = wardDto.WardFee,
+                    WardNo = wardDto.WardNo
+                };
+
+
+                db.Wards.Add(ward);
+                db.SaveChanges();
+            }
+        }
+
+        public void editWard(WardDTO wardDto)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                Ward ward = new Ward()
+                {
+                    Id = wardDto.Id,
+                    WardFee = wardDto.WardFee,
+                    WardNo = wardDto.WardNo
+                };
+
+                db.Entry(ward).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+        }
+
+        public void deleteWard(int id)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                Ward ward = db.Wards.Find(id);
+                db.Wards.Remove(ward);
+                db.SaveChanges();
+            }
+        }
+    }
+}

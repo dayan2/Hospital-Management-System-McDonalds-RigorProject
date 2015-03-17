@@ -1,0 +1,354 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitalManagement.Web.Models;
+using AutoMapper;
+using Mcd.HospitalManagement.Web.Enums;
+using Mcd.HospitalManagement.Web;
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class UserController : BaseController
+    {
+        private IUserManager usermanager;
+        public UserController()
+            : base()
+        {
+            usermanager = new UserManager();
+        }
+
+        public UserController(IUserManager userManager)
+        {
+            this.userManager = userManager;
+
+        }
+
+        private LP_HMSDbEntities db = new LP_HMSDbEntities();
+        private IUserManager userManager;
+
+        // GET: /User/
+
+
+        public ActionResult Index()
+        {
+            
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+            IEnumerable<UserDTO> user = usermanager.ViewtAllUser();
+            var users = from c in user
+                        select new UserModel
+                        {
+                            Id = c.Id,
+                            UserName = c.UserName,
+                            Password = c.Password,
+                            UserRole =c.UserRole,
+                            UserRoleType = c.UserRoleType,
+                            UserRoleId = c.UserRoleId
+                        };
+           
+            return View(users);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        // GET: /User/Details/5
+        public ActionResult Details(int id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            UserDTO userdto = usermanager.ViewtUserById(id);
+
+            UserModel usermodel = new UserModel()
+            {
+                Id = userdto.Id,
+                UserName = userdto.UserName,
+                Password = userdto.Password,
+                UserRoleId = userdto.UserRoleId
+            };
+
+            if (usermodel == null)
+            {
+                return HttpNotFound();
+            }
+            return View(usermodel);
+        }
+
+        // GET: /User/Create
+        public ActionResult Create(int? Id)
+        {
+            //IEnumerable<UserDTO> userDto = usermanager.SelectToCreateUser();
+
+            //IEnumerable<UserModel> userModel = from udto in userDto
+            //                                   select new UserModel
+            //                                   {
+            //                                       Id = udto.Id,
+            //                                       Password = udto.Password,
+            //                                       UserName = udto.UserName,
+            //                                       ConfirmPassword = udto.ConfirmPassword
+            //                                   };
+            //ViewBag.Id = new SelectList(userModel, "Id", "Id");
+            //return View();
+
+            ViewBag.UserRoleId = new SelectList(db.UserRoles, "Id", "Role");
+            return View();
+        }
+
+        // POST: /User/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include = "Id,UserName,Password,UserRoleId,ConfirmPassword")] UserModel usermodel)
+        {
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                UserDTO userdto = new UserDTO()
+                {
+                    Id = usermodel.Id,
+                    UserName = usermodel.UserName,
+                    Password = usermodel.Password,
+                    UserRoleId = usermodel.UserRoleId,
+                    ConfirmPassword = usermodel.ConfirmPassword
+
+                };
+
+                if (ModelState.IsValid)
+                {
+                    string displayMessage = string.Empty;
+                    if (!usermanager.InsertUser(userdto))
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+                        ViewBag.Message = CustomEnumMessage.GetStringValue(UserErrorMessage.AlreadyExistUser);
+                    }
+                    else
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationInsertedMsg);
+                        return Json(new { Message = displayMessage });
+                    }
+                }
+                ViewBag.UserRoleId = new SelectList(db.UserRoles, "Id", "Role", usermodel.UserRoleId);
+                return View(usermodel);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+
+
+        // GET: /User/Edit/5
+        public ActionResult Edit(int id)
+        {
+            usermanager = new UserManager();
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            UserDTO userdto = usermanager.ViewtUserById(id);
+
+            UserModel usermodel = new UserModel()
+            {
+                Id = userdto.Id,
+                UserName = userdto.UserName,
+                Password = userdto.Password,
+                UserRoleId = userdto.UserRoleId
+            };
+
+            if (usermodel == null)
+            {
+                return HttpNotFound();
+            }
+            ViewBag.UserRoleId = new SelectList(db.UserRoles, "Id", "Role", usermodel.UserRoleId);
+            return View(usermodel);
+        }
+
+        // POST: /User/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include = "Id,UserName,Password,UserRoleId,ConfirmPassword")] UserModel user)
+        {
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                UserDTO userdto = new UserDTO()
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Password = user.Password,
+                    UserRoleId = user.UserRoleId,
+                    ConfirmPassword = user.ConfirmPassword
+                };
+
+                if (ModelState.IsValid)
+                {
+                    string displayMessage = string.Empty;
+                    if (!usermanager.EditUser(userdto))
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+                        ViewBag.Message = CustomEnumMessage.GetStringValue(UserErrorMessage.AlreadyExistUser);
+                    }
+                    else
+                    {
+                        displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationUpdatedMsg);
+                        return RedirectToAction("Index");
+                    }
+                }
+                ViewBag.UserRoleId = new SelectList(db.UserRoles, "Id", "Role", user.UserRoleId);
+                return View(user);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+        // GET: /User/Delete/5
+        public ActionResult Delete(int id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            UserDTO userdto = usermanager.ViewtUserById(id);
+
+            UserModel usermodel = new UserModel()
+            {
+                Id = userdto.Id,
+                UserName = userdto.UserName,
+                Password = userdto.Password,
+                UserRoleId = userdto.UserRoleId
+            };
+
+            if (usermodel == null)
+            {
+                return HttpNotFound();
+            }
+            return View(usermodel);
+        }
+
+        // POST: /User/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                usermanager = new UserManager();
+                string displayMessage = string.Empty;
+
+                if (!usermanager.DeleteUser(id))
+                {
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+                }
+                else
+                {
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationDeletedMsg);
+                }
+                return null;
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+
+       // [HttpPost]
+        public ActionResult RenderFilteredUserGrid(int? filterId)
+        {
+            if (filterId == 0)
+            {
+                IEnumerable<UserDTO> user = usermanager.ViewtAllUser();
+                var users = from c in user
+                            select new UserModel
+                            {
+                                Id = c.Id,
+                                UserName = c.UserName,
+                                Password = c.Password,
+                                UserRoleType = c.UserRoleType,
+                                UserRoleId = c.UserRoleId
+                            };
+
+                return PartialView("UserDetailsPartial", users);
+
+            }
+
+            if (filterId == 1)
+            {
+                IEnumerable<UserDTO> user = usermanager.ViewtUserByUserRoleId("Admin");
+
+                var users = from c in user
+                            select new UserModel
+                            {
+                                Id = c.Id,
+                                UserName = c.UserName,
+                                Password = c.Password,
+                                UserRoleType = c.UserRoleType,
+                                UserRoleId = c.UserRoleId
+                            };
+
+
+                return PartialView("UserDetailsPartial", users);
+          
+            }
+
+            if (filterId == 2)
+            {
+                IEnumerable<UserDTO> user = usermanager.ViewtUserByUserRoleId("Doctor");
+
+                var users = from c in user
+                            select new UserModel
+                            {
+                                Id = c.Id,
+                                UserName = c.UserName,
+                                Password = c.Password,
+                                UserRoleType = c.UserRoleType,
+                                UserRoleId = c.UserRoleId
+                            };
+
+                return PartialView("UserDetailsPartial", users);
+            }
+            if (filterId == 3)
+            {
+                IEnumerable<UserDTO> user = usermanager.ViewtUserByUserRoleId("Cashier");
+
+                var users = from c in user
+                            select new UserModel
+                            {
+                                Id = c.Id,
+                                UserName = c.UserName,
+                                Password = c.Password,
+                                UserRoleType = c.UserRoleType,
+                                UserRoleId = c.UserRoleId
+                            };
+
+                return PartialView("UserDetailsPartial", users);
+            }
+            return null;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+    }
+}

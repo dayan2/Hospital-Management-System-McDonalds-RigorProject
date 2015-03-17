@@ -1,0 +1,68 @@
+﻿@model IEnumerable<Mcd.HospitalManagement.Web.Models.PatientModel>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Invoice</h2>
+<div class="row">
+    <div class="col-xs-3">
+        <ol class="breadcrumb">
+            @if ((string)Session["USERROLE"] == "Admin")
+            {
+                <li><a href="~/AdminHome/Index">Home</a></li>
+            }
+            else
+            {
+                <li><a href="~/HomePage/HomePageForClerk">Home</a></li>
+            }            
+            <li class="active">Nurse Details</li>
+        </ol>
+    </div>
+</div><div class="col-xs-1">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation"><a href="~/Patient/Index">Patient Details</a></li>
+        <li role="presentation"><a href="~/Invoices/viewInvoices">Invoice List</a></li>
+        <li role="presentation" class="active"><a href="~/Invoices/Index">Prepare Invoices</a></li>
+    </ul>
+</div>
+<div class="col-xs-11">
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayName("Patient Name")
+            </th>
+            <th>
+                @Html.DisplayName("Patient Address")
+            </th>
+            <th>
+                @Html.DisplayName("Mobile No")
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr class="warning">
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                    @Html.HiddenFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Address)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MobileNo)
+                </td>
+                <td>
+                    @* @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |*@
+                    @Html.ActionLink("Create Invoice", "create", new { PatientId = item.Id })
+                    @* @Html.ActionLink("Details", "Details", new { id=item.Id }) |*@
+                    @* @Html.ActionLink("Delete", "Delete", new { id=item.Id })*@
+                </td>
+            </tr>
+        }
+
+    </table>
+</div>
+

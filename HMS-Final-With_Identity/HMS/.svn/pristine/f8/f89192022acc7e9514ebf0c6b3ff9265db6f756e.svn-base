@@ -1,0 +1,72 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientAdmissionDetailsModel
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Patient_Detail</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.AdmitDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AdmitDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IsDischarged)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.IsDischarged)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Bed.BedTicketNo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Bed.BedTicketNo)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Doctor.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Doctor.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Patient.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Patient.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Ward.WardNo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Ward.WardNo)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>

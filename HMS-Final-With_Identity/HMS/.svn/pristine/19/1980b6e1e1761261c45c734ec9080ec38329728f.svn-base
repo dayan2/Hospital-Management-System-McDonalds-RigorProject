@@ -1,0 +1,183 @@
+﻿#region Using Directives
+using AutoMapper;
+using Mcd.HospitalManagementSystem.Data;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+#endregion
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class WardRegistration
+    {
+        #region Private Fields
+        private LP_HMSDbEntities db = new LP_HMSDbEntities();
+        #endregion
+
+        #region Public Methods
+        /// <summary>
+        /// Get all ward details
+        /// </summary>
+        /// <returns>Ward dto type object</returns>
+        public IEnumerable<WardDTO> viewAllWard()
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    //Get all ward details
+                    IEnumerable<Ward> ward = db.Wards.ToList();
+
+                    //Map waard entity type object to ward dto type object 
+                    Mapper.CreateMap<Ward, WardDTO>();
+                    var wardList = Mapper.Map<IEnumerable<Ward>, IEnumerable<WardDTO>>(ward);
+                    return wardList;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+
+        /// <summary>
+        /// Get specific ward details by ward id 
+        /// </summary>
+        /// <param name="wardId">Ward id</param>
+        /// <returns></returns>
+        public WardDTO viewWardById(int? wardId)
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    //Find specified ward id
+                    Ward ward = db.Wards.Find(wardId);
+
+                    //Map ward entity type object to ward dto type object  
+                    WardDTO wardDto = new WardDTO()
+                    {
+                        Id = ward.Id,
+                        WardFee = ward.WardFee,
+                        WardNo = ward.WardNo
+                    };
+
+                    return wardDto;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+
+        }
+        /// <summary>
+        /// Insert new ward detail to the system
+        /// </summary>
+        /// <param name="wardDto"> Ward DTO type object</param>
+        /// <returns>Return insertion success or failure</returns>
+        public bool createWard(WardDTO wardDto)
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    //Map ward DTO type object to ward Entity type object  
+                    Ward ward = new Ward()
+                    {
+                        WardFee = wardDto.WardFee,
+                        WardNo = wardDto.WardNo
+                    };
+
+                    //Insert newly added object
+                    db.Wards.Add(ward);
+
+                    //Save changes return if it's success
+                    if (db.SaveChanges() == 1)
+                        return true;
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+                throw;
+
+            }
+
+        }
+        /// <summary>
+        /// Modified already exists ward detail
+        /// </summary>
+        /// <param name="wardDto">ward Dto type object</param>
+        /// <returns>Return modifing success or failure</returns>
+        public bool editWard(WardDTO wardDto)
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    //Map ward DTO type object to ward Entity type object  
+                    Ward ward = new Ward()
+                    {
+                        Id = wardDto.Id,
+                        WardFee = wardDto.WardFee,
+                        WardNo = wardDto.WardNo
+                    };
+
+                    db.Entry(ward).State = EntityState.Modified;
+
+                    //Save changes return if it's success
+                    if (db.SaveChanges() == 1)
+                        return true;
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+                throw;
+            }
+
+        }
+        /// <summary>
+        /// Delete ward detail by id
+        /// </summary>
+        /// <param name="id">Ward id</param>
+        /// <returns>Returns deletion success or failure</returns>
+        public bool deleteWard(int id)
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    //Find ward object by id to delete
+                    Ward ward = db.Wards.Find(id);
+
+                    //Remove ward detail
+                    db.Wards.Remove(ward);
+
+                    //Save changes return if it's success
+                    if (db.SaveChanges() == 1)
+                        return true;
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+                throw;
+            }
+
+        }
+        #endregion
+
+    }
+}

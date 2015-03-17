@@ -1,0 +1,152 @@
+﻿#region Using Directives
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+#endregion
+
+namespace Mcd.HospitalManagement.Web.Enums
+{
+    #region Public enum Classes
+    public enum CommonEnum   
+    {
+       
+    }
+    /// <summary>
+    /// User Role Type enums
+    /// </summary>
+    public enum UserRoleEnum
+    {
+        Doctor,
+        Admin,
+        Cashier
+    }
+    /// <summary>
+    /// Enums class for describe Page Status
+    /// </summary>
+    public enum PageStatusEnum
+    {
+        [EnumStringAttribute("Access Denied")]
+        AccessDenied = 0,
+
+        [EnumStringAttribute("Bad Request")]
+        BadRequest = 1,
+
+        [EnumStringAttribute("Unauthorized")]
+        Unauthorized = 2,
+
+        [EnumStringAttribute("Forbidden")]
+        Forbidden = 3,
+
+        [EnumStringAttribute("NotFound")]
+        NotFound=4,
+
+        [EnumStringAttribute("Invalid Login")]
+        InvalidLogin=5
+    }
+    /// <summary>
+    /// Enum class for view User Error Messages
+    /// </summary>
+    public enum UserErrorMessage 
+    {
+        [EnumStringAttribute("This User Name Already Exists,Please enter another username")]
+        AlreadyExistUser = 0,
+
+        [EnumStringAttribute("This User Role Already Exists,Please enter another userrole")]
+        AlreadyExistUserRole = 1,
+        
+    }
+
+    /// <summary>
+    /// Enum class for view Patient Error Message
+    /// </summary>
+    public enum PatientErrorMessage
+    {
+        [EnumStringAttribute("Patient is already admitted")]
+        AlreadyAdmittedPatient = 0,
+
+        [EnumStringAttribute("Patient Details cant'delete")]
+        valideteRelationship = 1,
+
+        [EnumStringAttribute("Patient is already inserted")]
+        checkAvilabiltyOfPatient = 2,
+
+        [EnumStringAttribute("Patient  cant'delete")]
+        valideteRelationshipTopatientDetils = 3,
+
+
+        [EnumStringAttribute("Fill ALL Fields")]
+        fillfields = 4,
+    }
+    /// <summary>
+    /// Enum class for view Activity Confirmation Messages
+    /// </summary>
+    public enum ConfirmationMessages
+    {
+        [EnumStringAttribute("Error!! Some Thing Went Wrong, Please Try Again!")]
+        ConfirmationErrorMsg = 0,
+
+        [EnumStringAttribute("You have successfully inserted your record!")]
+        ConfirmationInsertedMsg = 1,
+
+        [EnumStringAttribute("You have successfully modified your record!")]
+        ConfirmationUpdatedMsg = 2,
+
+        [EnumStringAttribute("You have successfully Deleted your record!")]
+        ConfirmationRemovedMsg = 3,
+
+        [EnumStringAttribute("You have successfully transferred your record!")]
+        ConfirmationtTansferMsg = 4,
+
+        [EnumStringAttribute("Invalid Username or Password")]
+        LoginErrorMsg = 5,
+    }
+    /// <summary>
+    /// Enum class for view Patient Medical Test Errors
+    /// </summary>
+    public enum PatientMedicalTestError
+    {
+        [EnumStringAttribute("Medical Test of this patient admission is Already Exists")]
+        AlreadyExistPatientMedicalTest = 0,
+
+        [EnumStringAttribute("This Medical Test already Exists for this patient")]
+        AlreadyExistMedicalTest = 1,
+
+        [EnumStringAttribute("Not exists Medical Test for patients")]
+        ExistsPatientMedicalTest=2,
+    }
+    /// <summary>
+    /// Enum class for view Invoice Error
+    /// </summary>
+    public enum InvoiceError
+    {
+        [EnumStringAttribute("This Invoice can't be modified")]
+        AlreadyExistPatientMedicalTest = 0,
+
+
+    }
+    /// <summary>
+    /// Enum class for view Doctor related Error messages
+    /// </summary>
+    public enum DoctorError
+    {
+        [EnumStringAttribute("Record Already Exists.... Please Try Again!!")]
+        AlreadyExistMsg = 0
+
+    }
+
+    /// <summary>
+    /// Enum class for view Page Discription Messages
+    /// </summary>
+    public enum PageDiscriptionMessages
+    {
+        [EnumStringAttribute("Your application description page.")]
+        AboutDesc = 0,
+
+        [EnumStringAttribute("Your contact page.")]
+        ContactDesc = 1
+
+
+    }
+    #endregion
+}

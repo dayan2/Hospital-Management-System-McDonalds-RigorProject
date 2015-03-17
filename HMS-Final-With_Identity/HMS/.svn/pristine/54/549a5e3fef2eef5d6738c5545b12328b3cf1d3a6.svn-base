@@ -1,0 +1,77 @@
+﻿using Mcd.HospitalManagement.Web.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Security;
+
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class HomeController : Controller
+    {
+
+        #region constants
+        const string INDEX = "Index";
+        const string HOMEPAGE = "HomePage";
+        const string HOMEPAGEFORCLERK = "HomePageForClerk";
+        const string ADMINHOME = "AdminHome";
+        const string DOCTOR = "Doctor";
+        #endregion
+
+        #region Public Methods
+        /// <summary>
+        /// Redirect to home pages according to logged on user role type 
+        /// If the user is not logged on then redirect to default home page 
+        /// </summary>
+        /// <returns>Index View</returns>
+        public ActionResult Index()
+        {
+            //If User is not logged on yet return to default home page 
+            if ((string)Session["USERROLE"] == null)
+            {
+                return View();
+            }
+            //If User is  logged on as user role type admin return to admin home page 
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                return RedirectToAction(INDEX, ADMINHOME);
+            }
+            //If User is logged on as user role type doctor return to doctor home page 
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Doctor)
+            {
+                return RedirectToAction(HOMEPAGE, DOCTOR);
+            }
+            //If User is logged on as user role type Cashier return to cashier home page 
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Cashier)
+            {
+                return RedirectToAction(HOMEPAGEFORCLERK, HOMEPAGE);
+            }
+            return View();
+        }
+
+        /// <summary>
+        /// Redirect to about page
+        /// </summary>
+        /// <returns>About View</returns>
+        public ActionResult About()
+        {
+            ViewBag.Message = "Your application description page.";
+
+            return View();
+        }
+
+        /// <summary>
+        /// Redirect to contact page
+        /// </summary>
+        /// <returns>Contact View</returns>
+        public ActionResult Contact()
+        {
+            ViewBag.Message = "Your contact page.";
+
+            return View();
+        }
+        #endregion
+    }
+}
