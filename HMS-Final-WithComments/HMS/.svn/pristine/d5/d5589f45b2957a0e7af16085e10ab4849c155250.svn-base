@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Mcd.HospitalManagement.Web.Models
+{
+    public class PatientMedicalTestModel
+    {
+        public int Id { get; set; }
+
+        public int PatientDetailId { get; set; }
+
+        public Nullable<int> MedicalTestId { get; set; }
+
+        public int NurseId { get; set; }
+
+        public PatientAdmissionDetailsModel PatientAdmissionDetails { get; set; }
+
+
+    }
+}

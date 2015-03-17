@@ -1,0 +1,65 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class DoctorManager : IDoctorManager
+    {
+        private DoctorDetails doctorDetails;
+        public DoctorManager()
+        {
+            this.doctorDetails = new DoctorDetails();
+        }
+
+        IEnumerable<DoctorRoleDTO> IDoctorManager.GetDoctors()
+        {
+            IEnumerable<DoctorRoleDTO> EntityObjectsList = doctorDetails.GetDoctors();
+            return EntityObjectsList;
+        }
+
+        void IDoctorManager.AddDoctor(DoctorRoleDTO doctor)
+        {
+            doctorDetails.AddDoctor(doctor);
+        }
+
+        void IDoctorManager.RemoveDoctor(int id)
+        {
+            doctorDetails.RemoveDoctor(id);
+        }
+
+        void IDoctorManager.UpdateDoctor(DoctorRoleDTO doctor)
+        {
+            if (doctor != null)
+            {
+                doctorDetails.UpdateDoctor(doctor);
+            }
+        }
+        DoctorRoleDTO IDoctorManager.GetDoctorsById(int id)
+        {
+            var doctor = doctorDetails.GetDoctorsById(id);
+            return doctor;
+        }
+        //public void TransferDoctor(DoctorRecommendationDTO doctor)
+        //{
+        //    doctorDetails.TransferDoctor(doctor);
+        //}
+        void IDoctorManager.TransferDoctor(DoctorRecommendationDTO doctor)
+        {
+            doctorDetails.TransferDoctor(doctor);
+        }
+
+        IEnumerable<DoctorSpecialityDTO> IDoctorManager.GetAllDoctorSpecialityTypes()
+        {
+            var doctorList = doctorDetails.GetAllDoctorSpecialityTypes();
+            return doctorList;
+        }
+        IEnumerable<DoctorRoleDTO> IDoctorManager.GetDoctorsBySpecialityId(int id)
+        {
+            var doctorList = doctorDetails.GetDoctorsBySpecialityId(id);
+            return doctorList;
+        }
+    }
+}

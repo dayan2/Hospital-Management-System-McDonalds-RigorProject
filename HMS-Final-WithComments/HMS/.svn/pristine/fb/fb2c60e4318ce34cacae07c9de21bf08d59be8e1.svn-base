@@ -1,0 +1,27 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Mcd.HospitalManagement.Web.Models
+{
+    public class PatientAdmissionDetailsModel
+    {
+
+        public int PatientDetailId { get; set; }
+        public Nullable<System.DateTime> AdmitDate { get; set; }
+        public Nullable<int> BedId { get; set; }
+        public Nullable<int> WardId { get; set; }
+        public Nullable<int> DoctorId { get; set; }
+        public Nullable<int> PatientId { get; set; }
+        public Nullable<bool> IsDischarged { get; set; }
+
+
+        public IEnumerable<PatientModel> Patients { get; set; }
+        public virtual IEnumerable<PatientAdmissionDetailsModel> PatientAdmissonDetails { get; set; }
+        public virtual IEnumerable<BedModel> bedDetails { get; set; }
+        public virtual IEnumerable<DoctorModel> doctorDetails { get; set; }
+        public virtual IEnumerable<PatientModel> patientDetails { get; set; }
+        public virtual IEnumerable<WardDetailsModel> wardDetails { get; set; }
+    }
+}

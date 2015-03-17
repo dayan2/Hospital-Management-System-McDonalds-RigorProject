@@ -1,0 +1,87 @@
+﻿@model IEnumerable<Mcd.HospitalManagement.Web.Models.InvoiceDetailsModel>
+
+@{
+    ViewBag.Title = "Invoice List";
+}
+<h2>Invoice List</h2>
+@*<p>@Html.ActionLink("Patient List", "Index")</p>*@
+@*<br />*@
+<div class="col-xs-1">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation"><a href="~/Invoices/Index">Ready Invoices</a></li>
+
+    </ul>
+</div>
+<div class="col-xs-11">
+    <table class="table">
+        <tr>
+
+            <th>
+                @Html.DisplayName("Patient Name")
+            </th>
+            <th>
+                @Html.DisplayName("Invoice Date")
+            </th>
+            <th>
+                @Html.DisplayName("Admit Date")
+            </th>
+            <th>
+                @Html.DisplayName("Ward No")
+            </th>
+            <th>
+                @Html.DisplayName("Ward Fee")
+            </th>
+            <th>
+                @Html.DisplayName("Doctor Name")
+            </th>
+            <th>
+                @Html.DisplayName("Doctor Charges")
+            </th>
+            <th>
+                @Html.DisplayName("Total Fee")
+            </th>
+            <th></th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr class="warning">
+                <td>
+
+                    @Html.HiddenFor(modelItem => item.InvoiceId)
+
+
+
+                    @Html.DisplayFor(modelItem => item.PatientName)
+                </td>
+
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.InvoiceDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AdmitDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WardNo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WardFee)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.DoctorName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DoctorCharges)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TotalFee)
+                </td>
+                <td>
+                    @*    @Html.ActionLink("Details", "Details", new {Id=item.InvoiceId })*@
+                </td>
+            </tr>
+        }
+
+    </table>
+</div>

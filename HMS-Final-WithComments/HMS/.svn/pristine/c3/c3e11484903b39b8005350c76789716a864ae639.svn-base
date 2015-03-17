@@ -1,0 +1,75 @@
+﻿@model IEnumerable<Mcd.HospitalManagement.Web.Models.PatientFeedbackModel>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>View Patient Feedback Details</h2>
+<div class="row">
+    <div class="col-xs-3">
+        <ol class="breadcrumb">
+            <li><a href="~/HomePage/HomePageForClerk">Home</a></li>
+            @*<li><a href="#">Library</a></li>*@
+            <li class="active">Patient FeedBack</li>
+        </ol>
+    </div>
+</div>
+<div class="col-xs-2">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation"><a href="~/PatientFeedback/Create">Add Feedback</a></li>
+        <li role="presentation"><a href="~/Patient/Index">View Patient</a></li>
+        <li role="presentation" class="active"><a href="~/PatientAdmissionDetails/Index">Patient Details</a></li>
+
+
+
+    </ul>
+</div>
+<div class="col-xs-10">
+    <p>
+    </p>
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayName("Feedback Date")
+            </th>
+            <th>
+                @Html.DisplayName("Feedback Description")
+            </th>
+            <th>
+                @Html.DisplayName("Doctor name")
+            </th>
+            <th>
+                @Html.DisplayName("Patient Name")
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr class="warning">
+                <td>
+                    @Html.DisplayFor(modelItem => item.FeedbackDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FeedbackDescription)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DoctorName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PatientName)
+                </td>
+                <td>
+
+                    @Html.ActionLink("Details", "FeedbackDetails", new { id = item.Id }) |
+                    @Html.ActionLink("EditPatientFeedBack", "EditPatientFeedBack", new { id = item.Id }) |
+                    
+
+
+
+                </td>
+            </tr>
+        }
+
+    </table>
+</div>

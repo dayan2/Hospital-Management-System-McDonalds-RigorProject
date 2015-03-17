@@ -1,0 +1,211 @@
+﻿using AutoMapper;
+using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business.DTO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class UserManager : IUserManager
+    {
+        private UserRegistration userRegistration;
+        private UserRoleRegistration userRoleRegistration;
+        private UserLogin userLogin;
+        
+        
+        #region User Role Fuctions
+
+        public void InsertUserRole(DTO.UserRoleDTO UserRole)
+        {
+            userRoleRegistration = new UserRoleRegistration();
+            UserRole objUserRole = new UserRole()
+            {
+                Role = UserRole.Role,
+            };
+
+            userRoleRegistration.AddUserRole(objUserRole);
+
+        }
+
+        public void EditUserRole(DTO.UserRoleDTO UserRole)
+        {
+            userRoleRegistration = new UserRoleRegistration();
+            UserRole objUserRole = new UserRole()
+            {
+                Id = UserRole.Id,
+                Role = UserRole.Role,
+            };
+
+            userRoleRegistration.EditUserRole(objUserRole);
+        }
+
+        void IUserManager.DeleteUserRole(int UserRoleId)
+        {
+            userRoleRegistration = new UserRoleRegistration();
+            UserRole objUserRole = new UserRole()
+            {
+                Id = UserRoleId
+            };
+
+            userRoleRegistration.DeleteRole(UserRoleId);
+
+        }
+
+        public IEnumerable<DTO.UserRoleDTO> ViewtUserRole()
+        {
+            userRoleRegistration = new UserRoleRegistration();
+            List<UserRole> lstUserRole = userRoleRegistration.ViewAllUserRole();
+
+            Mapper.CreateMap<UserRole, UserRoleDTO>();
+            var modelList = Mapper.Map<IEnumerable<UserRole>, IEnumerable<UserRoleDTO>>(lstUserRole);
+
+            return modelList;
+        }
+        UserRoleDTO IUserManager.ViewtUserRoleById(int UserRoleId)
+        {
+            userRoleRegistration = new UserRoleRegistration();
+            UserRole usrRole = userRoleRegistration.ViewUserRoleDetailsById(UserRoleId);
+
+            UserRoleDTO objUser = new UserRoleDTO()
+            {
+                Id =usrRole.Id,
+                Role = usrRole.Role
+            };
+
+            return objUser;
+        }
+
+        UserRoleDTO IUserManager.SelectUserRoleById(int UserRoleId)
+        {
+            userRoleRegistration = new UserRoleRegistration();
+            UserRole usrRole = userRoleRegistration.ViewUserRoleDetailsById(UserRoleId);
+
+            UserRoleDTO objUser = new UserRoleDTO()
+            {
+                Id= usrRole.Id,
+                Role = usrRole.Role
+            };
+
+            return objUser;
+        }
+
+        public UserRoleDTO SelectToDeleteUserRole(int UserRoleId)
+        {
+            userRoleRegistration = new UserRoleRegistration();
+            UserRole usrRole = userRoleRegistration.ViewUserRoleDetailsById(UserRoleId);
+
+            UserRoleDTO objUser = new UserRoleDTO()
+            {
+                Role = usrRole.Role
+            };
+
+            return objUser;
+        }
+
+
+        #endregion
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="User"></param>
+
+
+        #region User Function
+
+        public void InsertUser(DTO.UserDTO userdto)
+        {
+            User user = new User()
+            {
+                Id = userdto.Id,
+                UserName =userdto.UserName,
+                Password = userdto.Password,
+                UserRoleId=userdto.UserRoleId
+            };
+
+            userRegistration = new UserRegistration();
+            userRegistration.AddNewUser(user);
+        }
+
+
+        public void EditUser(UserDTO userdto)
+        {
+            User user = new User()
+            {
+                Id = userdto.Id,
+                UserName =userdto.UserName,
+                Password =userdto.Password,
+                UserRoleId =userdto.UserRoleId
+            };
+
+            userRegistration = new UserRegistration();
+            userRegistration.EditUser(user);
+        }
+        
+
+        public void DeleteUser(int UserId)
+        {
+            userRegistration = new UserRegistration();
+            userRegistration.DeleteUser(UserId);
+        }
+
+        public IEnumerable<UserDTO> ViewtAllUser()
+        {
+            userRegistration = new UserRegistration();
+            List<User> lstUser = userRegistration.ViewAllUser();
+
+            Mapper.CreateMap<User, UserDTO>();
+            var modelList = Mapper.Map<IEnumerable<User>, IEnumerable<UserDTO>>(lstUser);
+
+            return modelList;
+        }
+
+        public UserDTO ViewtUserById(int id)
+        {
+            userRegistration = new UserRegistration();
+            User user = userRegistration.ViewUserById(id);
+
+            UserDTO userdto = new UserDTO()
+            {
+                Id = user.Id,
+                Password = user.Password,
+                UserName = user.UserName,
+                UserRoleId = user.UserRoleId
+
+            };
+
+            return (userdto);
+        }
+      
+        void IUserManager.AddNewUser()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+
+
+
+        #region Check user Authentication
+
+        public UserDTO CheckUserAuthentication(string UserName, string Password)
+        {
+            userLogin = new UserLogin();
+            Task<User> user=userLogin.CheckAuthentication(UserName, Password);
+
+            return null;
+        }
+        #endregion
+
+
+
+
+
+        
+    }
+}

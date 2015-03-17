@@ -1,0 +1,58 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientFeedbackModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Details</title>
+</head>
+<body>
+    <div>
+        <h4>PatientFeedback</h4>
+    	<hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.FeedbackDate)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.FeedbackDate)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.FeedbackDescription)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.FeedbackDescription)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.DoctorName)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.DoctorName)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.PatientName)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.PatientName)
+            </dd>
+    
+        </dl>
+    </div>
+    <p>
+       
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+</body>
+</html>

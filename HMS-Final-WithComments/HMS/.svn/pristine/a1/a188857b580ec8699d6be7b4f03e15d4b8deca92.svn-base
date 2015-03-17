@@ -1,0 +1,55 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class WardManager : IWards 
+    {
+        WardRegistration wardRegistration;
+
+
+        public void InsertWard(WardDTO ward)
+        {
+            wardRegistration = new WardRegistration();
+            wardRegistration.createWard(ward);
+        }
+
+        public void EditWard(WardDTO ward)
+        {
+            wardRegistration = new WardRegistration();
+            wardRegistration.editWard(ward);
+        }
+
+        public WardDTO SelectWard(int wardId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public WardDTO SelectToDeleteWard(int wardId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteWard(int wardId)
+        {
+            wardRegistration = new WardRegistration();
+            wardRegistration.deleteWard(wardId);
+        }
+
+        public IEnumerable<WardDTO> ViewWardDetails()
+        {
+            wardRegistration = new WardRegistration();
+            return wardRegistration.viewAllWard();
+        }
+
+        public WardDTO ViewWardById(int wardId)
+        {
+            wardRegistration = new WardRegistration();
+            return wardRegistration.viewWardById(wardId);
+           
+        }
+    }
+}

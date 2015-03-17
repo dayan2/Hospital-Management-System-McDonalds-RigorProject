@@ -1,0 +1,278 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Mcd.HospitalManagementSystem.Data;
+using AutoMapper;
+using System.Data.Entity;
+using System.Collections.Generic;
+using System.Collections;
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class PatientAdmissionDetails
+    {
+        #region Local Variable
+        IPatientManager PatientManager;
+        PatientDetail patientDetails;
+        PatientAdmissionDTO patientAdmissionDTO;
+        PatientFeedback patientFeedback;
+        #endregion
+        /// <summary>
+        /// Use to insert admission details for patient
+        /// </summary>
+        /// <param name="PatientAdmissionDTO"></param>
+        /// 
+        #region Public Methods
+        public void InsertPatientAdmissionDetails(PatientAdmissionDTO PatientAdmissionDTO)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                patientDetails = new PatientDetail()
+                {
+                    PatientDetailId = PatientAdmissionDTO.PatientDetailId,
+                    AdmitDate = PatientAdmissionDTO.AdmitDate,
+                    BedId = PatientAdmissionDTO.BedId,
+                    WardId = PatientAdmissionDTO.WardId,
+                    DoctorId = PatientAdmissionDTO.DoctorId,
+                    PatientId = PatientAdmissionDTO.PatientId,
+                    IsDischarged = PatientAdmissionDTO.IsDischarged,
+
+
+                };
+
+                db.PatientDetails.Add(patientDetails);
+                db.SaveChanges();
+            }
+        }
+        /// <summary>
+        /// retriving all patient
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<PatientDTO> FillPatients()
+        {
+            PatientManager = new PatientManager();
+            return PatientManager.ViewAllPatientDetails();
+        }
+
+        /// <summary>
+        /// use to edit patient admission details
+        /// </summary>
+        /// <param name="PatientAdmissionDTO"></param>
+        public void EditPatientAdmissionDetails(AllPatientDTO PatientAdmissionDTO)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                patientDetails = new PatientDetail()
+                {
+                    PatientDetailId = PatientAdmissionDTO.PatientDetailId,
+                    AdmitDate = PatientAdmissionDTO.AdmitDate,
+                    BedId = PatientAdmissionDTO.BedId,
+                    WardId = PatientAdmissionDTO.WardId,
+                    DoctorId = PatientAdmissionDTO.DoctorId,
+                    PatientId = PatientAdmissionDTO.PatientId,
+                    IsDischarged = PatientAdmissionDTO.IsDischarged,
+
+                };
+                db.Entry(patientDetails).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+        }
+
+        public PatientAdmissionDTO ViewPatientAdmissionDetails(int? PatientDetailID)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                patientDetails = db.PatientDetails.Find(PatientDetailID);
+                patientAdmissionDTO = new PatientAdmissionDTO()
+                {
+                    PatientDetailId = patientDetails.PatientDetailId,
+                    AdmitDate = patientDetails.AdmitDate,
+                    BedId = patientDetails.BedId,
+                    WardId = patientDetails.WardId,
+                    DoctorId = patientDetails.DoctorId,
+                    PatientId = patientDetails.PatientId,
+                    IsDischarged = patientDetails.IsDischarged,
+
+                };
+
+                return patientAdmissionDTO;
+            }
+
+
+        }
+        public IEnumerable<PatientAdmissionDTO> ViewAllAdmissionPatientDetails()
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                IList<PatientDetail> patientDetails = db.PatientDetails.ToList();
+                Mapper.CreateMap<PatientDetail, PatientAdmissionDTO>();
+                var patientAdmissionList = Mapper.Map<IEnumerable<PatientDetail>, IEnumerable<PatientAdmissionDTO>>(patientDetails);
+                return patientAdmissionList;
+            }
+        }
+        public void DeletePatientAdmissionDetails(int? PatientId)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                patientDetails = db.PatientDetails.Find(PatientId);
+                db.PatientDetails.Remove(patientDetails);
+                db.SaveChanges();
+            }
+        }
+
+        public AllPatientDTO viewPatientRelatedData(int? patientId)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                IEnumerable<AllPatientDTO> allDetails = db.PatientDetails.Where(c => c.PatientDetailId == patientId)
+                    .Join(db.Patients, x => x.PatientId, s => s.Id,
+                      ((x, s) => new { x, s }))
+                         .Join(db.Doctors, p => p.x.DoctorId, d => d.Id,
+                    ((p, d) => new { p, d }))
+                        .Join(db.Wards, n => n.p.x.WardId, a => a.Id,
+                        ((n, a) => new { n, a }))
+                       .Join(db.Beds, d => d.n.p.x.BedId, f => f.Id,
+                       ((d, f) => new { d, f }))
+                    .Select(m => new AllPatientDTO
+                    {
+                        PatientDetailId = m.d.n.p.x.PatientDetailId,
+                        PatientId = m.d.n.p.s.Id,
+                        Address = m.d.n.p.s.Address,
+                        MobileNo = m.d.n.p.s.MobileNo,
+                        AdmitDate = m.d.n.p.x.AdmitDate,
+                        Name = m.d.n.p.s.Name,
+                        WardNo = m.d.a.WardNo,
+                        BedTicketNo = m.f.BedTicketNo,
+                        DoctorName = m.d.n.d.Name,
+                        DoctorId = m.d.n.d.Id,
+                        WardId = m.d.a.Id,
+                        BedId = m.f.Id,
+                        IsDischarged = m.d.n.p.x.IsDischarged,
+                    }).ToList();
+
+                var patientAdmissionDetails = allDetails.First();
+                return patientAdmissionDetails;
+            }
+
+
+        }
+        public IEnumerable<AllPatientDTO> ViewAllPatientAdmissionDetails()
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                IEnumerable<AllPatientDTO> allDetails = db.PatientDetails
+                        .Join(db.Patients, x => x.PatientId, s => s.Id,
+                          ((x, s) => new { x, s }))
+                             .Join(db.Doctors, p => p.x.DoctorId, d => d.Id,
+                        ((p, d) => new { p, d }))
+                            .Join(db.Wards, n => n.p.x.WardId, a => a.Id,
+                            ((n, a) => new { n, a }))
+                           .Join(db.Beds, d => d.n.p.x.BedId, f => f.Id,
+                           ((d, f) => new { d, f }))
+                        .Select(m => new AllPatientDTO
+                        {
+                            PatientDetailId = m.d.n.p.x.PatientDetailId,
+                            PatientId = m.d.n.p.s.Id,
+                            Address = m.d.n.p.s.Address,
+                            MobileNo = m.d.n.p.s.MobileNo,
+                            AdmitDate = m.d.n.p.x.AdmitDate,
+                            Name = m.d.n.p.s.Name,
+                            WardNo = m.d.a.WardNo,
+                            BedTicketNo = m.f.BedTicketNo,
+                            DoctorName = m.d.n.d.Name,
+                            DoctorId = m.d.n.d.Id,
+                            WardId = m.d.a.Id,
+                            BedId = m.f.Id,
+                            IsDischarged = m.d.n.p.x.IsDischarged,
+                        }).ToList();
+
+                var patientAdmissionDetails = allDetails;
+                return patientAdmissionDetails;
+            }
+        }
+
+        public bool CheckPatientAdmissionAvilabilty(int? patientID)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                bool p = db.PatientDetails.Any(x => x.PatientId == patientID);
+                if (p == true)
+                {
+                    patientDetails = db.PatientDetails.Where(x => x.PatientId == patientID).First();
+                    if ((bool)patientDetails.IsDischarged)
+                        return true;
+                }
+                else
+                    return true;
+                return false;
+            }
+
+        }
+
+        public bool CheckRelationshipBetweenPatientAndPatientDetails(int?patientId)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                var avilability = db.PatientDetails.Any(x => x.PatientId == patientId);
+                if (avilability == true)
+                {
+                    patientDetails = db.PatientDetails.Where(x => x.PatientId == patientId).First();
+                    if (patientDetails.PatientId != 0 && patientDetails.PatientId != null)
+                        return false;
+
+                }
+                return true;
+                
+            }
+        }
+
+
+     
+        public void InsertPatientFeedBack(PatientFeedbackDTO patientFeedbackDTO)
+        {
+            using(LP_HMSDbEntities db=new LP_HMSDbEntities())
+            {
+                patientFeedback = new PatientFeedback()
+                {
+                    DoctorId = patientFeedbackDTO.DoctorId,
+                    PatientDetailId = patientFeedbackDTO.PatientDetailId,
+                    FeedbackDate = patientFeedbackDTO.FeedbackDate,
+                    FeedbackDescription = patientFeedbackDTO.FeedbackDescription,
+
+
+                };
+                db.PatientFeedbacks.Add(patientFeedback);
+                db.SaveChanges();
+            }
+
+
+        }
+        public System.Collections.Generic.IEnumerable<PatientDoctorDTO> GetAllPatientDetailsForDoctor()
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                var patientList = db.Patients.ToList();
+                var patientDetailsList = db.PatientDetails.ToList();
+                var patientBedDetailsList = db.Beds.ToList();
+                IEnumerable<PatientDoctorDTO> returningPatientList = from c in patientList
+                                                                     from d in patientDetailsList
+                                                                     from b in patientBedDetailsList
+                                                                     select new PatientDoctorDTO
+                                                                     {
+                                                                         Id = 1,
+                                                                         Name = c.Name,
+                                                                         AdmitDate = d.AdmitDate,
+                                                                         Bed = b.BedTicketNo,
+                                                                         Ward = d.WardId,
+                                                                         IsDischarged = d.IsDischarged
+                                                                     };
+                return returningPatientList;
+            }
+        }
+        #endregion        
+
+    }
+
+    
+}

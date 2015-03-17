@@ -1,0 +1,227 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitaManagementSystem.Business.Interface;
+using AutoMapper;
+using Mcd.HospitalManagement.Web.Models;
+
+using Mcd.HospitalManagement.Web.Enums;
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class BedController : Controller
+    {
+        IBedManager bedManager;
+
+        public BedController()
+        {
+            bedManager = new BedManager();
+        }
+
+        private LP_HMSDbEntities db = new LP_HMSDbEntities();
+
+        // GET: /Bed/
+        public ActionResult Index()
+        {
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                IEnumerable<BedDTO> lstBed = bedManager.ViewAllBed();
+
+                var bedsModel = from c in lstBed
+                                select new BedModel()
+                                {
+                                    Id = c.Id,
+                                    BedTicketNo = c.BedTicketNo,
+                                    WardId = c.WardId,
+                                    WardNo = c.WardNo
+                                };
+
+                //Mapper.CreateMap<BedDTO, BedModel>();
+                //Mapper.AssertConfigurationIsValid();
+                //var modelList = Mapper.Map<IEnumerable<BedDTO>, IEnumerable<BedModel>>(bedDto);
+
+                //var users = db.Users.Include(u => new User() { });
+                return View(bedsModel.ToList());
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+
+        }
+
+        // GET: /Bed/Details/5
+        public ActionResult Details(int id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            BedDTO bedDto=bedManager.ViewtBedById(id);
+
+            BedModel bedModel = new BedModel()
+            {
+                BedTicketNo = bedDto.BedTicketNo,
+                Id = bedDto.Id,
+                WardNo = bedDto.WardNo,
+                WardId = bedDto.WardId
+            };
+
+            if (bedModel == null)
+            {
+                return HttpNotFound();
+            }
+            return View(bedModel);
+        }
+
+        // GET: /Bed/Create
+        public ActionResult Create()
+        {
+            ViewBag.WardId = new SelectList(db.Wards, "Id", "WardNo");
+            return View();
+        }
+
+        // POST: /Bed/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include="Id,WardId,BedTicketNo")] BedModel bedmodel)
+        {
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                if (ModelState.IsValid)
+                {
+                    BedDTO bedDto = new BedDTO()
+                    {
+                        BedTicketNo = bedmodel.BedTicketNo,
+                        WardId = bedmodel.WardId
+                    };
+
+                    bedManager.InsertBed(bedDto);
+                    return RedirectToAction("Index");
+                }
+
+                ViewBag.WardId = new SelectList(db.Wards, "Id", "WardNo", bedmodel.WardId);
+                return View(bedmodel);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+
+            }
+
+        }
+
+        // GET: /Bed/Edit/5
+        public ActionResult Edit(int id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            BedDTO bedDto=bedManager.ViewtBedById(id);
+
+            BedModel bedModel = new BedModel()
+            {
+                BedTicketNo =bedDto.BedTicketNo,
+                WardId =bedDto.WardId
+            };
+
+            if (bedModel == null)
+            {
+                return HttpNotFound();
+            }
+            ViewBag.WardId = new SelectList(db.Wards, "Id", "WardNo", bedModel.WardId);
+            return View(bedModel);
+        }
+
+        // POST: /Bed/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include="Id,WardId,BedTicketNo")] BedModel bedModel)
+        {
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                if (ModelState.IsValid)
+                {
+                    BedDTO bedDto = new BedDTO()
+                    {
+                        BedTicketNo = bedModel.BedTicketNo,
+                        Id = bedModel.Id,
+                        WardId = bedModel.WardId
+                    };
+
+                    bedManager.EditBed(bedDto);
+                    return RedirectToAction("Index");
+                }
+                ViewBag.WardId = new SelectList(db.Wards, "Id", "WardNo", bedModel.WardId);
+                return View(bedModel);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+
+            }
+        }
+
+        // GET: /Bed/Delete/5
+        public ActionResult Delete(int id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            BedDTO bedDto = bedManager.ViewtBedById(id);
+
+            BedModel bedModel = new BedModel()
+            {
+                BedTicketNo = bedDto.BedTicketNo,
+                WardId = bedDto.WardId
+            };
+
+
+            if (bedModel == null)
+            {
+                return HttpNotFound();
+            }
+            return View(bedModel);
+        }
+
+        // POST: /Bed/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                bedManager.DeleteBed(id);
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+
+            }
+
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+    }
+}

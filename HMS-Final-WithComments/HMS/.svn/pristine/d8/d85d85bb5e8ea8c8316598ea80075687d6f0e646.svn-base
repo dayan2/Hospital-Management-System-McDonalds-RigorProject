@@ -1,0 +1,114 @@
+﻿@model Mcd.HospitalManagement.Web.Models.NurseModel
+@{
+    ViewBag.Title = "Delete";
+}
+<div class="row">
+    <h2>Delete</h2>
+    <h3>Are you sure you want to delete this?</h3>
+
+    <div class="col-xs-2">
+        <ul class="nav nav-pills" role="tablist">
+            <li role="presentation"><a href="~/HomePage/Create">Home???</a></li>
+            <li role="presentation"><a href="~/Nurses/Create">Create Nurse</a></li>
+            <li role="presentation"><a href="~/Nurses/Index">Index</a></li>
+            <li role="presentation"><a href="~/PatientMedicalTests/ViewPatientMedicalTest">View Patient Medical Test</a></li>          
+        </ul>
+    </div>
+    <div class="col-xs-10">
+        <h4>Nurse</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.WardNo)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.WardNo)
+            </dd>
+        </dl>
+        @using (Html.BeginForm("Delete", "Nurses", FormMethod.Post, new { @id = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.Id, new { @id = "nurseId" })
+            <div class="form-actions no-color">
+                <input type="submit" value="Delete" class="btn btn-primary" id="submit" /> |
+                @Html.ActionLink("Back to List", "Index")
+            </div>
+        }
+    </div>
+    </div>
+    @section Scripts {
+
+        <script type="text/javascript">
+            $(document).ready(function () {
+
+                $("#submit").on("click", function () {
+                    var nurseId1 = $('#nurseId').val();
+                    var nurseId = parseInt(nurseId1);
+                    alert(nurseId);
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("DeleteConfirmed")',
+                        data: { "nurseId": nurseId },
+                        success: function (data) {
+                            $('#submit').hide();
+                            if (data.Message == "You have successfully Deleted your record!") {
+
+                                toastr.options = {
+                                    "closeButton": true,
+                                    "debug": false,
+                                    "newestOnTop": true,
+                                    "progressBar": true,
+                                    "positionClass": "toast-top-full-width",
+                                    "preventDuplicates": true,
+                                    "onclick": null,
+                                    "showDuration": "5000",
+                                    "hideDuration": "5000",
+                                    "timeOut": "5000",
+                                    "extendedTimeOut": "5000",
+                                    "showEasing": "swing",
+                                    "hideEasing": "linear",
+                                    "showMethod": "fadeIn",
+                                    "hideMethod": "fadeOut"
+                                }
+                                toastr["success"]("You have successfully Deleted your record!", "Success!!");
+
+                            }
+                            else {
+
+                                toastr.options = {
+                                    "closeButton": true,
+                                    "debug": false,
+                                    "newestOnTop": true,
+                                    "progressBar": true,
+                                    "positionClass": "toast-top-full-width",
+                                    "preventDuplicates": true,
+                                    "onclick": null,
+                                    "showDuration": "5000",
+                                    "hideDuration": "5000",
+                                    "timeOut": "5000",
+                                    "extendedTimeOut": "5000",
+                                    "showEasing": "swing",
+                                    "hideEasing": "linear",
+                                    "showMethod": "fadeIn",
+                                    "hideMethod": "fadeOut"
+                                }
+                                toastr["error"]("Please try again!!", "Error!!");
+
+                            }
+
+                        },
+                        error: function () {
+                            alert("Error!!!");
+                        }
+                    });
+                    return false;
+                });
+            });
+        </script>
+    }

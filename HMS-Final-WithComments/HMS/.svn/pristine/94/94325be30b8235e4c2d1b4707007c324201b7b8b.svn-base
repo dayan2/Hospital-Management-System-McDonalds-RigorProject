@@ -1,0 +1,74 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Mcd.HospitalManagement.Web.Enums
+{
+    public enum CommonEnum   
+    {
+       
+    }
+    public enum UserRoleEnum
+    {
+        Doctor,
+        Admin,
+        Cashier
+    }
+    public enum PageStatusEnum
+    {
+        [EnumStringAttribute("Access Denied")]
+        AccessDenied = 0,
+
+        [EnumStringAttribute("Bad Request")]
+        BadRequest = 1,
+
+        [EnumStringAttribute("Unauthorized")]
+        Unauthorized = 2,
+
+        [EnumStringAttribute("Forbidden")]
+        Forbidden = 3,
+
+        [EnumStringAttribute("NotFound")]
+        NotFound=4
+    }
+
+    public enum UserErrorMessage 
+    {
+        [EnumStringAttribute("This User Name Already Exists")]
+        AlreadyExistUser = 0,
+
+        [EnumStringAttribute("This User Role Already Exists")]
+        AlreadyExistUserRole = 1,
+        
+    }
+    public enum PatientErrorMessage
+    {
+        [EnumStringAttribute("Patient is already admitted")]
+        AlreadyAdmittedPatient = 0,
+
+        [EnumStringAttribute("Patient Details cant'delete")]
+        valideteRelationship = 1,
+
+        [EnumStringAttribute("Patient is already inserted")]
+        checkAvilabiltyOfPatient = 2,
+
+        [EnumStringAttribute("Patient  cant'delete")]
+        valideteRelationshipTopatientDetils = 3,
+    }
+    public enum ConfirmationMessages
+    {
+        [EnumStringAttribute("Error!! Some Thing Went Wrong, Please Try Again!")]
+        ConfirmationErrorMsg = 0,
+
+        [EnumStringAttribute("You have successfully inserted your record!")]
+        ConfirmationInsertedMsg = 1,
+
+        [EnumStringAttribute("You have successfully modified your record!")]
+        ConfirmationUpdatedMsg = 2,
+
+        [EnumStringAttribute("You have successfully Deleted your record!")]
+        ConfirmationUpdatedMsg = 3,
+    }
+    
+}

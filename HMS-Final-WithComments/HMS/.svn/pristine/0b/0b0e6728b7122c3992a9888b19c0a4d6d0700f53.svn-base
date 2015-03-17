@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="25b54e382421480bae365645e0cb129e" Name="Diagram1">
+        <EntityTypeShape EntityType="LP_HMSDbModel.Bed" Width="1.5" PointX="3" PointY="6.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="LP_HMSDbModel.Doctor" Width="1.5" PointX="6" PointY="11.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="LP_HMSDbModel.DoctorRecomendation" Width="1.5" PointX="8.25" PointY="12.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="LP_HMSDbModel.DoctorSpeciality" Width="1.5" PointX="3.75" PointY="16.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="LP_HMSDbModel.Invoice" Width="1.5" PointX="7.5" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LP_HMSDbModel.Medical_Test_Type" Width="1.5" PointX="8.25" PointY="15.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="LP_HMSDbModel.Nurse" Width="1.5" PointX="3" PointY="14" IsExpanded="true" />
+        <EntityTypeShape EntityType="LP_HMSDbModel.Patient" Width="1.5" PointX="3" PointY="2.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LP_HMSDbModel.Patient_Detail" Width="1.5" PointX="5.25" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LP_HMSDbModel.Patient_Medical_Test" Width="1.5" PointX="10.5" PointY="10.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="LP_HMSDbModel.PatientFeedback" Width="1.5" PointX="10.25" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LP_HMSDbModel.sysdiagram" Width="1.5" PointX="5.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LP_HMSDbModel.User" Width="1.5" PointX="3.75" PointY="19.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="LP_HMSDbModel.UserRole" Width="1.5" PointX="1.5" PointY="19.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="LP_HMSDbModel.Ward" Width="1.5" PointX="0.75" PointY="8" IsExpanded="true" />
+        <AssociationConnector Association="LP_HMSDbModel.FK_Bed_Ward" ManuallyRouted="false" />
+        <AssociationConnector Association="LP_HMSDbModel.FK_Patient_Detail_Bed" ManuallyRouted="false" />
+        <AssociationConnector Association="LP_HMSDbModel.FK_Doctor_DoctorSpeciality" ManuallyRouted="false" />
+        <AssociationConnector Association="LP_HMSDbModel.FK_Doctor_User" ManuallyRouted="false" />
+        <AssociationConnector Association="LP_HMSDbModel.FK_Doctor_Ward" ManuallyRouted="false" />
+        <AssociationConnector Association="LP_HMSDbModel.FK_DoctorRecomendation_Doctor" ManuallyRouted="false" />
+        <AssociationConnector Association="LP_HMSDbModel.FK_DoctorRecomendation_Doctor1" ManuallyRouted="false" />
+        <AssociationConnector Association="LP_HMSDbModel.FK_Patient_Detail_Doctor" ManuallyRouted="false" />
+        <AssociationConnector Association="LP_HMSDbModel.FK_PatientFeedback_Doctor" ManuallyRouted="false" />
+        <AssociationConnector Association="LP_HMSDbModel.FK_Invoice_Patient_Detail" ManuallyRouted="false" />
+        <AssociationConnector Association="LP_HMSDbModel.FK_Patient_Medical_Test_Medical_Test_Type" ManuallyRouted="false" />
+        <AssociationConnector Association="LP_HMSDbModel.FK_Nurse_Ward" ManuallyRouted="false" />
+        <AssociationConnector Association="LP_HMSDbModel.FK_Patient_Medical_Test_Nurse" ManuallyRouted="false" />
+        <AssociationConnector Association="LP_HMSDbModel.FK_Patient_Detail_Patient" ManuallyRouted="false" />
+        <AssociationConnector Association="LP_HMSDbModel.FK_Patient_Detail_Ward" ManuallyRouted="false" />
+        <AssociationConnector Association="LP_HMSDbModel.FK_Patient_Medical_Test_Patient_Detail" ManuallyRouted="false" />
+        <AssociationConnector Association="LP_HMSDbModel.FK_PatientFeedback_Patient_Detail" ManuallyRouted="false" />
+        <AssociationConnector Association="LP_HMSDbModel.FK_User_UserRole" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

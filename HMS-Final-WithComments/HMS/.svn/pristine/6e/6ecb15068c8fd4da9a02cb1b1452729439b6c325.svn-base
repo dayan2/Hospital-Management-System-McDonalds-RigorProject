@@ -1,0 +1,26 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business.DTO
+{
+    public class InvoiceDetialsDTO
+    {
+        public int Id { get; set; }
+        public int PatientId { get; set; }
+        public string PatientName { get; set; }
+        public Nullable<int> PatientDetailId { get; set; }
+        public Nullable<System.DateTime> AdmitDate { get; set; }
+        public Nullable<System.DateTime> InvoiceDate { get; set; }
+        public decimal TotalFee { get; set; }
+        public string WardNo { get; set; }
+        public Nullable<decimal> WardFee { get; set; }
+        public int DoctorId { get; set; }
+        public string DoctorName { get; set; }
+        public decimal? DoctorCharges { get; set; }
+    }
+
+
+}

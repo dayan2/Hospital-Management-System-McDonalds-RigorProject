@@ -1,0 +1,87 @@
+﻿@model IEnumerable<Mcd.HospitalManagement.Web.Models.UserModel>
+
+<h2>Users</h2>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<div class="row">
+    <div class="col-xs-7">
+    </div>
+    <div class="col-xs-1" id="txtTempo">
+        Filter:
+    </div>
+    <div class="col-xs-3">
+
+        <select id="filterDropdown"  class="form-control formSelect">
+            <option value="0">All</option>
+            <option value="1">Admin</option>
+            <option value="2">Doctor‎</option>
+            <option value="3">Cashier‎</option>
+        </select>
+    </div>
+</div> 
+<div class="col-xs-1">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation" class="active"><a href="~/User/Index">Users</a></li>
+        <li role="presentation"><a href="~/UserRole/Index">User Roles</a></li>
+        <li role="presentation"><a href="~/Doctor/GetDoctors">Doctors</a></li>
+        <li role="presentation"><a href="~/Ward/Index">Wards</a></li>
+        <li role="presentation"><a href="~/Bed/Index">Beds</a></li>
+        <li role="presentation"><a href="~/Nurses/Index">Nurses</a></li>
+        <li role="presentation"><a href="~/MedicalTestType/Index">Medical Test</a></li>
+        
+    </ul>
+</div>
+<div class="col-xs-1"></div>
+<div class="col-xs-10">
+
+    <div id="tableHere">
+        @{Html.RenderPartial("UserDetailsPartial", Model);}
+    </div>
+</div> 
+
+    <script type="text/javascript">
+
+    @*$.ajax({
+        type: "POST",
+        url: '@Url.Action("Index")',
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+
+        success: function (data) {
+            $('.ddlProjectvalue').empty();
+            $.each(data, function (index, item) {
+                $('.ddlProjectvalue').append$('<option>', {
+                    value: item.Value,
+                    text: item.Text
+                }, '<option/>')
+            }
+                                   );
+        }
+        });*@
+
+        $(document).ready(function () {
+
+            $("#filterDropdown").on("change", function () {
+                //alert($('#filterDropdown option:selected').text());
+                //alert(" on");
+                var dId = $('#filterDropdown option:selected').val();
+                var filterId = parseInt(dId);
+                //alert(filterId);
+                $.ajax({
+                    url: '@Url.Action("RenderFilteredUserGrid")',
+                    type: 'POST',
+                    data: { "filterId": filterId },
+                    success: function (phtml) {
+                        $("#userGrid").html($(phtml).children());
+                        //alert("Done");
+                        //$.post(data.Url, function (phtml) {
+                        //    $('#doctorGrid').html($(phtml).html());
+                        //    alert("done");
+                        //});
+                    },
+                });
+            });
+
+        });
+    </script>

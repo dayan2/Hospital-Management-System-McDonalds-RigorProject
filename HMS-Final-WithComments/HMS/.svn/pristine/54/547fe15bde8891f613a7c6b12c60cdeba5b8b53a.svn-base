@@ -1,0 +1,51 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class DoctorRecommendationManager : IDoctorRecommendationManager
+    {
+        #region private fields
+        private DoctorRecommendationDetails doctorRecommendationDetails;
+        #endregion
+
+        #region constructors
+        public DoctorRecommendationManager()
+        {
+            this.doctorRecommendationDetails = new DoctorRecommendationDetails();
+        }
+        #endregion
+
+
+        #region Public Methods
+        IEnumerable<DoctorRecommendationDTO> IDoctorRecommendationManager.GetDoctorRecommendationDetails()
+        {
+            return doctorRecommendationDetails.GetDoctorRecommendationDetails();
+        }
+
+        bool IDoctorRecommendationManager.SaveTransferDoctorDetails(DoctorRecommendationDTO doctor)
+        {
+            return doctorRecommendationDetails.SaveTransferDoctorDetails(doctor);
+        }
+        DoctorRecommendationDTO IDoctorRecommendationManager.GetDoctorRecommendationById(int id)
+        {
+            return doctorRecommendationDetails.GetDoctorRecommendationById(id);
+        }
+        bool IDoctorRecommendationManager.RemoveDoctorRecommendationDetails(int id)
+        {
+            return doctorRecommendationDetails.RemoveDoctorRecommendationDetails(id);
+        }
+        #endregion
+
+
+
+
+
+
+
+        
+    }
+}

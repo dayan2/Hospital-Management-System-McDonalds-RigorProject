@@ -1,0 +1,177 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientMedicalTestModel
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h3> Edit </h3>
+<div class="row">
+    <div class="col-xs-3">
+        <ol class="breadcrumb">
+            @if ((string)Session["USERROLE"] == "Admin")
+            {
+                <li><a href="~/AdminHome/Index">Home</a></li>
+            }
+            else
+            {
+                <li><a href="~/HomePage/HomePageForClerk">Home</a></li>
+            }
+
+            <li class="active">Patient Medical Test Edit</li>
+        </ol>
+    </div>
+</div>
+@using (Html.BeginForm("Edit", "PatientMedicalTests", FormMethod.Post, new { @id = "form" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Patient Medical Test</h4>
+        <hr />
+        <div class="col-xs-1">
+            <ul class="nav nav-pills" role="tablist">
+                <li role="presentation"><a href="~/PatientMedicalTests/ViewPatientMedicalTest">View Patient Medical Test</a></li>
+                <li role="presentation"><a href="~/MedicalTestType/Index">Search Patient Medical Test Details</a></li>
+            </ul>
+        </div>
+        <div class="col-xs-11">
+            @Html.ValidationSummary(true)
+            @Html.HiddenFor(model => model.Id)
+
+            <div class="form-group">
+                @Html.Label("Patient Name", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DisplayFor(model => model.PatientName)
+                    @Html.ValidationMessageFor(model => model.PatientDetailId)
+                    @Html.HiddenFor(model => model.PatientDetailId)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("Medical Test", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.MedicalTestId, (IEnumerable<SelectListItem>)Model.MedicalTestType, new { @class = "btn-group-vertical" })
+                    @Html.ValidationMessageFor(model => model.MedicalTestId)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("Nurse", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.NurseId, (IEnumerable<SelectListItem>)Model.Nurse, new { @class = "btn-group-vertical", @name = "NurseId" })
+                    @Html.ValidationMessageFor(model => model.NurseId)
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-primary" id="submit" />
+                @if ((string)Session["USERROLE"] == "Admin")
+                {
+                    <a href="~/AdminHome/Index" class="btn btn-primary">Cancel</a>
+                }
+                else
+                {
+                    <a href="~/HomePage/HomePageForClerk" class="btn btn-primary">Cancel</a>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+@section Scripts {
+    @*@Scripts.Render("~/bundles/jqueryval")*@
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            var jsonObj = $('#form').serialize();
+
+            $("#form").validate({
+                rules: {
+                    "NurseId": {
+                        required: true
+                    }
+                },
+                //perform an AJAX post to ajax.php
+                submitHandler: function () {
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Content("~/PatientMedicalTests/Edit")',
+                        data: $('#form').serialize(),
+                        success: function (data) {
+                            alert(data.Message);
+
+                            $('#submit').hide();
+                            //if (data.Message == "You have successfully modified your record!") {
+                            msg(data.Message);
+                            //    toastr.options = {
+                            //        "closeButton": true,
+                            //        "debug": false,
+                            //        "newestOnTop": true,
+                            //        "progressBar": true,
+                            //        "positionClass": "toast-top-full-width",
+                            //        "preventDuplicates": true,
+                            //        "onclick": null,
+                            //        "showDuration": "5000",
+                            //        "hideDuration": "5000",
+                            //        "timeOut": "5000",
+                            //        "extendedTimeOut": "5000",
+                            //        "showEasing": "swing",
+                            //        "hideEasing": "linear",
+                            //        "showMethod": "fadeIn",
+                            //        "hideMethod": "fadeOut"
+                            //    }
+                            //    toastr["success"]("You have successfully modified your record!", "Success!!");
+
+                            //}
+                            //else {
+
+                            //    toastr.options = {
+                            //        "closeButton": true,
+                            //        "debug": false,
+                            //        "newestOnTop": true,
+                            //        "progressBar": true,
+                            //        "positionClass": "toast-top-full-width",
+                            //        "preventDuplicates": true,
+                            //        "onclick": null,
+                            //        "showDuration": "5000",
+                            //        "hideDuration": "5000",
+                            //        "timeOut": "5000",
+                            //        "extendedTimeOut": "5000",
+                            //        "showEasing": "swing",
+                            //        "hideEasing": "linear",
+                            //        "showMethod": "fadeIn",
+                            //        "hideMethod": "fadeOut"
+                            //    }
+                            //    toastr["error"]("Please try again!!", "Error!!");
+
+                            //}
+
+
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert("Error: " + errorThrown + " , Please try again");
+                        }
+                    });
+                    return false;
+
+                }
+            });
+        });
+        function msg(value) {
+            alert(value);
+            return false;
+        }
+
+
+    </script>
+
+
+
+
+}

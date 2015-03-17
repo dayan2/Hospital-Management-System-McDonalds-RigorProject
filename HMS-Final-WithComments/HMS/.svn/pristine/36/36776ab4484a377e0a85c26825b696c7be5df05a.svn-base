@@ -1,0 +1,122 @@
+﻿@model Mcd.HospitalManagement.Web.Models.UserModel
+
+
+<h3>Delete User</h3> 
+
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.UserName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UserName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Password)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Password)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UserRole.Role)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UserRole.Role)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm("Delete", "User", FormMethod.Post, new { @id = "form" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" id="submit"  class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>
+
+
+@section Scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#notificationSuccess').hide();
+            $('#notificationError').hide();
+
+            $('#submit').click(function () {
+
+                var jsonObj = $('#form').serialize();
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Delete", "User")",
+                    data: $('#form').serialize(),
+                    success: function (data) {
+                        if (data.Message == "You have successfully Deleted your record!") {
+                            toastr.options = {
+                                "closeButton": true,
+                                "debug": false,
+                                "newestOnTop": true,
+                                "progressBar": true,
+                                "positionClass": "toast-top-full-width",
+                                "preventDuplicates": true,
+                                "onclick": null,
+                                "showDuration": "5000",
+                                "hideDuration": "5000",
+                                "timeOut": "5000",
+                                "extendedTimeOut": "5000",
+                                "showEasing": "swing",
+                                "hideEasing": "linear",
+                                "showMethod": "fadeIn",
+                                "hideMethod": "fadeOut"
+                            }
+                            toastr["success"]("You have successfully Deleted your record!", "Success!!");
+                        }
+                        else {
+                            toastr.options = {
+                                "closeButton": true,
+                                "debug": false,
+                                "newestOnTop": true,
+                                "progressBar": true,
+                                "positionClass": "toast-top-full-width",
+                                "preventDuplicates": true,
+                                "onclick": null,
+                                "showDuration": "5000",
+                                "hideDuration": "5000",
+                                "timeOut": "5000",
+                                "extendedTimeOut": "5000",
+                                "showEasing": "swing",
+                                "hideEasing": "linear",
+                                "showMethod": "fadeIn",
+                                "hideMethod": "fadeOut"
+                            }
+                            toastr["error"]("Please try again!!", "Error!!");
+                        }
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Error: " + errorThrown + " , Please try again");
+                    }
+
+                });
+                return false;
+
+            });
+
+        });
+
+    </script>
+
+
+}

@@ -1,0 +1,184 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientAdmissionDetailsModel
+
+@{
+    ViewBag.Title = "Create";
+}
+
+@if (ViewBag.Message != null)
+{ 
+    <p>@ViewBag.Message</p>
+}
+ 
+
+<h2>Create Admission</h2>
+<div class="row">
+    <div class="col-xs-3">
+        <ol class="breadcrumb">
+            @if ((string)Session["USERROLE"] == "Admin")
+            {
+                <li><a href="~/AdminHome/Index">Home</a></li>
+            }
+            else
+            {
+                <li><a href="~/HomePage/HomePageForClerk">Home</a></li>
+            }
+            <li class="active">Create Patient Admission</li>
+        </ol>
+    </div>
+</div>
+<div class="col-xs-2">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation" class="active"><a href="~/PatientAdmissionDetails/CreatePatientAdmission">Admission</a></li>
+        <li role="presentation"><a href="~/Patient/Index">View Patient</a></li>
+        <li role="presentation"><a href="~/PatientFeedback/Index">FeedBack Details</a></li>
+        <li role="presentation" ><a href="~/DoctorRecommendation/Index">Recomended Doctors</a></li>
+
+    </ul>
+</div>
+
+<div class="col-xs-10">
+    @using (Html.BeginForm("CreatePatientAdmission", "CreatePatientAdmission", FormMethod.Post, new { @id = "form" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            <h4>Patient Admission Detail</h4>
+            <hr />
+            @Html.ValidationSummary(true)
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.AdmitDate, "Admit Date", new { @class = "control-label col-md-2", style = "width: 150px;align:left;" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.AdmitDate, new { @id = "AdmitDate", @class = "date-picker admissionDate", style = "width: 200px;", @name = "AdmitDate" })
+
+
+                    @Html.ValidationMessageFor(model => model.AdmitDate)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.BedId, "Bed Number", new { @class = "control-label col-md-2", style = "width: 150px;align:right;" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.BedId, (IEnumerable<SelectListItem>)ViewBag.BedId, new { @class = "btn-group-vertical", style = "width: 200px;", @name = "Bed Number", @id = "BedTicketNo" })
+                    @Html.ValidationMessageFor(model => model.BedId)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.WardId, "Ward Number", new { @class = "control-label col-md-2", style = "width: 150px;align:left;" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.WardId, (IEnumerable<SelectListItem>)ViewBag.WardId, new { @class = "btn-group-vertical", style = "width: 200px;", @name = "Ward Number", @id = "WardNo" })
+                    @Html.ValidationMessageFor(model => model.WardId)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.DoctorId, "Doctor Name", new { @class = "control-label col-md-2", style = "width: 150px;align:left;" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.DoctorId, (IEnumerable<SelectListItem>)ViewBag.DoctorId, new { @class = "btn-group-vertical", style = "width: 200px;", @name = "Doctor Name", @id = "DoctorName" })
+                    @Html.ValidationMessageFor(model => model.DoctorId)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.PatientId, "Patient Name", new { @class = "control-label col-md-2", style = "width: 150px;align:left;" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.PatientId, (IEnumerable<SelectListItem>)ViewBag.PatientId, new { @class = "btn-group-vertical", style = "width: 200px;", @name = "Patient Name", @id = "Name" })
+                    @Html.ValidationMessageFor(model => model.PatientId)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.IsDischarged, "Discharged Status", new { @class = "control-label col-md-2", style = "width: 150px;align:left;" })
+                <div class="col-md-10">
+                    @Html.DisplayFor(model => model.IsDischarged, new { @class = "btn-group-vertical", style = "width: 200px;", @name = "Discharged Status", @id = "IsDischarged" })
+                    @Html.HiddenFor(model => model.IsDischarged)
+                    @Html.ValidationMessageFor(model => model.IsDischarged)
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Create" class="btn btn-primary" id="submit" />
+                    @if ((string)Session["USERROLE"] == "Admin")
+                    {
+                        <a href="~/AdminHome/Index" class="btn btn-primary">Cancel</a>
+                    }
+                    else
+                    {
+                        <a href="~/HomePage/HomePageForClerk" class="btn btn-primary">Cancel</a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    </div>
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+    <script type="text/javascript">
+
+
+    $(document).ready(function () {
+              $('#AdmitDate').datepicker({
+                  maxDate: new Date,
+              });
+
+
+        var jsonObj = $('#form').serialize();
+
+        //validation rules
+        $("#form").validate({
+            rules: {
+                "AdmitDate": {
+                    required: true
+                },
+                "BedTicketNo": {
+                    required: true
+                },
+                "WardNo": {
+                    required: true
+                },
+                "DoctorName": {
+                    required: true
+                },
+                "Name": {
+                    required: true
+                },
+                "IsDischarged": {
+                    required: true
+                }
+            },
+            //perform an AJAX post to ajax.php
+            submitHandler: function () {
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("CreatePatientAdmission")',
+                    data: $('#form').serialize(),
+                    success: function (data) {
+                        //alert(data.Message);
+                        $('#submit').hide();
+                        TriggerMsg(data.Message);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Error: " + errorThrown + " , Please try again");
+
+                    }
+                });
+                return false;
+
+            }
+        });
+
+
+    });
+    function TriggerMsg(value) {
+        alert(value);
+        return false;
+    }
+
+
+    </script>
+

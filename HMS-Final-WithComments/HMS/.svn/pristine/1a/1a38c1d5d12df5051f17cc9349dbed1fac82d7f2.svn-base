@@ -1,0 +1,205 @@
+﻿using Mcd.HospitalManagement.Web.Models;
+using Mcd.HospitaManagementSystem.Business;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitalManagement.Web;
+using Mcd.HospitalManagement.Web.Enums;
+
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class PatientController : Controller
+    {
+        #region private variables
+        private IPatientManager patientManager;
+        private PatientModel patient;
+        #endregion
+        public PatientController()
+        {
+            patientManager = new PatientManager();
+        }
+        // GET: /Patient/
+        public ActionResult Index()
+        {
+            patient = new PatientModel();
+            var patients = patientManager.ViewAllPatientDetails();
+            IEnumerable<PatientModel> PList = from c in patients
+                                              select new PatientModel
+                                              {
+                                                  Id = c.Id,
+                                                  Name = c.Name,
+                                                  NIC = c.NIC,
+                                                  Address = c.Address,
+                                                  Gender = c.Gender,
+                                                  MobileNo = c.MobileNo,
+
+
+                                              };
+            patient.Patients = PList;
+            return View(patient);
+        }
+
+        // GET: /Patient/Details/5
+        public ActionResult DetailsPatientDetails(int id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            PatientDTO PatientDTO = patientManager.ViewPatientDetails(id);
+            patient = new PatientModel
+            {
+                //Id = PatientDTO.Id,
+                Name = PatientDTO.Name,
+                Address = PatientDTO.Address,
+                NIC = PatientDTO.NIC,
+                Gender = PatientDTO.Gender,
+                MobileNo = PatientDTO.MobileNo,
+
+
+            };
+
+
+
+
+            if (patient == null)
+            {
+                return HttpNotFound();
+            }
+            return View(patient);
+        }
+
+        // GET: /Patient/Create
+        public ActionResult CreatePatientDetails()
+        {
+            return View();
+        }
+
+        // POST: /Patient/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreatePatientDetails([Bind(Include = "Id,Name,NIC,Address,Gender,MobileNo")] PatientModel patient)
+        {
+            PatientDTO patientDTO = new PatientDTO { Id = patient.Id, Name = patient.Name, NIC = patient.NIC, Address = patient.Address, Gender = patient.Gender, MobileNo = patient.MobileNo };
+            if (ModelState.IsValid)
+            {
+                if (patientManager.CheckPatientAvilability(patientDTO.NIC))
+                {
+                    patientManager.InsertPatient(patientDTO);
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    ViewBag.Message = CustomEnumMessage.GetStringValue(PatientErrorMessage.checkAvilabiltyOfPatient);
+                }
+
+            }
+
+            return View(patient);
+        }
+
+        // GET: /Patient/Edit/5
+        public ActionResult EditPatientDetails(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            PatientDTO patientDTO = patientManager.ViewPatientDetails(id);
+            patient = new PatientModel
+            {
+                Id = patientDTO.Id,
+                Name = patientDTO.Name,
+                Address = patientDTO.Address,
+                NIC = patientDTO.NIC,
+                Gender = patientDTO.Gender,
+                MobileNo = patientDTO.MobileNo,
+
+
+            };
+
+
+
+
+
+            if (patient == null)
+            {
+                return HttpNotFound();
+            }
+            return View(patient);
+        }
+
+        // POST: /Patient/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditPatientDetails([Bind(Include = "Id,Name,NIC,Address,Gender,MobileNo")] PatientModel patient)
+        {
+            PatientDTO patientDTO = new PatientDTO { Id = patient.Id, Name = patient.Name, NIC = patient.NIC, Address = patient.Address, Gender = patient.Gender, MobileNo = patient.MobileNo };
+            if (ModelState.IsValid)
+            {
+                patientManager.EditPatient(patientDTO);
+                return RedirectToAction("Index");
+            }
+            return View(patient);
+        }
+
+        //// GET: /Patient/Delete/5
+        public ActionResult DeletePatientDetails(int id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            PatientDTO patientDTO = patientManager.ViewPatientDetails(id);
+            patient = new PatientModel
+            {
+                Id = patientDTO.Id,
+                Name = patientDTO.Name,
+                Address = patientDTO.Address,
+                NIC = patientDTO.NIC,
+                Gender = patientDTO.Gender,
+                MobileNo = patientDTO.MobileNo,
+
+
+            };
+            if (patient == null)
+            {
+                return HttpNotFound();
+            }
+            return View(patient);
+        }
+
+        //// POST: /Patient/Delete/5
+        [HttpPost, ActionName("DeletePatientDetails")]
+        //[ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            if (!patientManager.CheckRelationshipBetweenPatientAndPatientDetails(id))
+            {
+                ViewBag.Message = CustomEnumMessage.GetStringValue(PatientErrorMessage.valideteRelationshipTopatientDetils);
+            }
+            patientManager.Deletepatient(id);
+            return RedirectToAction("Index");
+
+        }
+
+        //protected override void Dispose(bool disposing)
+        //{
+        //    if (disposing)
+        //    {
+        //        db.Dispose();
+        //    }
+        //    base.Dispose(disposing);
+        //}
+    }
+}

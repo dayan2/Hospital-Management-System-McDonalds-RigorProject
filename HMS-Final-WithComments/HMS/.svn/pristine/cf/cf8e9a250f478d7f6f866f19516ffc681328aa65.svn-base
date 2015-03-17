@@ -1,0 +1,381 @@
+﻿using Mcd.HospitalManagementSystem.Data;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class DoctorDetails
+    {
+        private LP_HMSDbEntities hmsDbContext;
+        //private ExceptionHandling exception;
+        #region Constructors
+        public DoctorDetails()
+        {
+            this.hmsDbContext = new LP_HMSDbEntities();
+            //this.exception = new ExceptionHandling();
+        }
+        public DoctorDetails(LP_HMSDbEntities context)
+        {
+            this.hmsDbContext = context;
+        }
+        #endregion
+
+
+        #region Public Methods
+        /// <summary>
+        /// Retrieving All Doctor Details from the DB
+        /// </summary>
+        /// <returns list of doctor roles>
+        /// DoctorRoleDTO type of list is returning from the method containing all doctor details
+        /// </returns>
+        public IEnumerable<DoctorRoleDTO> GetDoctors()
+        {
+            try
+            {
+                using (hmsDbContext = new LP_HMSDbEntities())
+                {
+                    var doctorList = hmsDbContext.Doctors.ToList();
+                    //IEnumerable<DoctorRoleDTO> doctorDTOlist = from c in doctorList
+                    //                                           select new DoctorRoleDTO
+                    //                                           {
+                    //                                               Id = c.Id,
+                    //                                               Name = c.Name,
+                    //                                               DoctorSpecialityId = c.DoctorSpecialityId,
+                    //                                               PhoneNo = c.PhoneNo,
+                    //                                               WardId = c.WardId,
+                    //                                               Charges = c.Charges
+                    //                                           };
+                    //IEnumerable<DoctorRoleDTO> doctorDTOlist = (from c in doctorList.Select(m=> new DoctorRoleDTO {
+                    //                                                m.Id ,
+                    //                                                m.Name,
+                    //                                                m.DoctorSpecialityId,
+                    //                                                m.Charges,
+                    //                                                m.PhoneNo,
+                    //                                                m.WardId,
+                    //                                                m.UserId
+                    //                                            })).ToList();
+
+
+                    IEnumerable<DoctorRoleDTO> doctorDTOlist = doctorList.Select(m => new DoctorRoleDTO
+                    {
+                        Id = m.Id,
+                        Name = m.Name,
+                        PhoneNo = m.PhoneNo,
+                        UserId = m.UserId,
+                        WardId = m.WardId,
+                        DoctorSpecialityId = m.DoctorSpecialityId,
+                        Charges = m.Charges,
+                        SpecializeArea = m.DoctorSpeciality.SpecializeArea
+                    });
+                    return doctorDTOlist.ToList();
+                }
+                
+            }
+            catch (Exception)
+            {
+                throw new Exception();
+            }
+
+        }
+
+        /// <summary>
+        /// Retrieving Doctor Details By DoctorId
+        /// </summary>
+        /// <param name="id">
+        /// Doctor Id is passed here to get the specified doctor details 
+        /// </param>
+        /// <returns name="doctorDto">
+        /// DoctorRoleDTO type of object is returning from the method containing specified doctor details
+        /// </returns>
+        public DoctorRoleDTO GetDoctorsById(int id)
+        {
+            using (hmsDbContext = new LP_HMSDbEntities())
+            {
+                try
+                {
+                    var doctor = hmsDbContext.Doctors.Find(id);
+
+                    DoctorRoleDTO doctorDto = new DoctorRoleDTO
+                    {
+                        Id = doctor.Id,
+                        Name = doctor.Name,
+                        Charges = doctor.Charges,
+                        DoctorSpecialityId = doctor.DoctorSpecialityId,
+                        PhoneNo = doctor.PhoneNo,
+                        WardId = doctor.WardId,
+                        UserId = doctor.UserId
+                    };
+
+                    return doctorDto;
+                }
+                catch (Exception)
+                {
+                    throw new Exception();
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// Add new Doctor Details
+        /// </summary>
+        /// <param name="doctor">
+        /// Doctor Id is passed here to add new doctor details 
+        /// </param>
+        public bool AddDoctor(DoctorRoleDTO doctor)
+        {
+            try
+            {
+                using (hmsDbContext = new LP_HMSDbEntities())
+                {
+                    Doctor doctorObj = new Doctor
+                    {
+                        Id = doctor.Id,
+                        Name = doctor.Name,
+                        DoctorSpecialityId = doctor.DoctorSpecialityId,
+                        Charges = doctor.Charges,
+                        PhoneNo = doctor.PhoneNo,
+                        WardId = doctor.WardId,
+                        UserId = doctor.UserId
+                    };
+                    hmsDbContext.Doctors.Add(doctorObj);
+                    hmsDbContext.SaveChanges();
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                throw new Exception();
+            }
+        }
+
+        /// <summary>
+        /// Remove Doctor Details By DoctorId
+        /// </summary>
+        /// <param name="id">
+        /// Doctor Id is passed here to remove doctor details 
+        /// </param>
+        public bool RemoveDoctor(int id)
+        {
+            try
+            {
+                using (hmsDbContext = new LP_HMSDbEntities())
+                {
+                    var doctor = hmsDbContext.Doctors.Find(id);
+                    //if (doctor != null)
+                    //{
+                    hmsDbContext.Doctors.Remove(doctor);
+                    hmsDbContext.SaveChanges();
+                    //}
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                throw new Exception();
+            }
+
+        }
+
+        /// <summary>
+        /// Updating Doctor Details
+        /// </summary>
+        /// <param name="id">
+        /// Doctor Id is passed here to update an existing doctor 
+        /// </param>
+        public bool UpdateDoctor(DoctorRoleDTO doctor)
+        {
+            try
+            {
+                using (hmsDbContext = new LP_HMSDbEntities())
+                {
+                    Doctor doctorObj = new Doctor
+                    {
+                        Id = doctor.Id,
+                        Name = doctor.Name,
+                        DoctorSpecialityId = doctor.DoctorSpecialityId,
+                        Charges = doctor.Charges,
+                        PhoneNo = doctor.PhoneNo,
+                        WardId = doctor.WardId,
+                        UserId = doctor.UserId
+                    };
+                    hmsDbContext.Entry(doctorObj).State = EntityState.Modified;
+                    hmsDbContext.SaveChanges();
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                throw new Exception();
+            }
+
+        }
+        /// <summary>
+        /// Transfering Patients to other Doctors
+        /// </summary>
+        /// <param name="doctor">
+        /// DoctorRecommendationDTO doctor object is passed here to store PatientTransfer records
+        /// </param>
+        public void TransferDoctor(DoctorRecommendationDTO doctor)
+        {
+            try
+            {
+                using (var hmsDbContext = new LP_HMSDbEntities())
+                {
+                    DoctorRecomendation doctorObj = new DoctorRecomendation
+                    {
+                        Id = doctor.Id,
+                        Reason = doctor.Reason,
+                        CurrentDoctorId = doctor.CurrentDoctorId,
+                        RecomendedDoctorId = doctor.RecomendedDoctorId
+                    };
+                    hmsDbContext.DoctorRecomendations.Add(doctorObj);
+                    hmsDbContext.SaveChanges();
+                }
+            }
+            catch (Exception)
+            {
+                throw new Exception();
+            }
+        }
+
+        /// <summary>
+        /// Retrieving All DoctorSpeciality Details 
+        /// </summary>
+        /// <returns name="doctorDTOlist">
+        /// DoctorSpecialityDTO type of object is returning from the method containing all DoctorSpeciality details
+        /// </returns>
+        public IEnumerable<DoctorSpecialityDTO> GetAllDoctorSpecialityTypes()
+        {
+            try
+            {
+                using (hmsDbContext = new LP_HMSDbEntities())
+                {
+                    var doctorList = hmsDbContext.DoctorSpecialities.ToList();
+                    //IEnumerable<DoctorSpecialityDTO> doctorDTOlist = from c in doctorList
+                    //                                                 select new DoctorSpecialityDTO
+                    //                                           {
+                    //                                               DoctorSpecialityId = c.DoctorSpecialityId,
+                    //                                               SpecializeArea = c.SpecializeArea
+                    //                                           };
+
+                    IEnumerable<DoctorSpecialityDTO> doctorDTOlist = doctorList.Select(m => new DoctorSpecialityDTO
+                    {
+                        DoctorSpecialityId = m.DoctorSpecialityId,
+                        SpecializeArea = m.SpecializeArea
+                    }).ToList();
+
+                    return doctorDTOlist;
+                }
+
+            }
+            catch (Exception)
+            {
+                throw new Exception();
+            }
+        }
+        /// <summary>
+        /// Retrieving Doctor Details for the Profile Info Page in the DoctorDetail Page
+        /// </summary>
+        /// <param name="id">
+        /// Doctor Id is passed here to get the Profile details for each doctor
+        /// </param>
+        /// <returns name="doctorDTO">
+        /// DoctorDetailDTO object is returning from the method containing specified doctor details
+        /// </returns>
+        public DoctorDetailDTO GetDoctorByDoctorIdWithSpecializeAreaForProfileDetail(int id)
+        {
+            try
+            {
+                using (hmsDbContext = new LP_HMSDbEntities())
+                {
+                    var doctor = hmsDbContext.Doctors.Where(e => e.Id == id).FirstOrDefault();
+                    var doctorSpecialty = hmsDbContext.DoctorSpecialities.Where(e => e.DoctorSpecialityId == doctor.DoctorSpecialityId).FirstOrDefault();
+
+                    DoctorDetailDTO doctorDTO = new DoctorDetailDTO
+                    {
+                        Id = doctor.Id,
+                        Name = doctor.Name,
+                        DoctorSpecialityField = doctorSpecialty.SpecializeArea,
+                        PhoneNo = doctor.PhoneNo,
+                        WardId = doctor.WardId
+                    };
+                    return doctorDTO;
+                }
+            }
+            catch (Exception)
+            {
+                throw new Exception();
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public DoctorDetailDTO GetDoctorByUserIdForProfileDetail(int id)
+        {
+            //return new DoctorDetailDTO();
+            using (hmsDbContext = new LP_HMSDbEntities())
+            {
+                var doctor = hmsDbContext.Doctors.Where(e => e.UserId == id).FirstOrDefault();
+                var doctorSpecialty = hmsDbContext.DoctorSpecialities.Where(e => e.DoctorSpecialityId == doctor.DoctorSpecialityId).FirstOrDefault();
+
+                DoctorDetailDTO doctorDTO = new DoctorDetailDTO
+                {
+                    Id = doctor.Id,
+                    Name = doctor.Name,
+                    DoctorSpecialityField = doctorSpecialty.SpecializeArea,
+                    PhoneNo = doctor.PhoneNo,
+                    WardId = doctor.WardId
+                };
+                return doctorDTO;
+            }
+        }
+
+        /// <summary>
+        /// Retrieving All Doctor Details for the Json methods in DoctorController
+        /// </summary>
+        /// <returns name="doctorList">
+        /// DoctorDetailDTO type of list is returning from the method containing all doctor details
+        /// </returns>
+        //public IEnumerable<DoctorDetailDTO> GetAllDoctorDetailsForJson()
+        //{
+        //    using (hmsDbContext = new LP_HMSDbEntities())
+        //    {
+        //        var doctorEntityList = hmsDbContext.Doctors.ToList();
+        //        var doctorSpecialityList = hmsDbContext.DoctorSpecialities.ToList();
+        //        //IEnumerable<DoctorDetailDTO> doctorList = from c in doctorEntityList
+        //        //                                          from d in doctorSpecialityList
+        //        //                                          where c.DoctorSpecialityId == d.DoctorSpecialityId
+        //        //                                          select new DoctorDetailDTO
+        //        //                                          {
+        //        //                                              Id = c.Id,
+        //        //                                              Name = c.Name,
+        //        //                                              WardId = c.WardId,
+        //        //                                              PhoneNo = c.PhoneNo,
+        //        //                                              DoctorSpecialityField = d.SpecializeArea
+        //        //                                          };
+
+        //        //var doctorList = doctorEntityList.Join(doctorSpecialityList, c => c.DoctorSpecialityId, d => d.DoctorSpecialityId,
+        //        //    (c, d) => new { c, d })
+        //        //    .Select(m => new DoctorDetailDTO { m.c.Id, m.c.Name, m.c.WardId, m.c.PhoneNo, m.d.SpecializeArea });
+
+        //        patientDetailList
+
+
+        //        //var doctorList = context.Doctors.Join(context.DoctorSpecialities, c => c.DoctorSpecialityId, d => d.DoctorSpecialityId,
+        //        //    (c, d) => new { c, d })
+        //        //    .Select(m => new DoctorRoleDTO { m.c.Id, m.c.Name, m.c.WardId, m.c.PhoneNo, m.d.SpecializeArea });
+
+        //        return doctorList;
+        //    }
+        //}
+        #endregion
+
+    }
+}

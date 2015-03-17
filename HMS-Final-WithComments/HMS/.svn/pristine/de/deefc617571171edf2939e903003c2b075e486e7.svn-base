@@ -1,0 +1,163 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitaManagementSystem.Business.DTO;
+using Mcd.HospitalManagement.Web.Models;
+using AutoMapper;
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class UserRoleController : Controller
+    {
+        private LP_HMSDbEntities db = new LP_HMSDbEntities();
+
+         private IUserManager usermanager;
+
+         public UserRoleController()
+        {
+            usermanager = new UserManager();
+        }
+
+
+        // GET: /UserRole/
+        public ActionResult Index()
+        {
+            IEnumerable <UserRoleDTO> lstuserrole=usermanager.ViewtUserRole();
+         
+            Mapper.CreateMap<UserRoleDTO, UserRoleModel>();
+            var modelList = Mapper.Map<IEnumerable<UserRoleDTO>, IEnumerable<UserRoleModel>>(lstuserrole);
+
+            return View(modelList);
+
+        }
+
+        // GET: /UserRole/Details/5
+        public ActionResult Details(int id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            UserRoleDTO userrole = usermanager.ViewtUserRoleById(id);
+
+            UserRoleModel UserRole = new UserRoleModel()
+            {
+                Role = userrole.Role,
+            };
+
+            if (userrole == null)
+            {
+                return HttpNotFound();
+            }
+            return View(UserRole);
+        }
+
+        // GET: /UserRole/Create
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: /UserRole/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include="Id,Role")] UserRoleModel userrole)
+        {
+            UserRoleDTO UserRole = new UserRoleDTO()
+            {
+                Role = userrole.Role,
+            };
+
+            if (ModelState.IsValid)
+            {
+                usermanager.InsertUserRole(UserRole);
+                return RedirectToAction("Index");
+            }
+            return View(userrole);
+        }
+
+        // GET: /UserRole/Edit/5
+        public ActionResult Edit(int id)
+        {
+            
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                
+            }
+            UserRoleDTO userrole = usermanager.SelectUserRoleById(id);
+            UserRoleModel UserRole = new UserRoleModel()
+            {
+                Role = userrole.Role,
+            };
+            if (UserRole == null)
+            {
+                return HttpNotFound();
+            }
+            return View(UserRole);
+        }
+
+        // POST: /UserRole/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include="Id,Role")] UserRoleModel usrmodel)
+        {
+            UserRoleDTO usrroledto = new UserRoleDTO()
+            {
+                Id=usrmodel.Id,
+                Role=usrmodel.Role 
+            };
+
+            if (ModelState.IsValid)
+            {
+                usermanager.EditUserRole(usrroledto);
+                return RedirectToAction("Index");
+            }
+            return View(usrroledto);
+        }
+
+        // GET: /UserRole/Delete/5
+        public ActionResult Delete(int id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+             UserRoleDTO userrole=usermanager.SelectUserRoleById(id);
+            if (userrole == null)
+            {
+                return HttpNotFound();
+            }
+            return View(userrole);
+        }
+
+        // POST: /UserRole/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            usermanager.DeleteUserRole(id);
+            return RedirectToAction("Index");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+    }
+}

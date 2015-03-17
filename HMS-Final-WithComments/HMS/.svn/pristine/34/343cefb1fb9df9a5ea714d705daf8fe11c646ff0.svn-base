@@ -1,0 +1,116 @@
+﻿@model Mcd.HospitalManagement.Web.Models.UserRoleModel  
+
+
+<h3>Modify User Role</h3> 
+
+@using (Html.BeginForm("Edit", "UserRole", FormMethod.Post, new { @id = "form" }))
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <hr />
+        @if (ViewBag.message != null)
+{
+    <h4> @ViewBag.message </h4>
+}
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Role, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.Role, new { @class = "form-control",@name = "Role" })
+                @Html.ValidationMessageFor(model => model.Role)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" id="submit" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+<div id="notificationSuccess" class="alert alert-success msgBoxx" role="alert">
+    <div id="messageSuccess"></div>
+    <label id="successMsg"></label>
+</div>
+<div id="notificationError" class="alert alert-danger" role="alert">
+    <div id="messageError"></div>
+</div>
+
+@section Scripts {
+
+    <script type="text/javascript">
+
+         $(document).ready(function () {
+
+            var jsonObj = $('#form').serialize();
+
+
+            //validation rules
+            $("#form").validate({
+                rules: {
+                    "Role": {
+                        required: true
+                    }
+                },
+                //perform an AJAX post to ajax.php
+                submitHandler: function () {
+                    //$.post('ajax.php',
+                    //$('form#form').serialize(),
+                    //function (data) {
+                    //    alert(data.msg);
+                    //}, "json");
+
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Content("~/UserRole/Edit")',
+                        data: $('#form').serialize(),
+                        success: function (data) {
+                            //alert(data.Message);
+
+                            $('#submit').hide();
+                            if (data.Message == "You have successfully inserted your record!") {
+                                $('#notificationSuccess').show();
+                                $('#messageSuccess').replaceWith(data.Message);
+                                $('#notificationSuccess').delay(3500).fadeOut(2500);
+
+                            }
+                            else {
+                                $('#notificationError').show();
+                                $('#messageError').replaceWith(data.Message);
+                                $('#notificationError').delay(3500).fadeOut(2500);
+                            }
+
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert("Error: " + errorThrown + " , Please try again");
+                        }
+                    });
+                    return false;
+
+
+
+                }
+            });
+        });
+
+
+
+
+
+
+</script>
+
+
+
+}
+
+

@@ -1,0 +1,66 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientAdmissionDetailsModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Patient_Detail</h4>
+	<hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.AdmitDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AdmitDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IsDischarged)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.IsDischarged)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Bed.BedTicketNo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Bed.BedTicketNo)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Doctor.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Doctor.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Patient.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Patient.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Ward.WardNo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Ward.WardNo)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Patient_Detail_Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

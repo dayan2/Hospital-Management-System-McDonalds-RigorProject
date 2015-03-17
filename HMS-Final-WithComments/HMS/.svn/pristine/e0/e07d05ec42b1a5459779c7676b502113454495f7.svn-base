@@ -1,0 +1,145 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitaManagementSystem.Business.DTO;
+using Mcd.HospitalManagement.Web.Models;
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class MedicalTestTypeController : Controller
+    {
+        private IHMSMedicalTestType dbMedical;
+
+        public MedicalTestTypeController()
+        {
+            dbMedical = new HMSMedicalTestType();
+        }
+        
+        // GET: MedicalTestType
+        public ActionResult Index()
+        {
+            var medicalTestType = dbMedical.ViewtMedicalTestType();
+            IEnumerable<MedicalTestType> medical = from c in medicalTestType
+                                                     select new MedicalTestType
+                                       {
+                                           Id = c.Id,
+                                           Description = c.Description
+
+                                       };
+            return View(medical);
+        }
+
+        // GET: Medical_Test_Type/Details/5
+        public ActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            MedicalTestTypeDTO medicalTestTypeDto = dbMedical.ViewtMedicalTestTypeById(id);
+            if (medicalTestTypeDto == null)
+            {
+                return HttpNotFound();
+            }
+            MedicalTestType medicalTestType = new MedicalTestType { Id=medicalTestTypeDto.Id, Description= medicalTestTypeDto.Description };
+
+            return View(medicalTestType);
+        }
+
+        // GET: Medical_Test_Type/Create
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: Medical_Test_Type/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include = "Id,Description")] MedicalTestType medicalTestType)
+        {
+            MedicalTestTypeDTO MedicalTypeDto = new MedicalTestTypeDTO { Id=medicalTestType.Id, Description=medicalTestType.Description };
+            if (ModelState.IsValid)
+            {
+                dbMedical.InsertMedicalTestType(MedicalTypeDto);
+                return RedirectToAction("Index");
+            }
+
+            return View(medicalTestType);
+        }
+
+        // GET: Medical_Test_Type/Edit/5
+        public ActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            MedicalTestTypeDTO medicalTestTypeDTO = dbMedical.ViewtMedicalTestTypeById(id);
+            if (medicalTestTypeDTO == null)
+            {
+                return HttpNotFound();
+            }
+            MedicalTestType medicalType = new MedicalTestType { Id=medicalTestTypeDTO.Id, Description=medicalTestTypeDTO.Description };
+            return View(medicalType);
+        }
+
+        // POST: Medical_Test_Type/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include = "Id,Description")] MedicalTestType medicalTestType)
+        {
+            MedicalTestTypeDTO medicalTypeDto = new MedicalTestTypeDTO {  Id=medicalTestType.Id, Description=medicalTestType.Description};
+            if (ModelState.IsValid)
+            {
+                dbMedical.EditMedicalTestType(medicalTypeDto);
+                return RedirectToAction("Index");
+            }
+            return View(medicalTestType);
+        }
+
+        // GET: Medical_Test_Type/Delete/5
+        public ActionResult Delete(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            MedicalTestTypeDTO medicalTestTypeDto = dbMedical.ViewtMedicalTestTypeById(id);
+            if (medicalTestTypeDto == null)
+            {
+                return HttpNotFound();
+            }
+            MedicalTestType medicalType = new MedicalTestType { Id = medicalTestTypeDto.Id, Description = medicalTestTypeDto.Description };
+            return View(medicalType);
+        }
+
+        // POST: Medical_Test_Type/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            //MedicalTestTypeDTO medicalTestTypeDto = dbMedical.ViewtMedicalTestTypeById(id);
+            dbMedical.DeleteMedicalTestType(id);
+            return RedirectToAction("Index");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                dbMedical.Dispose(disposing);
+            }
+            base.Dispose(disposing);
+        }
+    }
+}

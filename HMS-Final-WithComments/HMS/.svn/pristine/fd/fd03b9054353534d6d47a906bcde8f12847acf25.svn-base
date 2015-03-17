@@ -1,0 +1,205 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientAdmissionDetailsModel
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+@if (ViewBag.Message != null)
+{
+    <p>@ViewBag.Message</p>
+}
+<h2>Delete</h2>
+
+<h1>Are you sure you want to delete this?</h1>
+<div class="col-xs-2">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation"><a href="~/PatientAdmissionDetails/CreatePatientAdmission">Admission</a></li>
+        <li role="presentation"><a href="~/Patient/Index">View Patient</a></li>
+        <li role="presentation" class="active"><a href="~/PatientFeedback/Index">FeedBack Details</a></li>
+
+    </ul>
+</div>
+
+<div class="col-xs-10">
+    <div>
+        <h4>Patient_Detail</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.AdmitDate)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.AdmitDate)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.IsDischarged)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.IsDischarged)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.BedTicketNo)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.BedTicketNo)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.DoctorName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.DoctorName)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.WardNo)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.WardNo)
+            </dd>
+
+        </dl>
+
+        @using (Html.BeginForm("DeletePatientAdmission", "DeletePatientAdmission", FormMethod.Post, new { @id = "form" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-actions no-color">
+                @Html.HiddenFor(model => model.AdmitDate, new { @class = "form-control", @name = "AdmitDate" })
+                @Html.HiddenFor(model => model.bedDetails, new { @class = "form-control", @name = "Bed Number" })
+                @Html.HiddenFor(model => model.WardNo, new { @class = "form-control", @name = "Ward Number" })
+                @Html.HiddenFor(model => model.DoctorName, new { @class = "form-control", @name = "Doctor Name" })
+                @Html.HiddenFor(model => model.Name, new { @class = "form-control", @name = "Patient Name" })
+                @Html.HiddenFor(model => model.IsDischarged, new { @class = "form-control", @name = "Discharged Status" })
+                <input type="submit" value="Delete" class="btn btn-default" id="submit" /> |
+                @Html.ActionLink("Back to List", "Index")
+            </div>
+        }
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+
+
+        $(document).ready(function () {
+
+            var jsonObj = $('#form').serialize();
+            alert(jsonObj);
+
+
+            //validation rules
+            $("#form").validate({
+                rules: {
+                    "AdmitDate": {
+                        required: true
+                    },
+                    "Bed Number": {
+                        required: true
+                    },
+                    "Ward Number": {
+                        required: true
+                    },
+                    "Doctor Name": {
+                        required: true
+                    },
+                    "Patient Name": {
+                        required: true
+                    },
+                    "Discharged Status": {
+                        required: true
+                    }
+                },
+                //perform an AJAX post to ajax.php
+                submitHandler: function () {
+
+
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("DeletePatientAdmission")',
+                        data: $('#form').serialize(),
+                        success: function (data) {
+                            //alert(data.Message);
+
+                            $('#submit').hide();
+                            if (data.Message == "You have successfully Deleted your record!") {
+
+                                toastr.options = {
+                                    "closeButton": true,
+                                    "debug": false,
+                                    "newestOnTop": true,
+                                    "progressBar": true,
+                                    "positionClass": "toast-top-full-width",
+                                    "preventDuplicates": true,
+                                    "onclick": null,
+                                    "showDuration": "5000",
+                                    "hideDuration": "5000",
+                                    "timeOut": "5000",
+                                    "extendedTimeOut": "5000",
+                                    "showEasing": "swing",
+                                    "hideEasing": "linear",
+                                    "showMethod": "fadeIn",
+                                    "hideMethod": "fadeOut"
+                                }
+                                toastr["success"]("You have successfully inserted your record!", "Success!!");
+
+                            }
+                            else {
+
+                                toastr.options = {
+                                    "closeButton": true,
+                                    "debug": false,
+                                    "newestOnTop": true,
+                                    "progressBar": true,
+                                    "positionClass": "toast-top-full-width",
+                                    "preventDuplicates": true,
+                                    "onclick": null,
+                                    "showDuration": "5000",
+                                    "hideDuration": "5000",
+                                    "timeOut": "5000",
+                                    "extendedTimeOut": "5000",
+                                    "showEasing": "swing",
+                                    "hideEasing": "linear",
+                                    "showMethod": "fadeIn",
+                                    "hideMethod": "fadeOut"
+                                }
+                                toastr["error"]("Please try again!!", "Error!!");
+
+                            }
+
+
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert("Error: " + errorThrown + " , Please try again");
+                        }
+                    });
+                    return false;
+
+
+
+                }
+            });
+        });
+
+
+
+
+
+
+    </script>
+}

@@ -1,0 +1,192 @@
+﻿#region Using Directives
+using Mcd.HospitalManagementSystem.Data;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+#endregion
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class HMSNurse : INurse
+    {
+        #region Public Methods
+
+        /// <summary>
+        /// Save nurese details. It needs for Medical Test arrangement to patients
+        /// </summary>
+        /// <param name="NurseDTO"></param>
+        public void InsertNurse(NurseDTO NurseDTO)
+        {
+            try
+            {
+
+
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    Nurse Nurse = new Nurse { Id = NurseDTO.Id, Name = NurseDTO.Name, WardId = NurseDTO.WardId };
+                    db.Nurses.Add(Nurse);
+                    db.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public void EditNurse(NurseDTO NurseDTO)
+        {
+            try
+            {
+
+
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    Nurse nurse = new Nurse { Id = NurseDTO.Id, Name = NurseDTO.Name, WardId = NurseDTO.WardId };
+                    db.Entry(nurse).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public void DeleteNurse(int NurseId)
+        {
+            try
+            {
+
+
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    Nurse nurse = db.Nurses.Find(NurseId);
+                    db.Nurses.Remove(nurse);
+                    db.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        // get all nurses details 
+        public IEnumerable<NurseDTO> ViewtNurse()
+        {
+            try
+            {
+
+
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    //var nurses = db.Nurses.ToList();
+                    //IEnumerable<NurseDTO> NurseList = from c in nurses
+                    //                                  select new NurseDTO
+                    //                                  {
+                    //                                      Id = c.Id,
+                    //                                      Name = c.Name,
+                    //                                      WardId = c.WardId
+                    //                                  };
+                    IEnumerable<NurseDTO> NurseList = db.Nurses.Join(db.Wards, n => n.WardId, w => w.Id,
+                        ((n, w) => new { n, w })).Select(c => new NurseDTO
+                        {
+                            Id = c.n.Id,
+                            Name = c.n.Name,
+                            WardId = c.w.Id,
+                            WardNo = c.w.WardNo
+                        }).ToList();
+
+                    return NurseList;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        //public NurseDTO ViewtNurseById(int NurseId)
+        //{
+
+        //}
+
+        // get nurse details by id
+        public NurseDTO ViewtNurseById(int? NurseId)
+        {
+            try
+            {
+
+
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    //Nurse Nurse = db.Nurses.Find(NurseId);
+
+                    //NurseDTO NurseDTO = new NurseDTO
+                    //{
+                    //    Id = Nurse.Id,
+                    //    Name = Nurse.Name,
+                    //    WardId = Nurse.WardId
+                    //};
+
+                    if (db.Nurses.Find(NurseId) == null)
+                    {
+                        throw new ArgumentNullException("Null object");
+                    }
+                    IEnumerable<NurseDTO> NurseList = db.Nurses.Where(b => b.Id == NurseId).Join(db.Wards, n => n.WardId, w => w.Id,
+                        ((n, w) => new { n, w })).Select(c => new NurseDTO
+                        {
+                            Id = c.n.Id,
+                            Name = c.n.Name,
+                            WardId = c.w.Id,
+                            WardNo = c.w.WardNo
+                        }).ToList();
+
+                    return NurseList.First(); ;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public bool CheckExistsNurse(int? NurseId)
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+
+                    if (db.Nurses.Find(NurseId) == null)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        //void INurse.Dispose(bool disposing)
+        //{
+        //    if (disposing)
+        //    {
+        //        db.Dispose();
+        //    }
+        //}
+        #endregion
+    }
+}
+

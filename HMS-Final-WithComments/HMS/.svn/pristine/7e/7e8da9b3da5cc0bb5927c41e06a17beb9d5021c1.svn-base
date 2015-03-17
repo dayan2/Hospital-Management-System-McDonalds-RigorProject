@@ -1,0 +1,116 @@
+﻿using Mcd.HospitalManagementSystem.Data;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    class UserRegistration
+    {
+        private LP_HMSDbEntities db = new LP_HMSDbEntities();
+        public bool AddNewUser(User user)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                User users = db.Users.Where(x => x.UserName == user.UserName).FirstOrDefault();
+                if (users == null)
+                {
+                    db.Users.Add(user);
+                    db.SaveChanges();
+                    return true;
+                }
+
+                return false;
+            }
+      
+        }
+
+        public IEnumerable<UserDTO> ViewAllUser()
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                var userList = db.Users.ToList();
+                var userRoleList = db.UserRoles.ToList();
+                IEnumerable<UserDTO> userSelectedList = from ul in userList
+                                                        from ur in userRoleList
+                                                        where ul.UserRoleId == ur.Id
+                                                        select new UserDTO
+                                                        {
+                                                            Id = ul.Id,
+                                                            UserName = ul.UserName,
+                                                            Password = ul.Password,
+                                                            UserRoleId = ul.UserRoleId,
+                                                            UserRoleType = ur.Role
+
+                                                        };
+
+                return userSelectedList;
+            }
+        }
+
+        public bool EditUser(User user)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                User users = db.Users.Where(x => x.UserName == user.UserName && x.Id != user.Id).FirstOrDefault();
+                if (users == null)
+                {
+                    db.Entry(user).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        public UserDTO ViewUserById(int Id)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                User user = db.Users.Find(Id);
+
+                UserDTO userdto = new UserDTO()
+                {
+                    Id = user.Id,
+                    Password = user.Password,
+                    UserName = user.UserName,
+                    UserRoleId = user.UserRoleId,
+                    UserRole= user.UserRole
+                };
+
+                return userdto;
+            }
+        }
+
+        public IEnumerable<UserDTO> SelectToCreate()
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                var usersList = db.Users.ToList();
+                IEnumerable<UserDTO> users = from ul in usersList
+                                             select new UserDTO
+                                             {
+                                                 Id = ul.Id,
+                                                 UserName = ul.UserName,
+                                                 Password = ul.Password,
+                                                 ConfirmPassword = ""
+                                             };
+                return users;
+            }
+        }
+
+        public void DeleteUser(int Id)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                User user = db.Users.Find(Id);
+                db.Users.Remove(user);
+                db.SaveChanges();
+            }
+        }
+    }
+}

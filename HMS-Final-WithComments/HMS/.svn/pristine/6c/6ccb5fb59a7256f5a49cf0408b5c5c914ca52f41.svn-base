@@ -1,0 +1,167 @@
+﻿@model IEnumerable<Mcd.HospitalManagement.Web.Models.PatientFeedbackModel>
+
+@{
+    ViewBag.Title = "Create";
+}
+
+@if (ViewBag.Message != null)
+{
+    <p>@ViewBag.Message</p>
+}
+
+
+<h2>Create</h2>
+<div class="col-xs-2">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation"><a href="~/PatientFeedback/Create">Add Feedback</a></li>
+        <li role="presentation"><a href="~/Patient/Index">View Patient</a></li>
+        <li role="presentation" class="active"><a href="~/PatientAdmissionDetails/Index">Patient Details</a></li>
+
+    </ul>
+</div>
+
+<div class="col-xs-10">
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>PatientFeedback</h4>
+        <hr />
+        @Html.ValidationSummary(true)
+
+
+
+        <div class="form-group">
+
+
+            @Html.Label("Patient Name", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select id="filterDropdown">
+                    <option>--Select Patient--</option>
+                    @foreach (var item in Model)
+                        {
+                       
+                        <option value=@item.PatientId> @item.PatientName</option>
+
+                        }
+
+                </select>
+
+            </div>
+        </div>
+        <div class="form-group">
+
+
+            @Html.Label("Doctor Name", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                
+                    @{Html.RenderPartial("PatientFeedBackDetails", Model);}
+
+              
+                </div>
+            </div>
+
+        <div class="form-group">
+            @Html.Label("Feedback Description", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextArea("FeedbackDescription", new
+       {
+           @id = "FeedbackDescription",
+           maxlength = 150,
+           style = "width: 200px; height: 100px;"
+       })
+                </div>
+            </div>
+
+        <div class="form-group">
+            @Html.Label("Feedback Date", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBox("FeedbackDate", "", new { @id = "FeedbackDate" })
+                </div>
+            </div>
+
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="InsertFeedBack" class="btn btn-info" id="btnSubmit" />
+                    </div>
+                </div>
+
+            </div>
+
+            }
+
+
+        </div>
+
+        <script type="text/javascript">
+
+            $(document).ready(function () {
+
+                $("#filterDropdown").on("change", function () {
+                    alert($("#filterDropdown option:selected").val());
+                    var patientId = ($("#filterDropdown option:selected").val());
+                    GetDoctors(patientId);
+
+                });
+                $('#FeedbackDate').datepicker({
+                    changeMonth: true,
+                    changeYear: true
+                });
+
+
+            });
+
+            function GetDoctors(patientId) {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("GetDoctorsById")',
+                    data: { "PatientId": patientId },
+                    success: function (data) {
+
+                        $("#DoctorDrp").html($(data).find("#DoctorDrp").html());
+
+
+                    },
+                    error: function () {
+                        alert("Error!!!");
+                    }
+
+                });
+            }
+
+            $("#btnSubmit").click(function () {
+                var pId = ($("#filterDropdown option:selected").val());
+                //alert(patientId);
+                var dId = ($("#DoctorDrp option:selected").val());
+                //alert(doctorId);
+                var fDate = ($("#FeedbackDate").val());
+                //alert(feedBackDate);
+                var fDescription = ($("#FeedbackDescription").val());
+                //alert(feedBackDescription + " " + feedBackDate);
+                GetFeedBackDeatils(pId, dId, fDate, fDescription)
+
+            });
+
+            function GetFeedBackDeatils(pId, dId, fDate, fDescription) {
+                //alert("ok")
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("InsertFeedBack")',
+                    data: { "patientId": pId, "doctorId": dId, "feedbackDate": fDate, "feedBackDescription": fDescription },
+                    success: function (data) {
+                        alert(data);
+                    },
+                    error: function () {
+                        alert("Error!!!");
+                    }
+
+                });
+            }
+
+
+
+        </script>
+
+

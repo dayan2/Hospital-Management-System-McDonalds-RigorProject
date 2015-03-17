@@ -1,0 +1,92 @@
+﻿using Mcd.HospitalManagement.Web.Models;
+using Mcd.HospitaManagementSystem.Business;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class DoctorRecommendationController : Controller
+    {
+        #region private fields
+        IDoctorRecommendationManager doctorRecommendationManager;
+        #endregion
+
+        #region Constructors
+        public DoctorRecommendationController()
+        {
+            this.doctorRecommendationManager = new DoctorRecommendationManager();
+        }
+        #endregion
+
+        public ActionResult Index()
+        {
+            IEnumerable<DoctorRecommendationDTO> doctorRecommendationList = doctorRecommendationManager.GetDoctorRecommendationDetails();
+
+            IEnumerable<DoctorRecommendationModel> doctorRecommendationModelList = doctorRecommendationList.Select(m => new DoctorRecommendationModel 
+            {
+                CurrentDoctorId = m.CurrentDoctorId,
+                CurrentDoctorName = m.CurrentDoctorName,
+                PatientId = m.PatientId,
+                PatientName  = m.PatientName,
+                Reason = m.Reason,
+                RecomendedDoctorId = m.RecomendedDoctorId,
+                RecomendedDoctorName = m.RecomendedDoctorName ,
+                Id = m.Id
+            
+            });
+
+            return View(doctorRecommendationModelList);
+        }
+
+        /// <summary>
+        /// Doctor's patient transfering details are stored in the DB
+        /// </summary>
+        /// <param name="details">Transfer Patient details</param>
+        /// <returns>Redirecting to the HomePage</returns>
+        //public ActionResult SaveTransferDoctorDetails(DoctorRecommendationModel details)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        DoctorRecommendationDTO doctorDTO = new DoctorRecommendationDTO
+        //        {
+        //            Id = details.Id,
+        //            CurrentDoctorId = details.CurrentDoctorId,
+        //            Reason = details.Reason,
+        //            RecomendedDoctorId = details.RecomendedDoctorId,
+        //            PatientId = details.PatientId
+        //        };
+
+        //        doctorRecommendationManager.SaveTransferDoctorDetails(doctorDTO);
+        //        return RedirectToAction("Index", "DoctorRecommendation");
+        //    }
+        //    return View(details);
+
+        //}
+
+        [HttpGet]
+        public ActionResult UpdateDoctorRecommendationDetails(int id)
+        {
+            //Getting info about Doctor using their ID
+            DoctorRecommendationDTO doctorRecommendation = doctorRecommendationManager.GetDoctorRecommendationById(id);
+
+            //Mapping DTO into Model
+            DoctorRecommendationModel doctor = new DoctorRecommendationModel
+            {
+                Id = doctorRecommendation.Id,
+                CurrentDoctorName = doctorRecommendation.CurrentDoctorName,
+                CurrentDoctorId = doctorRecommendation.CurrentDoctorId,
+                PatientId = doctorRecommendation.PatientId,
+                PatientName = doctorRecommendation.PatientName,
+                Reason = doctorRecommendation.Reason,
+                RecomendedDoctorId = doctorRecommendation.RecomendedDoctorId,
+                RecomendedDoctorName = doctorRecommendation.RecomendedDoctorName
+            };            
+
+            return View(doctor);
+        }
+
+	}
+}

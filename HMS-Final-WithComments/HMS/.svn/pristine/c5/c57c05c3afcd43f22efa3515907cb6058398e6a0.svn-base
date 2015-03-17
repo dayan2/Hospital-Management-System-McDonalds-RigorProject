@@ -1,0 +1,138 @@
+﻿@model Mcd.HospitalManagement.Web.Models.DoctorRecommendationModel
+
+@{
+    ViewBag.Title = "TransferPatient";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    //int userId = (int)Session["USERID"];
+}
+<div class="container-fluid">
+
+    @*<div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Application name", "Index", "Home", null, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "HomePage", "Doctor")</li>
+                    <li>@Html.ActionLink("About", "About", "Home")</li>
+                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                </ul>
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </div>*@
+
+    <h2>Transfer Patient</h2>
+    <div class="row">
+        <div class="col-xs-4">
+            <ol class="breadcrumb">
+                <li><a href="~/Doctor/HomePage">Home</a></li>
+                <li><a href="~/Doctor/Index">My Patients</a></li>
+                <li class="active">Transfer Patient</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="row">
+        
+        <div class="col-xs-1">
+            <ul class="nav nav-pills" role="tablist">
+                @*<li role="presentation"><a href="~/Doctor/HomePage">Home</a></li>*@
+                <li role="presentation"><a href="~/Doctor/Index">My Patients</a></li>
+                <li role="presentation"><a href="~/Doctor/Details/33">Profile</a></li>
+                <li role="presentation"><a href="~/Doctor/RecommendDoctors">Recommended Doctors</a></li>
+            </ul>
+        </div>
+        <div class="col-xs-1"></div>
+
+        <div class="col-xs-10">
+            @using (Html.BeginForm("TransferDoctor", "Doctor", FormMethod.Post, new { @id = "form" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-horizontal">
+                    <hr />
+                    @Html.ValidationSummary(true)
+                    @Html.HiddenFor(model => model.Id)
+                    <div class="form-group">
+                        @Html.Label("Recomended Doctor", new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @*@Html.EditorFor(model => model.RecomendedDoctorId)
+                                @Html.ValidationMessageFor(model => model.RecomendedDoctorId)*@
+                            @*@Html.DropDownList("doctorViewbag", (IEnumerable<SelectListItem>)ViewBag.doctorViewbag)*@
+                            @Html.DropDownListFor(model => model.RecomendedDoctorId, (IEnumerable<SelectListItem>)ViewBag.doctorViewbag, new { @class = "btn-group-vertical" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.CurrentDoctorId, new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(model => model.CurrentDoctorId, new { @class = "form-control", @name = "CurrentDoctorId" })
+                            @Html.ValidationMessageFor(model => model.CurrentDoctorId)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.PatientId, new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(model => model.PatientId, new { @class = "form-control", @name = "PatientId" })
+                            @Html.ValidationMessageFor(model => model.PatientId)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Reason, new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.TextAreaFor(model => model.Reason, new { @class = "form-control", @name = "Reason" })
+                            @Html.ValidationMessageFor(model => model.Reason)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Transfer" class="btn btn-primary" />
+                            <a href="~/Doctor/HomePage" class="btn btn-primary">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            var jsonObj = $('#form').serialize();
+
+            //validation rules
+            $("#form").validate({
+                rules: {
+                    "CurrentDoctorId": {
+                        required: true,
+                        number: true
+                    },
+                    "PatientId": {
+                        required: true,
+                        number: true
+                    },
+                    "Reason": {
+                        required: true
+
+                    }
+                }
+                
+            });
+        });
+
+    </script>
+}

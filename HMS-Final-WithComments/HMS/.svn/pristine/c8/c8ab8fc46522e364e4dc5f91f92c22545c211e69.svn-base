@@ -1,0 +1,98 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientAdmissionDetailsModel
+
+@{
+    ViewBag.Title = "Create";
+}
+
+
+
+<h2>Create</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Patient Admission Detail</h4>
+        <hr />
+        @Html.ValidationSummary(true)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.AdmitDate, "Admit Date", new { @class = "control-label col-md-2", style = "width: 150px;align:left;" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.AdmitDate, new { @id = "AdmitDate", @class = "date-picker admissionDate", style = "width: 200px;", })
+       
+                
+                 @Html.ValidationMessageFor(model => model.AdmitDate)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.BedId, "Bed Number", new { @class = "control-label col-md-2", style = "width: 150px;align:right;" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.BedId, (IEnumerable<SelectListItem>)ViewBag.BedId, "--Select Bed Number--", new { @class = "btn-group-vertical", style = "width: 200px;" })
+                @Html.ValidationMessageFor(model => model.BedId)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.WardId, "Ward Number", new { @class = "control-label col-md-2", style = "width: 150px;align:left;" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.WardId, (IEnumerable<SelectListItem>)ViewBag.WardId, "--Select Ward Number--", new { @class = "btn-group-vertical", style = "width: 200px;" })
+                @Html.ValidationMessageFor(model => model.WardId)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DoctorId, "Doctor Name", new { @class = "control-label col-md-2", style = "width: 150px;align:left;" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.DoctorId, (IEnumerable<SelectListItem>)ViewBag.DoctorId, "-- Select Doctor Name--", new { @class = "btn-group-vertical", style = "width: 200px;" })
+                @Html.ValidationMessageFor(model => model.DoctorId)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.PatientId, "Patient Name", new { @class = "control-label col-md-2", style = "width: 150px;align:left;" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.PatientId, (IEnumerable<SelectListItem>)ViewBag.PatientId, "-- Select Patient Name--", new { @class = "btn-group-vertical", style = "width: 200px;" })
+                @Html.ValidationMessageFor(model => model.PatientId)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.IsDischarged, "Discharged Status", new { @class = "control-label col-md-2", style = "width: 150px;align:left;" })
+            <div class="col-md-10">
+                @*@Html.LabelFor(model => model.IsDischarged, "False", new { @class = "control-label col-md-2", style = "width: 150px;",@value="False" })
+                    @Html.HiddenFor(model => model.IsDischarged,"False")*@
+                @Html.EditorFor(model => model.IsDischarged)
+                @Html.ValidationMessageFor(model => model.IsDischarged)
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+@*@Html.TextBox("AdmitDate")*@
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#AdmitDate').datepicker({
+            changeMonth: true,
+            changeYear: true
+        });
+    });
+
+
+    //function dateTime(ctrl) {
+    //    $('#' + ctrl + '').datetimepicker();
+    //}
+</script>
+

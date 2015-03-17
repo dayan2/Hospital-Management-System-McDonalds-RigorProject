@@ -1,0 +1,28 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Web;
+
+namespace Mcd.HospitalManagement.Web.Models
+{
+    public class NurseModel
+    {        
+        [Required(ErrorMessage="Id is required")]
+        public int Id { get; set; }
+
+        [Required(ErrorMessage = "Name is required")]
+        [Display(Name = "Nurse Name")]
+        public string Name { get; set; }
+
+        [Required(ErrorMessage = "Ward is required")]
+        [Display(Name = "Ward")]
+        public Nullable<int> WardId { get; set; } 
+
+        public WardModel Ward { get; set; } 
+
+        public IEnumerable<WardModel> Wards { get; set; } 
+
+        public string WardNo { get; set; } 
+    }
+}

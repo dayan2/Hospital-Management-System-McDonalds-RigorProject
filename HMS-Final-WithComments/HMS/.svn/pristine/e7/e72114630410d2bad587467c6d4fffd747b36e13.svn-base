@@ -1,0 +1,67 @@
+﻿@model Mcd.HospitalManagement.Web.Models.DoctorRecommendationModel
+
+@{
+    ViewBag.Title = "TransferPatient";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container-fluid">
+    <div class="row">
+        <h2>Transfer Patient</h2>
+        <div class="col-xs-1">
+            <ul class="nav nav-pills" role="tablist">
+                <li role="presentation"><a href="~/Doctor/FrontPage">Home</a></li>
+                <li role="presentation"><a href="~/Doctor/Details/5">Profile</a></li>
+                <li role="presentation" class="active"><a href="~/Doctor/RecommendDoctors">Recommended Doctors</a></li>
+            </ul>
+        </div>
+        <div class="col-xs-1"></div>
+
+        <div class="col-xs-10">
+            @using (Html.BeginForm("TransferDoctor", "Doctor", FormMethod.Post, new { @class = "form" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-horizontal">
+                    <hr />
+                    @Html.ValidationSummary(true)
+                    @Html.HiddenFor(model => model.Id)
+                    <div class="form-group">
+                        @Html.Label("Recomended Doctor", new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @*@Html.EditorFor(model => model.RecomendedDoctorId)
+                                @Html.ValidationMessageFor(model => model.RecomendedDoctorId)*@
+                            @*@Html.DropDownList("doctorViewbag", (IEnumerable<SelectListItem>)ViewBag.doctorViewbag)*@
+                            @Html.DropDownListFor(model => model.RecomendedDoctorId, (IEnumerable<SelectListItem>)ViewBag.doctorViewbag, new { @class = "btn-group-vertical" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.CurrentDoctorId, new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(model => model.CurrentDoctorId, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.CurrentDoctorId)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Reason, new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.TextAreaFor(model => model.Reason, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Reason)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Transfer" class="btn btn-info" />
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

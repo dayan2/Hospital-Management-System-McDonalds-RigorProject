@@ -1,0 +1,23 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Mcd.HospitalManagement.Web.Models
+{
+    public class PatientFeedbackModel
+    {
+        public int Id { get; set; }
+        public Nullable<int> DoctorId { get; set; }
+        public int PatientDetailId { get; set; }
+        public Nullable<System.DateTime> FeedbackDate { get; set; }
+        public string FeedbackDescription { get; set; }
+        public string DoctorName { get; set; }
+        public int PatientId { get; set; }
+        public string PatientName { get; set; }
+
+        public virtual IEnumerable<PatientFeedbackModel> doctors { get; set; }
+        public virtual PatientFeedbackModel doctorss { get; set; }
+
+    }
+}

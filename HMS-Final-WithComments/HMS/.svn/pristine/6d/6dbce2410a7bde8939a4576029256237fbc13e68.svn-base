@@ -1,0 +1,443 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="LP_HMSDbModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="Bed">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="WardId" Type="int" />
+    <Property Name="BedTicketNo" Type="varchar" MaxLength="20" />
+  </EntityType>
+  <EntityType Name="Doctor">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="varchar" MaxLength="50" />
+    <Property Name="DoctorSpecialityId" Type="int" Nullable="false" />
+    <Property Name="Charges" Type="decimal" Precision="18" Scale="2" />
+    <Property Name="PhoneNo" Type="varchar" MaxLength="50" />
+    <Property Name="UserId" Type="int" Nullable="false" />
+    <Property Name="WardId" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="DoctorRecomendation">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="RecomendedDoctorId" Type="int" />
+    <Property Name="CurrentDoctorId" Type="int" />
+    <Property Name="Reason" Type="varchar" MaxLength="150" />
+  </EntityType>
+  <EntityType Name="DoctorSpeciality">
+    <Key>
+      <PropertyRef Name="DoctorSpecialityId" />
+    </Key>
+    <Property Name="DoctorSpecialityId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="SpecializeArea" Type="varchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="Invoice">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="PatientDetailId" Type="int" />
+    <Property Name="InvoiceDate" Type="date" />
+  </EntityType>
+  <EntityType Name="Medical_Test_Type">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Description" Type="varchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="Nurse">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="varchar" MaxLength="50" />
+    <Property Name="WardId" Type="int" />
+  </EntityType>
+  <EntityType Name="Patient">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="varchar" MaxLength="50" />
+    <Property Name="NIC" Type="varchar" MaxLength="50" />
+    <Property Name="Address" Type="varchar" MaxLength="50" />
+    <Property Name="Gender" Type="char" MaxLength="10" />
+    <Property Name="MobileNo" Type="varchar" MaxLength="20" />
+  </EntityType>
+  <EntityType Name="Patient_Detail">
+    <Key>
+      <PropertyRef Name="Patient_Detail_Id" />
+    </Key>
+    <Property Name="Patient_Detail_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="AdmitDate" Type="date" />
+    <Property Name="BedId" Type="int" />
+    <Property Name="WardId" Type="int" />
+    <Property Name="DoctorId" Type="int" />
+    <Property Name="PatientId" Type="int" />
+    <Property Name="IsDischarged" Type="bit" />
+  </EntityType>
+  <EntityType Name="Patient_Medical_Test">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Patient_Detail_Id" Type="int" Nullable="false" />
+    <Property Name="Medical_TestId" Type="int" />
+    <Property Name="NurseId" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="PatientFeedback">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="DoctorId" Type="int" />
+    <Property Name="Patient_Detail_Id" Type="int" Nullable="false" />
+    <Property Name="FeedbackDate" Type="date" />
+    <Property Name="FeedbackDescription" Type="varchar" MaxLength="150" />
+  </EntityType>
+  <EntityType Name="sysdiagrams">
+    <Key>
+      <PropertyRef Name="diagram_id" />
+    </Key>
+    <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+    <Property Name="principal_id" Type="int" Nullable="false" />
+    <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="version" Type="int" />
+    <Property Name="definition" Type="varbinary(max)" />
+  </EntityType>
+  <EntityType Name="User">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="UserName" Type="varchar" MaxLength="20" Nullable="false" />
+    <Property Name="Password" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="UserRoleId" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="UserRole">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Role" Type="varchar" MaxLength="20" />
+  </EntityType>
+  <EntityType Name="Ward">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="WardNo" Type="varchar" MaxLength="10" />
+    <Property Name="WardFee" Type="decimal" Precision="18" Scale="2" />
+  </EntityType>
+  <Association Name="FK_Bed_Ward">
+    <End Role="Ward" Type="Self.Ward" Multiplicity="0..1" />
+    <End Role="Bed" Type="Self.Bed" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Ward">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Bed">
+        <PropertyRef Name="WardId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Doctor_DoctorSpeciality">
+    <End Role="DoctorSpeciality" Type="Self.DoctorSpeciality" Multiplicity="1" />
+    <End Role="Doctor" Type="Self.Doctor" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="DoctorSpeciality">
+        <PropertyRef Name="DoctorSpecialityId" />
+      </Principal>
+      <Dependent Role="Doctor">
+        <PropertyRef Name="DoctorSpecialityId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Doctor_User">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="Doctor" Type="Self.Doctor" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Doctor">
+        <PropertyRef Name="UserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Doctor_Ward">
+    <End Role="Ward" Type="Self.Ward" Multiplicity="1" />
+    <End Role="Doctor" Type="Self.Doctor" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Ward">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Doctor">
+        <PropertyRef Name="WardId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_DoctorRecomendation_Doctor">
+    <End Role="Doctor" Type="Self.Doctor" Multiplicity="0..1" />
+    <End Role="DoctorRecomendation" Type="Self.DoctorRecomendation" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Doctor">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="DoctorRecomendation">
+        <PropertyRef Name="RecomendedDoctorId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_DoctorRecomendation_Doctor1">
+    <End Role="Doctor" Type="Self.Doctor" Multiplicity="0..1" />
+    <End Role="DoctorRecomendation" Type="Self.DoctorRecomendation" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Doctor">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="DoctorRecomendation">
+        <PropertyRef Name="CurrentDoctorId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Invoice_Patient_Detail">
+    <End Role="Patient_Detail" Type="Self.Patient_Detail" Multiplicity="0..1" />
+    <End Role="Invoice" Type="Self.Invoice" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Patient_Detail">
+        <PropertyRef Name="Patient_Detail_Id" />
+      </Principal>
+      <Dependent Role="Invoice">
+        <PropertyRef Name="PatientDetailId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Nurse_Ward">
+    <End Role="Ward" Type="Self.Ward" Multiplicity="0..1" />
+    <End Role="Nurse" Type="Self.Nurse" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Ward">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Nurse">
+        <PropertyRef Name="WardId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Patient_Detail_Bed">
+    <End Role="Bed" Type="Self.Bed" Multiplicity="0..1" />
+    <End Role="Patient_Detail" Type="Self.Patient_Detail" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Bed">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Patient_Detail">
+        <PropertyRef Name="BedId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Patient_Detail_Doctor">
+    <End Role="Doctor" Type="Self.Doctor" Multiplicity="0..1" />
+    <End Role="Patient_Detail" Type="Self.Patient_Detail" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Doctor">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Patient_Detail">
+        <PropertyRef Name="DoctorId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Patient_Detail_Patient">
+    <End Role="Patient" Type="Self.Patient" Multiplicity="0..1" />
+    <End Role="Patient_Detail" Type="Self.Patient_Detail" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Patient">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Patient_Detail">
+        <PropertyRef Name="PatientId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Patient_Detail_Ward">
+    <End Role="Ward" Type="Self.Ward" Multiplicity="0..1" />
+    <End Role="Patient_Detail" Type="Self.Patient_Detail" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Ward">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Patient_Detail">
+        <PropertyRef Name="WardId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Patient_Medical_Test_Medical_Test_Type">
+    <End Role="Medical_Test_Type" Type="Self.Medical_Test_Type" Multiplicity="0..1" />
+    <End Role="Patient_Medical_Test" Type="Self.Patient_Medical_Test" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Medical_Test_Type">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Patient_Medical_Test">
+        <PropertyRef Name="Medical_TestId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Patient_Medical_Test_Nurse">
+    <End Role="Nurse" Type="Self.Nurse" Multiplicity="1" />
+    <End Role="Patient_Medical_Test" Type="Self.Patient_Medical_Test" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Nurse">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Patient_Medical_Test">
+        <PropertyRef Name="NurseId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Patient_Medical_Test_Patient_Detail">
+    <End Role="Patient_Detail" Type="Self.Patient_Detail" Multiplicity="1" />
+    <End Role="Patient_Medical_Test" Type="Self.Patient_Medical_Test" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Patient_Detail">
+        <PropertyRef Name="Patient_Detail_Id" />
+      </Principal>
+      <Dependent Role="Patient_Medical_Test">
+        <PropertyRef Name="Patient_Detail_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_PatientFeedback_Doctor">
+    <End Role="Doctor" Type="Self.Doctor" Multiplicity="0..1" />
+    <End Role="PatientFeedback" Type="Self.PatientFeedback" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Doctor">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="PatientFeedback">
+        <PropertyRef Name="DoctorId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_PatientFeedback_Patient_Detail">
+    <End Role="Patient_Detail" Type="Self.Patient_Detail" Multiplicity="1" />
+    <End Role="PatientFeedback" Type="Self.PatientFeedback" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Patient_Detail">
+        <PropertyRef Name="Patient_Detail_Id" />
+      </Principal>
+      <Dependent Role="PatientFeedback">
+        <PropertyRef Name="Patient_Detail_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_User_UserRole">
+    <End Role="UserRole" Type="Self.UserRole" Multiplicity="1" />
+    <End Role="User" Type="Self.User" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="UserRole">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="User">
+        <PropertyRef Name="UserRoleId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="LP_HMSDbModelStoreContainer">
+    <EntitySet Name="Bed" EntityType="Self.Bed" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Doctor" EntityType="Self.Doctor" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="DoctorRecomendation" EntityType="Self.DoctorRecomendation" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="DoctorSpeciality" EntityType="Self.DoctorSpeciality" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Invoice" EntityType="Self.Invoice" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Medical_Test_Type" EntityType="Self.Medical_Test_Type" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Nurse" EntityType="Self.Nurse" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Patient" EntityType="Self.Patient" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Patient_Detail" EntityType="Self.Patient_Detail" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Patient_Medical_Test" EntityType="Self.Patient_Medical_Test" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="PatientFeedback" EntityType="Self.PatientFeedback" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="UserRole" EntityType="Self.UserRole" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Ward" EntityType="Self.Ward" Schema="dbo" store:Type="Tables" />
+    <AssociationSet Name="FK_Bed_Ward" Association="Self.FK_Bed_Ward">
+      <End Role="Ward" EntitySet="Ward" />
+      <End Role="Bed" EntitySet="Bed" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Doctor_DoctorSpeciality" Association="Self.FK_Doctor_DoctorSpeciality">
+      <End Role="DoctorSpeciality" EntitySet="DoctorSpeciality" />
+      <End Role="Doctor" EntitySet="Doctor" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Doctor_User" Association="Self.FK_Doctor_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="Doctor" EntitySet="Doctor" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Doctor_Ward" Association="Self.FK_Doctor_Ward">
+      <End Role="Ward" EntitySet="Ward" />
+      <End Role="Doctor" EntitySet="Doctor" />
+    </AssociationSet>
+    <AssociationSet Name="FK_DoctorRecomendation_Doctor" Association="Self.FK_DoctorRecomendation_Doctor">
+      <End Role="Doctor" EntitySet="Doctor" />
+      <End Role="DoctorRecomendation" EntitySet="DoctorRecomendation" />
+    </AssociationSet>
+    <AssociationSet Name="FK_DoctorRecomendation_Doctor1" Association="Self.FK_DoctorRecomendation_Doctor1">
+      <End Role="Doctor" EntitySet="Doctor" />
+      <End Role="DoctorRecomendation" EntitySet="DoctorRecomendation" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Invoice_Patient_Detail" Association="Self.FK_Invoice_Patient_Detail">
+      <End Role="Patient_Detail" EntitySet="Patient_Detail" />
+      <End Role="Invoice" EntitySet="Invoice" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Nurse_Ward" Association="Self.FK_Nurse_Ward">
+      <End Role="Ward" EntitySet="Ward" />
+      <End Role="Nurse" EntitySet="Nurse" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Patient_Detail_Bed" Association="Self.FK_Patient_Detail_Bed">
+      <End Role="Bed" EntitySet="Bed" />
+      <End Role="Patient_Detail" EntitySet="Patient_Detail" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Patient_Detail_Doctor" Association="Self.FK_Patient_Detail_Doctor">
+      <End Role="Doctor" EntitySet="Doctor" />
+      <End Role="Patient_Detail" EntitySet="Patient_Detail" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Patient_Detail_Patient" Association="Self.FK_Patient_Detail_Patient">
+      <End Role="Patient" EntitySet="Patient" />
+      <End Role="Patient_Detail" EntitySet="Patient_Detail" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Patient_Detail_Ward" Association="Self.FK_Patient_Detail_Ward">
+      <End Role="Ward" EntitySet="Ward" />
+      <End Role="Patient_Detail" EntitySet="Patient_Detail" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Patient_Medical_Test_Medical_Test_Type" Association="Self.FK_Patient_Medical_Test_Medical_Test_Type">
+      <End Role="Medical_Test_Type" EntitySet="Medical_Test_Type" />
+      <End Role="Patient_Medical_Test" EntitySet="Patient_Medical_Test" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Patient_Medical_Test_Nurse" Association="Self.FK_Patient_Medical_Test_Nurse">
+      <End Role="Nurse" EntitySet="Nurse" />
+      <End Role="Patient_Medical_Test" EntitySet="Patient_Medical_Test" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Patient_Medical_Test_Patient_Detail" Association="Self.FK_Patient_Medical_Test_Patient_Detail">
+      <End Role="Patient_Detail" EntitySet="Patient_Detail" />
+      <End Role="Patient_Medical_Test" EntitySet="Patient_Medical_Test" />
+    </AssociationSet>
+    <AssociationSet Name="FK_PatientFeedback_Doctor" Association="Self.FK_PatientFeedback_Doctor">
+      <End Role="Doctor" EntitySet="Doctor" />
+      <End Role="PatientFeedback" EntitySet="PatientFeedback" />
+    </AssociationSet>
+    <AssociationSet Name="FK_PatientFeedback_Patient_Detail" Association="Self.FK_PatientFeedback_Patient_Detail">
+      <End Role="Patient_Detail" EntitySet="Patient_Detail" />
+      <End Role="PatientFeedback" EntitySet="PatientFeedback" />
+    </AssociationSet>
+    <AssociationSet Name="FK_User_UserRole" Association="Self.FK_User_UserRole">
+      <End Role="UserRole" EntitySet="UserRole" />
+      <End Role="User" EntitySet="User" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

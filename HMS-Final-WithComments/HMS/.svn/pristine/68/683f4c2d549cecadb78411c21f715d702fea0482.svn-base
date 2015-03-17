@@ -1,0 +1,120 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int userId = (int)Session["USERID"];
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Patient Doctor Details</title>
+</head>
+<body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Application name", "Index", "Home", null, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "HomePage", "Doctor")</li>
+                    <li>@Html.ActionLink("About", "About", "Home")</li>
+                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                </ul>
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <h2>Patient Profile</h2>
+
+        <div class="row">
+            <div class="col-xs-4">
+                <ol class="breadcrumb">
+                    <li><a href="~/Doctor/HomePage">Home</a></li>
+                    <li><a href="~/Doctor/Index">My Patients</a></li>
+                    <li class="active">Patient Profile</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-1">
+                <ul class="nav nav-pills" role="tablist">
+                    <li role="presentation"><a href="~/Doctor/HomePage">Home</a></li>
+                    <li role="presentation"><a href="~/Doctor/Index">My Patients</a></li>
+                    <li role="presentation" class="active"><a href="~/Doctor/Details/@userId">Profile</a></li>
+                    <li role="presentation"><a href="~/Doctor/RecommendDoctors">Recommended Doctors</a></li>
+                </ul>
+            </div>
+            <div class="col-xs-1"></div>
+            <div class="col-xs-3 ">
+                <a href="#" class="thumbnail">
+                    <img src="https://lh3.googleusercontent.com/-10t5sE1Gb_U/VAdFEgdJqaI/AAAAAAAACXo/YlnlOGR1mfM/w640-h640/10645259_10152361622265847_5970057161285428902_n.jpg" alt="Profile Image">
+                </a>
+            </div>
+            <div class="col-xs-1"></div>
+            <div class="col-xs-6 ">
+                <h4></h4>
+                <hr />
+                <dl class="dl-horizontal">
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Name)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.NIC)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.NIC)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Address)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Address)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Gender)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Gender)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.MobileNo)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.MobileNo)
+                    </dd>
+
+                </dl>
+            </div>
+        </div>
+    </div>
+    <p>
+        @*@Html.ActionLink("Edit", "Edit", new { id = Model.Id })*@ |
+        @Html.ActionLink("Back to Menu", "HomePage", "Doctor")
+    </p>
+</body>
+</html>

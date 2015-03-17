@@ -1,0 +1,11 @@
+﻿.FrontPageTemp {
+    margin-bottom: 30px;
+}
+
+.formSelect {
+    margin: 10px 10px 10px 10px;
+    float: right;
+}
+
+
+

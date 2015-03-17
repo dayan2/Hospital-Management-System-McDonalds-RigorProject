@@ -1,0 +1,309 @@
+﻿#region Using Directives
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitalManagement.Web.Models;
+using Mcd.HospitalManagement.Web.Enums;
+#endregion
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class PatientMedicalTestsController : Controller
+    {
+        #region Private Fields
+        IPatientManager dbPatient;
+        INurse dbNurse;
+        IHMSMedicalTestType dbMedicalTest;
+        IPatientMedicalTestAllocation dbMedicalTestAllocation;
+        string displayMessage = string.Empty;
+        #endregion
+
+        #region Constructor Method
+        public PatientMedicalTestsController()
+        {
+            dbPatient = new PatientManager();
+            dbNurse = new HMSNurse();
+            dbMedicalTest = new HMSMedicalTestType();
+            dbMedicalTestAllocation = new PatientMedicalTestAllocation();
+        }
+        #endregion
+
+        #region Public Methods
+
+        // GET: PatientMedicalTests
+        public ActionResult Index()
+        {
+
+            return View();
+        }
+
+        /// <summary>
+        /// Medical test details send to save that recieve by Json mwthod
+        /// </summary>
+        /// <param name="patientDetailsId"></param>
+        /// <param name="medicalTestId"></param>
+        /// <param name="nurseId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult Create(int patientDetailsId, int medicalTestId, int nurseId)
+        {
+            PatientMedicalTestDTO patientDto = new PatientMedicalTestDTO
+                   {
+                       MedicalTestId = Convert.ToInt32(medicalTestId),
+                       NurseId = Convert.ToInt32(nurseId),
+                       PatientDetailId = Convert.ToInt32(patientDetailsId)
+                   };
+            if (ModelState.IsValid)
+            {
+                if (!dbMedicalTestAllocation.CheckExistsMedicalTestForPatientAdmission(patientDto))
+                {
+                    ViewBag.Message = CustomEnumMessage.GetStringValue(PatientMedicalTestError.AlreadyExistPatientMedicalTest);
+                    //return View();
+                    return Json(new { Message = "this Medical Test already Exists for this patient" });
+                }
+                if (dbMedicalTestAllocation.InsertPatientMedicalTest(patientDto))
+                    return Json(new { Message = "Success" });
+            }
+            return Json(new { Message = "Data is not valid" });
+            // return View();
+        }
+
+        public ActionResult ViewPatientMedicalTest()
+        {
+            IEnumerable<PatientMedicalTestDTO> patientMedicalTestDto = dbMedicalTestAllocation.ViewtPatientMedicalTest();
+            if (patientMedicalTestDto == null)
+            {
+                ViewBag.Result = "No records";
+                return View();
+            }
+            IEnumerable<PatientMedicalTestModel> patientMedicalTestModel = patientMedicalTestDto.Select(m => new PatientMedicalTestModel
+          {
+              Id = m.Id,
+              MedicalTestId = m.MedicalTestId,
+              NurseId = m.NurseId,
+              NurseName = m.NurseName,
+              MedicalTestDescription = m.MedicalTest,
+              PatientDetailId = m.PatientDetailId,
+              PatientName = m.PatientName
+          }).ToList();
+
+            return View(patientMedicalTestModel);
+        }
+
+        public ActionResult Create(int? id)
+        {
+            if (id == null)
+            {
+                return HttpNotFound();
+            }
+
+            PatientMedicalTestModel patientMedicalTest = new PatientMedicalTestModel();
+            List<SelectListItem> medicalTestList = new List<SelectListItem>();
+            List<SelectListItem> nurseList = new List<SelectListItem>();
+            var nurses = dbNurse.ViewtNurse();
+            foreach (var n in nurses)
+            {
+                nurseList.Add(new SelectListItem
+                {
+                    Text = n.Name,
+                    Value = n.Id.ToString()
+                });
+            }
+
+            var medicalTest = dbMedicalTest.ViewtMedicalTestType();
+            foreach (var m in medicalTest)
+            {
+                medicalTestList.Add(new SelectListItem
+                {
+                    Value = m.Id.ToString(),
+                    Text = m.Description
+                });
+            }
+
+            //ViewBag.PatientDetailId = new SelectList(patientModel, "Id", "Name", 0);
+            // ViewBag.NurseId = new SelectList(nurseModel, "Id", "Name");
+            // ViewBag.MedicalTestId = new SelectList(medicalTestModel, "Id", "Description");
+
+            PatientAdmissionDTO patientDetatilDto = dbPatient.GetPatientDetailId(id);
+            PatientAdmissionDetailsModel patientDetailsModel = new PatientAdmissionDetailsModel
+            {
+                AdmitDate = patientDetatilDto.AdmitDate,
+                IsDischarged = patientDetatilDto.IsDischarged,
+                PatientDetailId = patientDetatilDto.PatientDetailId
+            };
+            patientMedicalTest.PatientDetailId = patientDetatilDto.PatientDetailId;
+            patientMedicalTest.PatientAdmissionDetails = patientDetailsModel;
+            patientMedicalTest.Nurse = nurseList;
+            patientMedicalTest.MedicalTestType = medicalTestList;
+            return View(patientMedicalTest);
+        }
+
+        // GET: PatientMedicalTests/Edit/5
+        public ActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            PatientMedicalTestModel patientMedicalTest = new PatientMedicalTestModel();
+            List<SelectListItem> medicalTestList = new List<SelectListItem>();
+            List<SelectListItem> nurseList = new List<SelectListItem>();
+            var nurses = dbNurse.ViewtNurse();
+            foreach (var n in nurses)
+            {
+                nurseList.Add(new SelectListItem
+                {
+                    Text = n.Name,
+                    Value = n.Id.ToString()
+                });
+            }
+
+            var medicalTest = dbMedicalTest.ViewtMedicalTestType();
+            foreach (var m in medicalTest)
+            {
+                medicalTestList.Add(new SelectListItem
+                {
+                    Value = m.Id.ToString(),
+                    Text = m.Description
+                });
+            }
+
+            PatientMedicalTestDTO patientMedicalDTO = dbMedicalTestAllocation.ViewtPatientMedicalTestById(id);
+            patientMedicalTest.Id = patientMedicalDTO.Id;
+            patientMedicalTest.MedicalTestId = patientMedicalDTO.MedicalTestId;
+            patientMedicalTest.NurseId = patientMedicalDTO.NurseId;
+            patientMedicalTest.PatientDetailId = patientMedicalDTO.PatientDetailId;
+            patientMedicalTest.PatientName = patientMedicalDTO.PatientName;
+            //patientMedicalTest.PatientAdmissionDetails = patientDetailsModel;
+            patientMedicalTest.Nurse = nurseList;
+            patientMedicalTest.MedicalTestType = medicalTestList;
+            return View(patientMedicalTest);
+        }
+
+        // POST: PatientMedicalTests/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include = "Id,PatientDetailId,MedicalTestId,NurseId")] PatientMedicalTestModel patientMedicalTest)
+        {
+            if (ModelState.IsValid)
+            {
+                PatientMedicalTestDTO patientMedicalDto = new PatientMedicalTestDTO
+                {
+                    Id = patientMedicalTest.Id,
+                    NurseId = patientMedicalTest.NurseId,
+                    PatientDetailId = patientMedicalTest.PatientDetailId,
+                    MedicalTestId = patientMedicalTest.MedicalTestId
+                };
+                if (!dbMedicalTestAllocation.CheckExistsMedicalTestForPatientAdmission(patientMedicalDto))
+                {
+                    //return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Already exists");
+                    displayMessage = CustomEnumMessage.GetStringValue(PatientMedicalTestError.AlreadyExistPatientMedicalTest);
+                    return Json(new { Message = displayMessage });
+                }
+
+                if (dbMedicalTestAllocation.EditPatientMedicalTest(patientMedicalDto))
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationUpdatedMsg);
+                else
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+
+                return Json(new { Message = displayMessage });
+                //return RedirectToAction("ViewPatientMedicalTest");
+            }
+
+            return View(patientMedicalTest);
+        }
+
+        // GET: PatientMedicalTests/Delete/5
+        public ActionResult Delete(int? id)
+        
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            if (!dbMedicalTestAllocation.ExistsPatientMedicalTest((int)id))
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+
+            PatientMedicalTestDTO patientMedicalTest = dbMedicalTestAllocation.ViewtPatientMedicalTestById(id);
+
+            if (patientMedicalTest == null)
+            {
+                return HttpNotFound();
+            }
+
+            PatientMedicalTestModel patientMedicalTestModel = new PatientMedicalTestModel
+            {
+                Id = patientMedicalTest.Id,
+                MedicalTestDescription = patientMedicalTest.MedicalTest,
+                MedicalTestId = patientMedicalTest.MedicalTestId,
+                NurseId = patientMedicalTest.NurseId,
+                NurseName = patientMedicalTest.NurseName,
+                PatientName = patientMedicalTest.PatientName,
+                PatientDetailId = patientMedicalTest.PatientDetailId
+
+            };
+            return View(patientMedicalTestModel);
+        }
+
+        // POST: PatientMedicalTests/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            if ((UserRoleEnum)Enum.Parse(typeof(UserRoleEnum), Session["USERROLE"].ToString()) == UserRoleEnum.Admin)
+            {
+                if (!dbMedicalTestAllocation.ExistsPatientMedicalTest(id))
+                    return HttpNotFound();
+
+                if (dbMedicalTestAllocation.DeletePatientMedicalTest(id))
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationRemovedMsg);
+                else
+                    displayMessage = CustomEnumMessage.GetStringValue(ConfirmationMessages.ConfirmationErrorMsg);
+                return Json(new { Message = displayMessage });
+                //return RedirectToAction("ViewPatientMedicalTest");
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Error", new { ErrorMessage = CustomEnumMessage.GetStringValue(PageStatusEnum.AccessDenied) });
+            }
+        }
+        /// <summary>
+        /// this is using for partial views
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult RenderPatientDetailsGrid(string name)
+        {
+
+            IEnumerable<PatientDTO> patientDetialsDTOList = dbMedicalTestAllocation.FindPatientDetails(name);
+
+            if (patientDetialsDTOList == null)
+            {
+                ViewBag.Result = "null";
+            }
+
+            IEnumerable<PatientModel> PatientModel = patientDetialsDTOList.Select(m => new PatientModel
+                  {
+                      Id = m.Id,
+                      Address = m.Address,
+                      Name = m.Name,
+                      NIC = m.NIC
+                  }).ToList();
+
+
+            return PartialView("_PatientMedicalTest", PatientModel);
+        }
+        #endregion
+
+    }
+}

@@ -1,0 +1,112 @@
+﻿@{
+    ViewBag.Title = "HomePageForClerk";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+   // int userId = (int)Session["USERID"];
+}
+
+<div class="container">
+
+    <!-- Title -->
+    <div class="row">
+        <div class="col-lg-12">
+            <h2>Home</h2>
+        </div>
+    </div>
+    <!-- /.row -->
+    <!-- Page Features -->
+    <div class="row text-center">
+
+        <div class="col-md-4 col-sm-6 hero-feature">
+            <div class="thumbnail">
+                <img src="~/Images/Patent.jpg" alt=""  style="height:100px"/>
+                <div class="caption">
+                    <h3>Patients</h3>
+                    <p>This Option allows you to view patient details.</p>
+                    <p>
+                        <a href="~/Patient/Index" class="btn btn-primary">View</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6 hero-feature">
+            <div class="thumbnail">
+                <img src="~/Images/PatientAdmission.jpg" alt="" style="height:100px" />
+                <div class="caption">
+                    <h3>Patient Admission</h3>
+                    <p>This Option allows you to view Admission details.</p>
+                    <p>
+                        <a href="~/PatientAdmissionDetails/Index" class="btn btn-primary">View</a> @*<a href="#" class="btn btn-default">More Info</a>*@
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6 hero-feature">
+            <div class="thumbnail">
+                <img src="~/Images/Feedback.jpg" alt="" style="height:100px" />
+                <div class="caption">
+                    <h3>Patient FeedBack</h3>
+                    <p>This option views patient feedbacks for doctors               </p>
+                    <p>
+                        <a href="~/PatientFeedback/Index" class="btn btn-primary">View</a> @*<a href="#" class="btn btn-default">More Info</a>*@
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="row text-center">
+        <br />
+        </div>
+        <div class="row text-center">
+
+            <div class="col-md-4 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="~/Images/invoices.jpg" alt="" style="height:100px" />
+                    <div class="caption">
+                        <h3>Invoices</h3>
+                        <p>This Option allows you to view invoice details.              </p>
+                        <p>
+                        <p></p>
+                        <a href="~/Invoices/ViewInvoices" class="btn btn-primary">View</a> @*<a href="#" class="btn btn-default">More Info</a>*@
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="~/Images/laboratory_icon.jpg" alt="" style="height:100px" />
+                    <div class="caption">
+                        <h3>Medical Test</h3>
+                        <p>Profile option allows you to View Medical Tests.</p>
+                        <p>
+
+                            <a href="~/PatientMedicalTests/ViewPatientMedicalTest" class="btn btn-primary">View</a> @*<a href="#" class="btn btn-default">More Info</a>*@
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="~/Images/recomandation.png" alt="" style="height:100px" />
+                    <div class="caption">
+                        <h3>Doctor Recomendations</h3>
+                        <p>Profile option allows to view recomended doctors</p>
+                        <p>
+                            <a href="~/DoctorRecommendation/Index" class="btn btn-primary">View</a> @*<a href="#" class="btn btn-default">More Info</a>*@
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <hr>
+
+    </div>
+

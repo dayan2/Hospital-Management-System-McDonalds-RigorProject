@@ -1,0 +1,436 @@
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using System.Data.Entity;
+using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
+
+namespace Mcd.HospitalManagement.Web.Tests
+{
+    [TestClass]
+    public class DoctorUnitTest
+    {
+        #region AddDoctorMethod
+
+
+        [TestMethod]
+        public void DoctorDetailsAddDoctorMethodSavesADoctorObjectViaContext()
+        {
+            // Arrange
+            var mockSet = new Mock<DbSet<Doctor>>();
+
+            var mockContext = new Mock<LP_HMSDbEntities>();
+            mockContext.Setup(m => m.Doctors).Returns(mockSet.Object);
+
+            // Act
+            var service = new DoctorDetails(mockContext.Object);
+            service.AddDoctor(new DoctorRoleDTO() { Id = 11, Name = "neranjan", Charges = 220, DoctorSpecialityId = 1, PhoneNo = "", WardId = 1 });
+
+            //Verify
+            mockSet.Verify(m => m.Add(It.IsAny<Doctor>()), Times.Once());
+            mockContext.Verify(m => m.SaveChanges(), Times.Once());
+        }
+        #endregion
+
+        #region GetDoctorsMethod
+
+        /// <summary>
+        /// GetDoctors Method
+        /// </summary>
+        /// 
+        [TestMethod]
+        public void DoctorDetailsGetDoctorsMethodRetrieveAllDoctorModels()
+        {
+            // Arrange
+            var data = new List<Doctor> 
+            { 
+                new Doctor { Name = "Duminda" }, 
+                new Doctor { Name = "Yohan" }, 
+                new Doctor { Name = "Piyumi" },
+                new Doctor { Name = "Neranjan" }
+            }.AsQueryable();
+
+            var mockSet = new Mock<DbSet<Doctor>>();
+            mockSet.As<IQueryable<Doctor>>().Setup(m => m.Provider).Returns(data.Provider);
+            mockSet.As<IQueryable<Doctor>>().Setup(m => m.Expression).Returns(data.Expression);
+            mockSet.As<IQueryable<Doctor>>().Setup(m => m.ElementType).Returns(data.ElementType);
+            mockSet.As<IQueryable<Doctor>>().Setup(m => m.GetEnumerator()).Returns(data.GetEnumerator());
+
+            var mockContext = new Mock<LP_HMSDbEntities>();
+            mockContext.Setup(c => c.Doctors).Returns(mockSet.Object);
+
+            // Act
+            var service = new DoctorDetails(mockContext.Object);
+            var doctors = service.GetDoctors();
+
+            // Assert
+            Assert.IsNotNull(doctors);
+            Assert.AreEqual(4, (int)doctors.Count());
+            Assert.AreEqual("Duminda", doctors.ElementAt(0).Name.ToString());
+            Assert.AreEqual("Yohan", doctors.ElementAt(1).Name.ToString());
+            Assert.AreEqual("Piyumi", doctors.ElementAt(2).Name.ToString());
+            Assert.AreEqual("Neranjan", doctors.ElementAt(3).Name.ToString());
+        }
+        #endregion
+
+        #region GetDoctorsByIdMethod
+
+
+        //[TestMethod]
+        //public void DoctorDetailsGetDoctorsByIdMethodShouldRetrieveDoctorsById()
+        //{
+        //    // Arrange
+        //    var data = new List<Doctor> 
+        //    { 
+        //        new Doctor { Id = 1 }, 
+        //        new Doctor { Id = 2 }, 
+        //        new Doctor { Id = 3 }
+        //    }.AsQueryable();
+
+        //    var mockSet = new Mock<DbSet<Doctor>>();
+        //    mockSet.As<IQueryable<Doctor>>().Setup(m => m.Provider).Returns(data.Provider);
+        //    mockSet.As<IQueryable<Doctor>>().Setup(m => m.Expression).Returns(data.Expression);
+        //    mockSet.As<IQueryable<Doctor>>().Setup(m => m.ElementType).Returns(data.ElementType);
+        //    mockSet.As<IQueryable<Doctor>>().Setup(m => m.GetEnumerator()).Returns(data.GetEnumerator());
+
+        //    var mockContext = new Mock<LP_HMSDbEntities>();
+        //    mockContext.Setup(c => c.Doctors).Returns(mockSet.Object);
+
+        //    // Act
+        //    var service = new DoctorDetails(mockContext.Object);
+        //    //service.AddDoctor(new DoctorRoleDTO() { Id = 11, Name = "neranjan", Charges = 220, DoctorSpecialityId = 1, PhoneNo = "", WardId = 1 });
+        //    var actual = (DoctorRoleDTO)service.GetDoctorsById(11);
+
+        //    // Assert
+        //    Assert.IsNotNull(actual);
+        //    //Assert.AreEqual(1, actual.Id);
+        //}
+
+        /// <summary>
+        /// Testing Through The Real Database
+        /// </summary>
+        [TestMethod]
+        public void DoctorDetailsGetDoctorsByIdMethodShouldReturnADoctorObject()
+        {
+            //Arrange
+            //Mock<DoctorDetails> mock = new Mock<DoctorDetails>();
+            
+            //Act
+            //mock.Setup(e => e.GetDoctorsById(It.IsAny<int>() ));
+            //doctorDetails.AddDoctor(expectedDoctor);
+            //var receivedDoctor = doctorDetails.GetDoctorsById(expectedDoctor.Id);
+
+
+
+            DoctorRoleDTO expectedDoctor = new DoctorRoleDTO { Id = 100, Name = "Dayan", DoctorSpecialityId = 1, Charges = 222000, 
+                                                                PhoneNo = "0947465", WardId = 1 };
+
+
+            //Act
+            DoctorDetails doctorDetails = new DoctorDetails();
+            doctorDetails.AddDoctor(expectedDoctor);
+            var result = (DoctorRoleDTO)(doctorDetails.GetDoctorsById(1));
+
+            //Assert
+            Assert.AreEqual("Dayan", result.Name);
+            Assert.AreEqual(222000, result.Charges);
+
+            //deleting doctor element from the DB
+            doctorDetails.RemoveDoctor(expectedDoctor.Id);
+
+            //Verify
+            //mock.Verify(e => e.GetDoctorsById(It.IsAny<int>()), Times.Once);
+        }
+        #endregion
+
+        #region RemoveDoctorMethod
+        /// <summary>
+        /// RemoveDoctor Method
+        /// </summary>
+        [TestMethod]
+        public void DoctorDetailsRemoveDoctorMethodRemoveDoctorObjectsByIdFromContext()
+        {
+            //Arrange
+            var data = new List<Doctor> 
+            { 
+                new Doctor { Id = 1 }, 
+                new Doctor { Id = 2 }, 
+                new Doctor { Id = 3 }
+            }.AsQueryable();
+
+            var mockSet = new Mock<DbSet<Doctor>>();
+
+            var mockContext = new Mock<LP_HMSDbEntities>();
+
+            mockSet.As<IQueryable<Doctor>>()
+             .Setup(x => x.Provider)
+             .Returns(data.Provider);
+            mockSet.As<IQueryable<Doctor>>()
+                     .Setup(x => x.ElementType)
+                     .Returns(data.ElementType);
+            mockSet.As<IQueryable<Doctor>>()
+                     .Setup(x => x.Expression)
+                     .Returns(data.Expression);
+            mockSet.As<IQueryable<Doctor>>()
+                     .Setup(x => x.GetEnumerator())
+                     .Returns(data.GetEnumerator());
+
+            mockContext.Setup(m => m.Doctors).Returns(mockSet.Object);
+
+            //Act
+            var service = new DoctorDetails(mockContext.Object);
+            service.RemoveDoctor(2);
+
+            //Verify
+            mockSet.Verify(m => m.Remove(It.IsAny<Doctor>()), Times.Once());
+            mockContext.Verify(m => m.SaveChanges(), Times.Once());
+        }
+        #endregion
+
+        #region UpdateDoctorMethod
+
+        //[TestMethod]
+        //public void DoctorDetailsUpdateDoctorMethodModifyDoctorObjectsFromContext()
+        //{
+        //    //Arrange
+        //    var data = new List<Doctor> 
+        //    { 
+        //        new Doctor { Id = 1 }, 
+        //        new Doctor { Id = 2 }, 
+        //        new Doctor { Id = 3 }
+        //    }.AsQueryable();
+
+        //    var mockSet = new Mock<DbSet<Doctor>>();
+        //    var mockContext = new Mock<LP_HMSDbEntities>();
+
+        //    mockSet.As<IQueryable<Doctor>>()
+        //     .Setup(x => x.Provider)
+        //     .Returns(data.Provider);
+        //    mockSet.As<IQueryable<Doctor>>()
+        //             .Setup(x => x.ElementType)
+        //             .Returns(data.ElementType);
+        //    mockSet.As<IQueryable<Doctor>>()
+        //             .Setup(x => x.Expression)
+        //             .Returns(data.Expression);
+        //    mockSet.As<IQueryable<Doctor>>()
+        //             .Setup(x => x.GetEnumerator())
+        //             .Returns(data.GetEnumerator());
+
+        //    mockContext.Setup(m => m.Entry(It.IsAny<Doctor>()));
+
+        //    //Act
+        //    var service = new DoctorDetails(mockContext.Object);
+        //    service.UpdateDoctor(new DoctorRoleDTO() { Id = 1, Name = "neranjan", Charges = 220, DoctorSpecialityId = 1, PhoneNo = "", WardId = 1 });
+
+        //    //Verify
+        //    mockSet.Verify(m => m.Entry(new Doctor()), Times.Once());
+
+        //    mockContext.Verify(m => m.SaveChanges(), Times.Once());
+        //}
+
+        /// <summary>
+        /// Testing Through the Real Database
+        /// </summary>
+        //[TestMethod]
+        //public void DoctorDetailsUpdateDoctorMethodModifyDoctorObjectsFromContext()
+        //{
+        //    //Arrange
+        //    DoctorDetails doctorDetails = new DoctorDetails();
+        //    DoctorRoleDTO doctorDTO = new DoctorRoleDTO { Id=1, Name="",DoctorSpecialityId=1, Charges=22000, PhoneNo="0947465", WardId = 1};
+        //    DoctorRoleDTO expectedDoctor = new DoctorRoleDTO { Id = 1, Name = "Dayan", DoctorSpecialityId = 1, Charges = 222000, PhoneNo = "0947465", WardId = 1 };
+
+        //    //Act
+        //    doctorDetails.AddDoctor(doctorDTO);
+        //    doctorDetails.UpdateDoctor(expectedDoctor);
+        //    var modifiedDoctor = doctorDetails.GetDoctorsById(expectedDoctor.Id);
+
+        //    //Assert
+        //    Assert.AreEqual("Dayan", modifiedDoctor.Name);
+        //    Assert.AreEqual(222000, modifiedDoctor.Charges);
+
+        //    //deleting doctor element from the DB
+        //    doctorDetails.RemoveDoctor(expectedDoctor.Id);
+        //}
+        #endregion
+
+        #region TransferDoctor
+
+        [TestMethod]
+        public void DoctorDetailsTransferDoctorMethodShouldAddDoctorRecommendationDataInToTheDB()
+        {
+            // Arrange
+            var mockSet = new Mock<DbSet<DoctorRecomendation>>();
+
+            var mockContext = new Mock<LP_HMSDbEntities>();
+            mockContext.Setup(m => m.DoctorRecomendations).Returns(mockSet.Object);
+
+            // Act
+            var service = new DoctorDetails(mockContext.Object);
+            service.TransferDoctor(new DoctorRecommendationDTO() );
+
+            //Verify
+            mockSet.Verify(m => m.Add(It.IsAny<DoctorRecomendation>()), Times.Once());
+            mockContext.Verify(m => m.SaveChanges(), Times.Once());
+        }
+        #endregion
+
+        #region Exception Handling
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void DoctorDetailsGetDoctorsMethodShouldRaisedAnException()
+        {
+            //Arrange
+            Mock<IDoctorManager> mock = new Mock<IDoctorManager>();
+
+            mock.Setup(x => x.GetDoctors()).Throws(new Exception());
+
+            //Act
+            DoctorDetails manager = new DoctorDetails();
+            var doctorList = (IEnumerable<DoctorRoleDTO>)manager.GetDoctors();
+            
+            //Verify
+            mock.Verify(x => x.GetDoctors() , Times.Once() ) ;
+
+            //Assert
+            Assert.Fail("Faild To Get Doctors From The Context", typeof(Exception));
+        }
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void DoctorDetailsGetDoctorsByIdMethodShouldRaisedAnException()
+        {
+            //Arrange
+            Mock<IDoctorManager> mock = new Mock<IDoctorManager>();
+
+            mock.Setup(x => x.GetDoctorsById(It.IsAny<int>())).Throws(new Exception());
+
+            //Act
+            DoctorDetails manager = new DoctorDetails();
+            var doctorList = (IEnumerable<DoctorRoleDTO>)manager.GetDoctorsById(It.IsAny<int>());
+
+            //Verify
+            mock.Verify(x => x.GetDoctorsById(It.IsAny<int>()), Times.Once());
+
+            //Assert
+            Assert.Fail("Faild To Retrieve Doctors By Id Parameters", typeof(Exception));
+        }
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void DoctorDetailsAddDoctorMethodShouldRaisedAnException()
+        {
+            //Arrange
+            Mock<IDoctorManager> mock = new Mock<IDoctorManager>();
+
+            mock.Setup(x => x.AddDoctor(It.IsAny<DoctorRoleDTO>())).Throws(new Exception());
+
+            //Act
+            DoctorDetails manager = new DoctorDetails();
+            manager.AddDoctor(new DoctorRoleDTO());
+
+            //Verify
+            mock.Verify(x => x.AddDoctor(It.IsAny<DoctorRoleDTO>()), Times.Once());
+
+            //Assert
+            Assert.Fail("Faild To Add Doctor element", typeof(Exception));
+        }
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void DoctorDetailsRemoveDoctorMethodShouldRaisedAnException()
+        {
+            //Arrange
+            Mock<IDoctorManager> mock = new Mock<IDoctorManager>();
+
+            mock.Setup(x => x.RemoveDoctor(It.IsAny<int>())).Throws(new Exception());
+
+            //Act
+            DoctorDetails manager = new DoctorDetails();
+            manager.RemoveDoctor(It.IsAny<int>());
+
+            //Verify
+            mock.Verify(x => x.RemoveDoctor(It.IsAny<int>()), Times.Once());
+
+            //Assert
+            Assert.Fail("Faild To Remove Doctor element", typeof(Exception));
+        }
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void DoctorDetailsUpdateDoctorMethodShouldRaisedAnException()
+        {
+            //Arrange
+            Mock<IDoctorManager> mock = new Mock<IDoctorManager>();
+
+            mock.Setup(x => x.UpdateDoctor(It.IsAny<DoctorRoleDTO>())).Throws(new Exception());
+
+            //Act
+            DoctorDetails manager = new DoctorDetails();
+            manager.UpdateDoctor(It.IsAny<DoctorRoleDTO>());
+
+            //Verify
+            mock.Verify(x => x.UpdateDoctor(It.IsAny<DoctorRoleDTO>()), Times.Once());
+
+            //Assert
+            Assert.Fail("Faild To Update Doctor element", typeof(Exception));
+        }
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void DoctorDetailsTransferDoctorMethodShouldRaisedAnException()
+        {
+            //Arrange
+            Mock<IDoctorManager> mock = new Mock<IDoctorManager>();
+
+            mock.Setup(x => x.TransferDoctor(It.IsAny<DoctorRecommendationDTO>())).Throws(new Exception());
+
+            //Act
+            DoctorDetails manager = new DoctorDetails();
+            manager.TransferDoctor(It.IsAny<DoctorRecommendationDTO>());
+
+            //Verify
+            mock.Verify(x => x.TransferDoctor(It.IsAny<DoctorRecommendationDTO>()), Times.Once());
+
+            //Assert
+            Assert.Fail("Faild To Transfer Patient", typeof(Exception));
+        }
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void DoctorDetailsGetAllDoctorSpecialityTypesMethodShouldRaisedAnException()
+        {
+            //Arrange
+            Mock<IDoctorManager> mock = new Mock<IDoctorManager>();
+
+            mock.Setup(x => x.GetAllDoctorSpecialityTypes()).Throws(new Exception());
+
+            //Act
+            DoctorDetails manager = new DoctorDetails();
+            var doctorList = (IEnumerable<DoctorSpecialityDTO>)manager.GetAllDoctorSpecialityTypes();
+
+            //Verify
+            mock.Verify(x => x.GetAllDoctorSpecialityTypes(), Times.Once());
+
+            //Assert
+            Assert.Fail("Faild To Get Doctors Speciality Types From The Context", typeof(Exception));
+        }
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void DoctorDetailsGetDoctorByDoctorIdWithSpecializeAreaForProfileDetailMethodShouldRaisedAnException()
+        {
+            //Arrange
+            Mock<IDoctorManager> mock = new Mock<IDoctorManager>();
+
+            mock.Setup(x => x.GetDoctorByDoctorIdWithSpecializeAreaForProfileDetail(It.IsAny<int>())).Throws(new Exception());
+
+            //Act
+            DoctorDetails manager = new DoctorDetails();
+            var doctorList = (IEnumerable<DoctorSpecialityDTO>)manager.GetDoctorByDoctorIdWithSpecializeAreaForProfileDetail(It.IsAny<int>());
+
+            //Verify
+            mock.Verify(x => x.GetDoctorByDoctorIdWithSpecializeAreaForProfileDetail(It.IsAny<int>()), Times.Once());
+
+            //Assert
+            Assert.Fail("Faild To Get Doctors Speciality Types From The Context", typeof(Exception));
+        }
+        #endregion
+
+    }
+}

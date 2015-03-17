@@ -1,0 +1,276 @@
+﻿#region Using Directives
+using Mcd.HospitalManagementSystem.Data;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+#endregion
+
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class PatientMedicalTestAllocation : IPatientMedicalTestAllocation
+    {
+        #region Public Methods
+
+        /// <summary>
+        /// Save medical test details related patients
+        /// </summary>
+        /// <param name="patientMedicalTestDTO"></param>
+        /// <returns>bool vale</returns>
+        public bool InsertPatientMedicalTest(PatientMedicalTestDTO patientMedicalTestDTO)
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    PatientMedicalTest patientMedicalTest = new PatientMedicalTest
+                    {
+                        //Id = patientMedicalTestDTO.Id,
+                        MedicalTestId = patientMedicalTestDTO.MedicalTestId,
+                        PatientDetailId = patientMedicalTestDTO.PatientDetailId,
+                        NurseId = patientMedicalTestDTO.NurseId
+                    };
+
+                    db.PatientMedicalTests.Add(patientMedicalTest);
+                    if (db.SaveChanges() == 1)
+                        return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// updating inserted Patient Medical Test
+        /// </summary>
+        /// <param name="patientMedicalTestDTO">patientMedicalTestDTO map to patientMedicalTest entity</param>
+        public bool EditPatientMedicalTest(PatientMedicalTestDTO patientMedicalTestDTO)
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    PatientMedicalTest patientMedicalTest = new PatientMedicalTest
+                    {
+                        Id = patientMedicalTestDTO.Id,
+                        MedicalTestId = patientMedicalTestDTO.MedicalTestId,
+                        PatientDetailId = patientMedicalTestDTO.PatientDetailId,
+                        NurseId = patientMedicalTestDTO.NurseId
+                    };
+
+                    db.Entry(patientMedicalTest).State = EntityState.Modified;
+                    if(db.SaveChanges()==1)
+                        return true;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Remove inserted patient medical test
+        /// </summary>
+        /// <param name="patientMedicalTestId">filtering by id</param>
+        public bool DeletePatientMedicalTest(int patientMedicalTestId)
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    PatientMedicalTest patientMedicalTest = db.PatientMedicalTests.Find(patientMedicalTestId);
+                    db.PatientMedicalTests.Remove(patientMedicalTest);
+                    if(db.SaveChanges()==1)
+                        return true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Return all medical test details of the patients
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<PatientMedicalTestDTO> ViewtPatientMedicalTest()
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    IEnumerable<PatientMedicalTestDTO> patientMedicalTestDTO = db.Patients.Join(db.PatientDetails.Where(d => d.IsDischarged == false),
+                           p => p.Id, pd => pd.PatientId, ((p, pd) => new { p, pd })).
+                           Join(db.PatientMedicalTests, ppd => ppd.pd.PatientDetailId, pm => pm.PatientDetailId, ((ppd, pm) => new { ppd, pm })).
+                           Join(db.MedicalTestTypes, pdm => pdm.pm.MedicalTestId, mt => mt.Id, ((pdm, mt) => new { pdm, mt })).
+                           Join(db.Nurses, pf => pf.pdm.pm.NurseId, n => n.Id, ((pf, n) => new { pf, n }))
+
+                           .Select(m => new PatientMedicalTestDTO
+                           {
+                               Id = m.pf.pdm.pm.Id,
+                               NurseId = m.pf.pdm.pm.NurseId,
+                               PatientDetailId = m.pf.pdm.pm.PatientDetailId,
+                               NurseName = m.n.Name,
+                               MedicalTest = m.pf.mt.Description,
+                               PatientName = m.pf.pdm.ppd.p.Name,
+                               MedicalTestId = m.pf.pdm.pm.MedicalTestId
+
+                           }).ToList();
+
+                    if (patientMedicalTestDTO.Count() > 0)
+                    {
+                        return patientMedicalTestDTO;
+                    }
+                    return null;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Return Medical Test of the patient by id
+        /// </summary>
+        /// <param name="patientMedicalTestId"></param>
+        /// <returns></returns>
+        public PatientMedicalTestDTO ViewtPatientMedicalTestById(int? patientMedicalTestId)
+        {
+            try
+            {
+                using (var db = new LP_HMSDbEntities())
+                {
+
+                    IEnumerable<PatientMedicalTestDTO> patientMedicalTestDTO = db.Patients.Join(db.PatientDetails,
+                                  p => p.Id, pd => pd.PatientId, ((p, pd) => new { p, pd })).
+                                  Join(db.PatientMedicalTests.Where(x => x.Id == patientMedicalTestId),
+                                  ppd => ppd.pd.PatientDetailId, pm => pm.PatientDetailId,
+                                  ((ppd, pm) => new { ppd, pm })).
+                                  Join(db.MedicalTestTypes, pdm => pdm.pm.MedicalTestId, mt => mt.Id,
+                                  ((pdm, mt) => new { pdm, mt })).
+                                  Join(db.Nurses, pf => pf.pdm.pm.NurseId, n => n.Id,
+                                  ((pf, n) => new { pf, n }))
+                                  .Select(m => new PatientMedicalTestDTO
+                                  {
+                                      Id = m.pf.pdm.pm.Id,
+                                      NurseId = m.pf.pdm.pm.NurseId,
+                                      PatientDetailId = m.pf.pdm.pm.PatientDetailId,
+                                      NurseName = m.n.Name,
+                                      MedicalTest = m.pf.mt.Description,
+                                      PatientName = m.pf.pdm.ppd.p.Name,
+                                      MedicalTestId = m.pf.pdm.pm.MedicalTestId
+                                  }).ToList();
+
+                    return patientMedicalTestDTO.First();
+
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Search patient details by name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public IEnumerable<PatientDTO> FindPatientDetails(string name)
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    IEnumerable<PatientDTO> patientDto = db.Patients.Where(c => c.Name.Contains(name))
+                          .Select(m => new PatientDTO
+                          {
+                              Id = m.Id,
+                              Name = m.Name,
+                              NIC = m.NIC,
+                              Address = m.Address
+                          }).ToList();
+
+                    return patientDto;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+
+        /// <summary>
+        /// check already exists. one patient admission have only unique medical test. but patient admission can different medical test
+        /// </summary>
+        /// <param name="patientMedicalTestDTO"></param>
+        /// <returns></returns>
+        public bool CheckExistsMedicalTestForPatientAdmission(PatientMedicalTestDTO patientMedicalTestDTO)
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+
+                    if (db.PatientMedicalTests.Where(x => x.MedicalTestId == patientMedicalTestDTO.MedicalTestId &&
+                        x.PatientDetailId == patientMedicalTestDTO.PatientDetailId).ToList().Count > 0)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// check existing state of the medical test for the unique patient
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public bool ExistsPatientMedicalTest(int id)
+        {
+            try
+            {
+                using (var db = new LP_HMSDbEntities())
+                {
+                    if (db.PatientMedicalTests.Find(id) == null)
+                        return false;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            return true;
+        }
+
+        #endregion
+    }
+}

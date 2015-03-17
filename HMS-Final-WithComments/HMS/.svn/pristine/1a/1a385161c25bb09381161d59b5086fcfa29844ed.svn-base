@@ -1,0 +1,60 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientFeedbackModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<div class="col-xs-2">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation"><a href="~/PatientFeedback/Create">Add Feedback</a></li>
+        <li role="presentation"><a href="~/Patient/Index">View Patient</a></li>
+        <li role="presentation" class="active"><a href="~/PatientAdmissionDetails/Index">Patient Details</a></li>
+
+    </ul>
+</div>
+<div class="col-xs-10">
+
+    <div>
+        <h4>PatientFeedback</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.FeedbackDate)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.FeedbackDate)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.FeedbackDescription)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.FeedbackDescription)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.DoctorName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.DoctorName)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.PatientName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.PatientName)
+            </dd>
+
+        </dl>
+    </div>
+    </div>
+    <p>
+
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+

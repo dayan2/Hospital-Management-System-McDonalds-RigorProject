@@ -1,0 +1,141 @@
+﻿using Mcd.HospitalManagementSystem.Data;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class UserRoleRegistration
+    {
+        #region Public Methods
+        public bool AddUserRole(UserRole usrRole)
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    UserRole usrrole = db.UserRoles.Where(x => x.Role == usrRole.Role).FirstOrDefault();
+                    if (usrrole == null)
+                    {
+                        db.UserRoles.Add(usrRole);
+                        db.SaveChanges();
+
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+
+        }
+
+        public bool EditUserRole(UserRole usrRole)
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    UserRole userrole = db.UserRoles.Where(x => x.Role == usrRole.Role && x.Id != usrRole.Id).FirstOrDefault();
+                    if (userrole == null)
+                    {
+                        db.Entry(usrRole).State = EntityState.Modified;
+                        db.SaveChanges();
+
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+
+        }
+
+        public bool DeleteRole(int usrRoleId)
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    UserRole userrole = db.UserRoles.Find(usrRoleId);
+                    db.UserRoles.Remove(userrole);
+                    db.SaveChanges();
+
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public List<UserRole> ViewAllUserRole()
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    List<UserRole> objUserRole = db.UserRoles.ToList();
+                    return objUserRole;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+
+        public List<UserRole> DistinctUserRole()
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    List<UserRole> objUserRole = db.UserRoles.ToList();
+                    return objUserRole;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+
+        public UserRole ViewUserRoleDetailsById(int UserId)
+        {
+            try
+            {
+                using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+                {
+                    UserRole objUserRole = db.UserRoles.Find(UserId);
+                    return objUserRole;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+        #endregion
+
+    }
+}

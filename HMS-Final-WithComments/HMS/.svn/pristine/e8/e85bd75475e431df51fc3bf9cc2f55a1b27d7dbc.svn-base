@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business.DTO
+{
+  public  class InvoiceDTO
+    {
+        public int Id { get; set; }
+        public Nullable<int> PatientDetailId { get; set; }
+        public Nullable<System.DateTime> InvoiceDate { get; set; }
+    }
+}

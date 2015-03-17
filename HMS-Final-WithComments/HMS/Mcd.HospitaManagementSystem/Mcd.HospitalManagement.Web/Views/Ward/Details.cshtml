@@ -1,0 +1,30 @@
+﻿@model Mcd.HospitalManagement.Web.Models.WardModel
+
+
+<h2>Ward Details</h2>
+
+<div>
+	<hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.WardNo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.WardNo)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.WardFee)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.WardFee)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

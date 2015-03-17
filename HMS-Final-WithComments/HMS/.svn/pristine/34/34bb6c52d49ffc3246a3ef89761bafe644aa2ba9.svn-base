@@ -1,0 +1,77 @@
+﻿using Mcd.HospitalManagementSystem.Data;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class UserRoleRegistration
+    {
+
+        public bool AddUserRole(UserRole usrRole)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                UserRole usrrole = db.UserRoles.Where(x => x.Role == usrRole.Role).FirstOrDefault();
+                if (usrrole == null)
+                {
+                    db.UserRoles.Add(usrRole);
+                    db.SaveChanges();
+
+                    return true;
+                }
+                return false;
+            }
+            
+        }
+
+        public bool EditUserRole(UserRole usrRole)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                UserRole userrole = db.UserRoles.Where(x => x.Role == usrRole.Role && x.Id != usrRole.Id).FirstOrDefault();
+                if (userrole == null)
+                {
+                    db.Entry(usrRole).State = EntityState.Modified;
+                    db.SaveChanges();
+
+                    return true;
+                }
+                return false;
+            }
+            
+        }
+
+        public void DeleteRole(int usrRoleId)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                UserRole userrole = db.UserRoles.Find(usrRoleId);
+                db.UserRoles.Remove(userrole);
+                db.SaveChanges();
+            }
+        }
+
+        public List<UserRole> ViewAllUserRole()
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                List<UserRole> objUserRole = db.UserRoles.ToList();
+                return objUserRole;
+            }
+        }
+
+        public UserRole ViewUserRoleDetailsById(int UserId)
+        {
+            using (LP_HMSDbEntities db = new LP_HMSDbEntities())
+            {
+                UserRole objUserRole = db.UserRoles.Find(UserId);
+                return objUserRole;
+            }
+        }
+
+    }
+}

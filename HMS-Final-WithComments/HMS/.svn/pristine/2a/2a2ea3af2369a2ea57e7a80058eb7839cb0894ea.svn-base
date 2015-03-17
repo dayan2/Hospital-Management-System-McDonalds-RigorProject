@@ -1,0 +1,28 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Mcd.HospitalManagementSystem.Data;
+using Mcd.HospitaManagementSystem.Business.DTO;
+using AutoMapper;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+ public class PatientAdmissionDetails
+    {
+     private LP_HMSDbEntities db = new LP_HMSDbEntities();
+     IPatientManager PatientManager;
+     //public void InsertPatientAdmissionDetails(PatientAdmissionDTO PatientAdmissionDTO)
+     //{
+
+     //}
+     public IEnumerable<PatientDTO> FillPatients()
+     {
+         PatientManager = new PatientManager();
+         return PatientManager.ViewAllPatientDetails();
+     }
+    
+       
+    }
+}

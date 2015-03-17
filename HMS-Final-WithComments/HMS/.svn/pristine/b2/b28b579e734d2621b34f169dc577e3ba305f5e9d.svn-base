@@ -1,0 +1,131 @@
+﻿@model Mcd.HospitalManagement.Web.Models.DoctorModel
+
+@{
+    ViewBag.Title = "UpdateDoctor";
+    <link href="~/Content/Style.css" rel="stylesheet" />
+}
+
+<h2>UpdateDoctor</h2>
+
+
+@using (Html.BeginForm("UpdateDoctor", "Doctor", FormMethod.Post, new { @id = "form" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>DoctorModel</h4>
+        <hr />
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.UserId)
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Name)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DoctorSpecialityId, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.DoctorSpecialityId, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.DoctorSpecialityId)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Charges, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.Charges, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Charges)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.WardId, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.WardId, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.WardId)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.PhoneNo, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.PhoneNo, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.PhoneNo)
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" value="Save" class="btn btn-default" id="submit" />
+            </div>
+        </div>
+    </div>
+}
+
+
+<div id="notificationSuccess" class="alert alert-success msgBoxx" role="alert">
+    <div id="messageSuccess"></div>
+    <label id="successMsg"></label>
+</div>
+<div id="notificationError" class="alert alert-danger" role="alert">
+    <div id="messageError"></div>
+</div>
+
+<div>
+    @Html.ActionLink("Back to Menu", "GetDoctors")
+</div>
+
+@section Scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#notificationSuccess').hide();
+            $('#notificationError').hide();
+
+            $('#submit').click(function () {
+
+                var jsonObj = $('#form').serialize();
+                alert(jsonObj);
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UpdateDoctor", "Doctor")",
+                    data: $('#form').serialize(),
+                    success: function (data) {
+                        //alert(data.Message);
+                        $('#submit').hide();
+                        if (data.Message == "You have successfully modified your record!!") {
+                            $('#notificationSuccess').show();
+                            $('#messageSuccess').replaceWith(data.Message);
+                            $('#notificationSuccess').delay(3500).fadeOut(2500);
+
+                        }
+                        else {
+                            $('#notificationError').show();
+                            $('#messageError').replaceWith(data.Message);
+                            $('#notificationError').delay(3500).fadeOut(2500);
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Error: " + errorThrown + " , Please try again");
+                    }
+
+                });
+                return false;
+
+            });
+
+        });
+
+    </script>
+
+
+}

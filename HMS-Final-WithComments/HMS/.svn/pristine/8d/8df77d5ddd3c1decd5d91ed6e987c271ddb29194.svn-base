@@ -1,0 +1,172 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitaManagementSystem.Business.DTO;
+using Mcd.HospitalManagement.Web.Models;
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class NursesController : Controller
+    {
+        INurse dbNurse;
+        
+        public NursesController()
+        {
+            dbNurse = new HMSNurse();
+        }
+
+        // GET: Nurses
+        public ActionResult Index()
+        {
+            var Nurses= dbNurse.ViewtNurse();
+            IEnumerable<Nurse> Nurse = from c in Nurses
+                                       select new Nurse
+                                       {
+                                           Id = c.Id,
+                                           Name = c.Name,
+                                           WardId=c.WardId,
+                                           Ward = new Ward { Id = 1, WardNo = "Ward1" }                                             
+
+                                       };
+           // Nurse. = new Ward { Id = 1, WardNo = "Ward1" };  // Dammy Data
+            return View(Nurse);
+        }
+
+        // GET: Nurses/Details/5
+        public ActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            NurseDTO nurses = dbNurse.ViewtNurseById(id);
+            
+            if (nurses == null)
+            {
+                return HttpNotFound();
+            }
+            Nurse Nurse = new Nurse
+            {
+                Id = nurses.Id,
+                Name = nurses.Name,
+                WardId = nurses.WardId
+            };
+            Nurse.Ward = new Ward { Id=1, WardNo="Ward1" };  // Dammy Data
+
+           // IEnumerable<Nurse> nurse = new List<Nurse> {new Nurse{Id=nurses.Id, Name=nurses.Name, WardId=nurses.WardId} };
+            return View(Nurse);
+        }
+
+        // GET: Nurses/Create
+        public ActionResult Create()
+        {
+            List<Ward> w = new List<Ward> { new Ward { Id = 1, WardNo = "Ward1" } };        // Dummy Data
+            IEnumerable<Ward> Wards = w;                                                    // Dummy Data
+            
+            ViewBag.WardId = new SelectList(Wards, "Id", "WardNo");
+            return View();
+        }
+
+       
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include = "Id,Name,WardId")] Nurse nurse)
+        {
+            NurseDTO nurseDto = new NurseDTO { Id = nurse.Id, Name = nurse.Name, WardId = nurse.WardId };
+            if (ModelState.IsValid)
+            {
+                dbNurse.InsertNurse(nurseDto);
+                return RedirectToAction("Index");
+            }
+
+           // ViewBag.WardId = new SelectList(db.Wards, "Id", "WardNo", nurse.WardId);
+            return View(nurse);
+        }
+
+        // GET: Nurses/Edit/5
+        public ActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            NurseDTO nurseDto = dbNurse.ViewtNurseById(id);
+            if (nurseDto == null)
+            {
+                return HttpNotFound();
+            }
+            List<Ward> w = new List<Ward> { new Ward { Id = 1, WardNo = "Ward1" } };        // Dummy Data
+            IEnumerable<Ward> Wards = w;                                                    // Dummy Data
+
+            Nurse Nurse = new Nurse { 
+             Id=nurseDto.Id, Name=nurseDto.Name, WardId=nurseDto.WardId
+            };
+
+            ViewBag.WardId = new SelectList(Wards, "Id", "WardNo", Nurse.WardId);
+
+            return View(Nurse);
+        }
+
+        // POST: Nurses/Edit/5
+       
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include = "Id,Name,WardId")] Nurse nurse)
+        {
+            NurseDTO nurseDto = new NurseDTO { Id=nurse.Id, Name= nurse.Name, WardId=nurse.WardId };
+            if (ModelState.IsValid)
+            {
+                dbNurse.EditNurse(nurseDto);
+                return RedirectToAction("Index");
+            }
+           // ViewBag.WardId = new SelectList(db.Wards, "Id", "WardNo", nurse.WardId);
+            return View(nurse);
+        }
+
+        // GET: Nurses/Delete/5
+        public ActionResult Delete(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            NurseDTO nurseDto =dbNurse.ViewtNurseById(id);
+            if (nurseDto == null)
+            {
+                return HttpNotFound();
+            }
+            Nurse Nurse = new Nurse
+            {
+                Id = nurseDto.Id,
+                Name = nurseDto.Name,
+                WardId = nurseDto.WardId
+            };
+            return View(Nurse);
+        }
+
+        // POST: Nurses/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            NurseDTO nurse = dbNurse.ViewtNurseById(id);
+            if (nurse ==null)
+            {
+                return HttpNotFound();
+            }
+            dbNurse.DeleteNurse(id);
+            return RedirectToAction("Index");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            dbNurse.Dispose(disposing);
+        }
+    }
+}

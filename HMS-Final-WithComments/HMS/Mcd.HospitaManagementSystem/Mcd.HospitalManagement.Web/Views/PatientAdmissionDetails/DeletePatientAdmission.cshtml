@@ -1,0 +1,172 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientAdmissionDetailsModel
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+@if (ViewBag.Message != null)
+{
+    <p>@ViewBag.Message</p>
+}
+<h2>Delete Admission</h2>
+
+<h1>Are you sure you want to delete this?</h1>
+<div class="col-xs-2">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation" class="active"><a href="~/PatientAdmissionDetails/CreatePatientAdmission">Admission</a></li>
+        <li role="presentation"><a href="~/Patient/Index">View Patient</a></li>
+        <li role="presentation"><a href="~/PatientFeedback/Index">FeedBack Details</a></li>
+        <li role="presentation"><a href="~/DoctorRecommendation/Index">Recomended Doctors</a></li>
+
+    </ul>
+</div>
+
+<div class="col-xs-10">
+    <div>
+        <h4>Patient_Detail</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayName("Admit Date")
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.AdmitDate)
+            </dd>
+
+            <dt>
+                @Html.DisplayName("Discharged Status")
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.IsDischarged)
+            </dd>
+
+            <dt>
+                @Html.DisplayName("BedTicket No")
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.BedTicketNo)
+            </dd>
+
+            <dt>
+                @Html.DisplayName("Doctor Name")
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.DoctorName)
+            </dd>
+
+            <dt>
+                @Html.DisplayName("Patient Name")
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayName("Ward No")
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.WardNo)
+            </dd>
+
+        </dl>
+
+        @using (Html.BeginForm("DeletePatientAdmission", "DeletePatientAdmission", FormMethod.Post, new { @id = "form" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-actions no-color">
+                @Html.HiddenFor(model => model.AdmitDate, new { @class = "form-control", @name = "AdmitDate" })
+                @Html.HiddenFor(model => model.bedDetails, new { @class = "form-control", @name = "BedTicketNo" })
+                @Html.HiddenFor(model => model.WardNo, new { @class = "form-control", @name = "WardNo" })
+                @Html.HiddenFor(model => model.DoctorName, new { @class = "form-control", @name = "DoctorName" })
+                @Html.HiddenFor(model => model.Name, new { @class = "form-control", @name = "Name" })
+                @Html.HiddenFor(model => model.IsDischarged, new { @class = "form-control", @name = "IsDischarged" })
+                <input type="submit" value="Delete" class="btn btn-primary" id="submit" /> 
+                @if ((string)Session["USERROLE"] == "Admin")
+                {
+                    <a href="~/AdminHome/Index" class="btn btn-primary">Cancel</a>
+                }
+                else
+                {
+                    <a href="~/HomePage/HomePageForClerk" class="btn btn-primary">Cancel</a>
+                }
+
+                <div>
+                    @Html.ActionLink("Back to List", "Index")
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#AdmitDate').datepicker({
+                changeMonth: true,
+                changeYear: true
+            });
+
+
+            var jsonObj = $('#form').serialize();
+
+            //validation rules
+            $("#form").validate({
+                rules: {
+                    "AdmitDate": {
+                        required: true
+                    },
+                    "BedTicketNo": {
+                        required: true
+                    },
+                    "WardNo": {
+                        required: true
+                    },
+                    "DoctorName": {
+                        required: true
+                    },
+                    "Name": {
+                        required: true
+                    },
+                    "IsDischarged": {
+                        required: true
+                    }
+                },
+                //perform an AJAX post to ajax.php
+                submitHandler: function () {
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("DeletePatientAdmission")',
+                        data: $('#form').serialize(),
+                        success: function (data) {
+                            //alert(data.Message);
+                            $('#submit').hide();
+                            TriggerMsg(data.Message);
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert("Error: " + errorThrown + " , Please try again");
+
+                        }
+                    });
+                    return false;
+
+                }
+            });
+
+
+        });
+        function TriggerMsg(value) {
+            alert(value);
+            return false;
+        }
+
+
+    </script>
+}

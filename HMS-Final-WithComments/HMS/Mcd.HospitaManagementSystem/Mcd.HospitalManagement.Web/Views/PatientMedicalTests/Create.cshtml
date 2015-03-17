@@ -1,0 +1,173 @@
+﻿@model Mcd.HospitalManagement.Web.Models.PatientMedicalTestModel
+
+@{
+    ViewBag.Title = "Create Patient Medical Test";
+}
+<div class="row">
+    <h2>Create</h2>
+
+    @if (ViewBag.Message != null)
+    {
+
+        <p style="color:Red"><h4>@ViewBag.Message</h4> </p>
+    }
+
+    <div class="col-xs-2">
+        <ul class="nav nav-pills" role="tablist">
+            <li role="presentation"><a href="~/PatientMedicalTests/ViewPatientMedicalTest">View Patient Medical Test</a></li>
+            <li role="presentation"><a href="~/PatientMedicalTests/Index">Search Patient Medical Test Details</a></li>
+        </ul>
+    </div>
+    <div class="col-xs-10">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+                <h4>PatientMedicalTest</h4>
+                <hr />
+                @Html.ValidationSummary(true)
+
+                <div class="form-group">
+                    @Html.Label("Medical Test", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @*@Html.DropDownList("MedicalTestId", String.Empty)*@
+                        @*@Html.DropDownListFor(model => model.MedicalTestId, (IEnumerable<SelectListItem>)Model.MedicalTestType, new { @class = "btn-group-vertical" })*@
+                        <select id="medicalDropdown" class="form-control formSelect">
+                            @foreach (var item in Model.MedicalTestType)
+                            {
+                                <option value=@item.Value>@item.Text</option>
+                            }
+
+                        </select>
+
+                        @Html.ValidationMessageFor(model => model.MedicalTestId)
+                        @Html.HiddenFor(m => m.PatientDetailId, new { @id = "patientDId" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.Label("Nurse", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @*@Html.DropDownList("NurseId", String.Empty)*@
+                        @*@Html.DropDownListFor(model => model.NurseId, (IEnumerable<SelectListItem>)Model.Nurse, new { @class = "btn-group-vertical" })*@
+                        <select id="nurseDropdown" class="form-control formSelect">
+                            @foreach (var item in Model.Nurse)
+                            {
+                                <option value=@item.Value>@item.Text</option>
+                            }
+
+                        </select>
+                        @Html.ValidationMessageFor(model => model.NurseId)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Create" class="btn btn-primary" id="submit" />
+                        @if ((string)Session["USERROLE"] == "Admin")
+                        {
+                            <a href="~/AdminHome/Index" class="btn btn-primary">Cancel</a>
+                        }
+                        else
+                        {
+                            <a href="~/HomePage/HomePageForClerk" class="btn btn-primary">Cancel</a>
+                        }
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#notificationSuccess').hide();
+            $('#notificationError').hide();
+
+
+            $('#submit').click(function () {
+
+                //alert("ready");
+                var patientDetailsId = $('#patientDId').val();
+                var medicalTestId = $("#medicalDropdown option:selected").val();
+                var nurseId = $("#nurseDropdown option:selected").val();
+
+                //alert(patientDetailsId +" "+ medicalTestId + " " +nurseId);
+                $.ajax({
+                    type: "POST",
+                    //url: '../PatientMedicalTests/Create',
+                    url: '@Url.Action("Create")',
+                    data: { "patientDetailsId": patientDetailsId, "medicalTestId": medicalTestId, "nurseId": nurseId },
+                    success: function (data) {
+                        // alert(data.Message);
+                        $('#submit').hide();
+                        msg(data.Message);
+                        //if (data.Message == "Success") {
+                        //    toastr.options = {
+                        //        "closeButton": true,
+                        //        "debug": false,
+                        //        "newestOnTop": true,
+                        //        "progressBar": true,
+                        //        "positionClass": "toast-top-full-width",
+                        //        "preventDuplicates": true,
+                        //        "onclick": null,
+                        //        "showDuration": "5000",
+                        //        "hideDuration": "5000",
+                        //        "timeOut": "5000",
+                        //        "extendedTimeOut": "5000",
+                        //        "showEasing": "swing",
+                        //        "hideEasing": "linear",
+                        //        "showMethod": "fadeIn",
+                        //        "hideMethod": "fadeOut"
+                        //    }
+                        //    toastr["success"]("You have successfully inserted your record!", "Success!!");
+
+                        //}
+                        //else {
+                        //    toastr.options = {
+                        //        "closeButton": true,
+                        //        "debug": false,
+                        //        "newestOnTop": true,
+                        //        "progressBar": true,
+                        //        "positionClass": "toast-top-full-width",
+                        //        "preventDuplicates": true,
+                        //        "onclick": null,
+                        //        "showDuration": "5000",
+                        //        "hideDuration": "5000",
+                        //        "timeOut": "5000",
+                        //        "extendedTimeOut": "5000",
+                        //        "showEasing": "swing",
+                        //        "hideEasing": "linear",
+                        //        "showMethod": "fadeIn",
+                        //        "hideMethod": "fadeOut"
+                        //    }
+                        //    toastr["error"]("Please try again!!", "Error!!");
+                        //}
+                    },
+                    error: function () {
+                        alert("Error!!!");
+                    }
+                });
+                return false;
+
+            });
+
+        });
+        function msg(value) {
+            alert(value);
+            return false;
+        }
+    </script>
+}
+@*@Html.DisplayName("Nurse") <br />
+    @Html.DropDownListFor(m => m.Id, (IEnumerable<SelectListItem>)ViewBag.NurseId, "--Select Nurse--", new { @class = "btn-group-vertical", style = "width: 200px;", @id = "dropDownNurse" })
+    @Html.ValidationMessageFor(model => model.NurseId)
+    <br />
+    @Html.DisplayName("Medical Test") <br />
+    @Html.DropDownListFor(m => m.Id, (IEnumerable<SelectListItem>)ViewBag.MedicalTestId, "--Select MedicalTest--", new { @class = "btn-group-vertical", style = "width: 200px;", @id = "dropDownMedical" })
+    @Html.ValidationMessageFor(model => model.MedicalTestId)*@

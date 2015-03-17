@@ -1,0 +1,222 @@
+﻿#region Using Directives
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Mcd.HospitaManagementSystem.Business;
+using Mcd.HospitalManagement.Web.Models;
+#endregion
+
+namespace Mcd.HospitalManagement.Web.Controllers
+{
+    public class InvoicesController : Controller
+    {
+        #region Private Fields     
+            IHMSInvoice dbInvoice; 
+            IPatientManager dbPatient;
+        #endregion
+        
+        #region Public Methods
+
+        public InvoicesController()
+        {
+            dbInvoice = new HMSInvoice();
+            dbPatient = new PatientManager();
+        }
+        // GET: Invoices
+        public ActionResult Index()
+        {
+
+
+            IEnumerable<AllPatientDTO> allPatientDto = dbPatient.ViewAllPatientAdmissionDetails().Where(x=>x.IsDischarged==false).Distinct();
+            if (allPatientDto ==null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            
+            IEnumerable<PatientModel> PatientModel= allPatientDto.Select(x => new PatientModel 
+            {
+                Name=x.Name, 
+                Id=x.PatientId, 
+                Address=x.Address, 
+                MobileNo=x.MobileNo 
+            });
+            //InvoiceDetailsModel invoice = new InvoiceDetailsModel 
+            //{  
+            //    Patients = PatientModel, 
+            //    InvoiceDate=DateTime.Now
+            //};
+
+            return View(PatientModel);
+        }
+
+        
+
+        // GET: Invoices/Details/5
+        public ActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            InvoiceDetialsDTO invoiceDto = dbInvoice.ViewtInvoiceById(id);
+            if (invoiceDto == null)
+            {
+                return HttpNotFound();
+            }
+
+            InvoiceDetailsModel InvoiceModel = new InvoiceDetailsModel { InvoiceId=invoiceDto.Id, InvoiceDate=invoiceDto.InvoiceDate, 
+                PatientDetailId=invoiceDto.PatientDetailId };
+            return View(InvoiceModel);
+        }
+
+        // GET: Invoices/Create
+        public ActionResult Create(int? PatientId)
+        {
+           InvoiceDetialsDTO invoiceDetialsDTO =  dbInvoice.ViewInitialInoice(PatientId);
+           if (!dbInvoice.CheckPatientAvalabilityForMakeInvoice(PatientId))
+           {
+                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest,"Patient not avaible to make invoice, First make patient admission details");
+           }
+           if (!dbInvoice.validateDatesForInvoices((DateTime)invoiceDetialsDTO.AdmitDate,(DateTime)invoiceDetialsDTO.InvoiceDate))
+           {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest,"Invoice date must be greater than Admited date");
+           }
+           InvoiceDetailsModel invoiceModel = new InvoiceDetailsModel
+           {
+                PatientName=invoiceDetialsDTO.PatientName,
+                WardNo=invoiceDetialsDTO.WardNo,
+                WardFee = invoiceDetialsDTO.WardFee,
+                InvoiceDate=invoiceDetialsDTO.InvoiceDate,
+                DoctorName = invoiceDetialsDTO.DoctorName,
+                DoctorCharges = invoiceDetialsDTO.DoctorCharges,
+                AdmitDate=invoiceDetialsDTO.AdmitDate,
+                PatientDetailId=invoiceDetialsDTO.PatientDetailId,
+                TotalFee = dbInvoice.CalculateInvoice(invoiceDetialsDTO)
+           };
+
+           //ViewBag.PatientDetailId = new SelectList(dbPatient.ViewAllAdmissionPatientDetails(), "PatientDetailId", "PatientDetailId");
+           return View(invoiceModel);
+        }
+
+        // POST: Invoices/Create
+       
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create([Bind(Include = "InvoiceId,PatientDetailId,InvoiceDate")] InvoiceDetailsModel invoiceModel)
+        {
+            if (ModelState.IsValid)
+            {
+                InvoiceDetialsDTO invoiceDto = new InvoiceDetialsDTO { Id=invoiceModel.InvoiceId, InvoiceDate = invoiceModel.InvoiceDate, PatientDetailId=invoiceModel.PatientDetailId };
+                dbInvoice.InsertInvoice(invoiceDto);
+               
+                #region Update Patient Discharge staus
+                    AllPatientDTO patientDto= dbPatient.ViewPatientRelatedData(invoiceModel.PatientDetailId);
+                    patientDto.IsDischarged = true;
+                    dbPatient.EditPatientAdmissionDetails(patientDto);
+                #endregion update
+
+                    return RedirectToAction("ViewInvoices");
+            }
+
+           //ViewBag.PatientDetailId = new SelectList(db.PatientDetails, "PatientDetailId", "PatientDetailId", invoice.PatientDetailId);
+            return View(invoiceModel);
+        }
+
+        // GET: Invoices/Edit/5
+        public ActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            InvoiceDetialsDTO invoiceDto = dbInvoice.ViewtInvoiceById(id);
+            if (invoiceDto == null)
+            {
+                return HttpNotFound();
+            }
+            InvoiceDetailsModel InvoiceModel = new InvoiceDetailsModel { InvoiceId= invoiceDto.Id, InvoiceDate = invoiceDto.InvoiceDate, PatientDetailId = invoiceDto.PatientDetailId };
+           // ViewBag.PatientDetailId = new SelectList(db.PatientDetails, "PatientDetailId", "PatientDetailId", invoice.PatientDetailId);
+            return View(InvoiceModel);
+        }
+
+        // POST: Invoices/Edit/5
+     
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit([Bind(Include = "Id,PatientDetailId,InvoiceDate")] InvoiceDetailsModel invoiceModel)
+        {
+            InvoiceDetialsDTO invoiceDto = new InvoiceDetialsDTO { Id = invoiceModel.InvoiceId, InvoiceDate = invoiceModel.InvoiceDate, PatientDetailId = invoiceModel.PatientDetailId };
+            if (ModelState.IsValid)
+            {
+                dbInvoice.EditInvoice(invoiceDto);
+                return RedirectToAction("Index");
+            }
+            //ViewBag.PatientDetailId = new SelectList(db.PatientDetails, "PatientDetailId", "PatientDetailId", invoice.PatientDetailId);
+            return View(invoiceModel);
+        }
+
+        // GET: Invoices/Delete/5
+        public ActionResult Delete(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            InvoiceDetialsDTO invoiceDto = dbInvoice.ViewtInvoiceById(id);
+            if (invoiceDto == null)
+            {
+                return HttpNotFound();
+            }
+            InvoiceDetailsModel InvoiceModel = new InvoiceDetailsModel { InvoiceId = invoiceDto.Id, InvoiceDate = invoiceDto.InvoiceDate, PatientDetailId = invoiceDto.PatientDetailId };
+            return View(InvoiceModel);
+        }
+
+        // POST: Invoices/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            InvoiceDetialsDTO invoiceDto = dbInvoice.ViewtInvoiceById(id);
+            if (invoiceDto == null)
+            {
+                return HttpNotFound();
+            }
+            dbInvoice.DeleteInvoice(id);
+            return RedirectToAction("Index");
+        }
+
+
+        public ActionResult ViewInvoices() 
+        {
+
+          IEnumerable<InvoiceDetailsModel> invoiceModel=  dbInvoice.ViewtInvoice()
+            .Select(m => new InvoiceDetailsModel { 
+            InvoiceId=m.Id,
+            InvoiceDate=m.InvoiceDate,
+            PatientName = m.PatientName,
+            WardNo=m.WardNo,
+            WardFee=m.WardFee,
+            DoctorName=m.DoctorName,
+            DoctorCharges=m.DoctorCharges,
+            AdmitDate=m.AdmitDate,
+            TotalFee = dbInvoice.CalculateInvoice(m)
+            }).ToList();
+
+          return View(invoiceModel);
+        }
+        //protected override void Dispose(bool disposing)
+        //{
+        //    if (disposing)
+        //    {
+        //        dbInvoice.Dispose(disposing);
+        //    }
+        //    base.Dispose(disposing);
+        //}
+        #endregion
+    }
+}

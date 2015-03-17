@@ -1,0 +1,109 @@
+﻿@model Mcd.HospitalManagement.Web.Models.MedicalTestTypeModel
+@{
+    ViewBag.Title = "Edit";
+}
+<h2>Edit</h2>
+
+@using (Html.BeginForm("Edit", "MedicalTestType", FormMethod.Post, new { @id = "form" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Medical Test Type</h4>
+        <hr />
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(model => model.Id)
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Description, new { @name = "Description" })
+                @Html.ValidationMessageFor(model => model.Description)
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-primary" id="submit" />
+            </div>
+        </div>
+    </div>
+}
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+@section Scripts {
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            var jsonObj = $('#form').serialize();
+
+            $("#form").validate({
+                rules: {
+                    "Description": {
+                        required: true
+                    }
+                },
+                //perform an AJAX post to ajax.php
+                submitHandler: function () {
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Content("~/MedicalTestType/Edit")',
+                        data: $('#form').serialize(),
+                        success: function (data) {
+                            alert(data.Message);
+
+                            $('#submit').hide();
+                            if (data.Message == "You have successfully modified your record!") {
+
+                                toastr.options = {
+                                    "closeButton": true,
+                                    "debug": false,
+                                    "newestOnTop": true,
+                                    "progressBar": true,
+                                    "positionClass": "toast-top-full-width",
+                                    "preventDuplicates": true,
+                                    "onclick": null,
+                                    "showDuration": "5000",
+                                    "hideDuration": "5000",
+                                    "timeOut": "5000",
+                                    "extendedTimeOut": "5000",
+                                    "showEasing": "swing",
+                                    "hideEasing": "linear",
+                                    "showMethod": "fadeIn",
+                                    "hideMethod": "fadeOut"
+                                }
+                                toastr["success"]("You have successfully modified your record!", "Success!!");
+
+                            }
+                            else {
+                                toastr.options = {
+                                    "closeButton": true,
+                                    "debug": false,
+                                    "newestOnTop": true,
+                                    "progressBar": true,
+                                    "positionClass": "toast-top-full-width",
+                                    "preventDuplicates": true,
+                                    "onclick": null,
+                                    "showDuration": "5000",
+                                    "hideDuration": "5000",
+                                    "timeOut": "5000",
+                                    "extendedTimeOut": "5000",
+                                    "showEasing": "swing",
+                                    "hideEasing": "linear",
+                                    "showMethod": "fadeIn",
+                                    "hideMethod": "fadeOut"
+                                }
+                                toastr["error"]("Please try again!!", "Error!!");
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert("Error: " + errorThrown + " , Please try again");
+                        }
+                    });
+                    return false;
+                }
+            });
+        });
+
+</script>
+}

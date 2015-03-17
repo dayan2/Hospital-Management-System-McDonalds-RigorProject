@@ -1,0 +1,37 @@
+﻿@{
+    ViewBag.Title = "About";
+}
+<h2>About Us</h2>
+@*<h3>@ViewBag.Message</h3>
+
+    <p>Use this area to provide additional information.</p>*@
+
+<div class="row">
+    <div class="col-xs-8">
+        @*<img src="http://www.cuh.org.uk/sites/default/files/fliss%20mansfield%20and%20estates%20team.jpg" alt="Image" class="img-thumbnail">*@
+        <img src="http://www.nhsemployers.org/~/media/Employers/Images/People/Hospital%20Doctors/young%20doctors.jpg?bc=ffffff&h=400&w=800" alt="Image" class="img-thumbnail">
+    </div>
+
+    <div class="col-xs-4">
+        <div>
+            <b>
+                At Our Hospital the staff, doctors and supporters are dedicated towards improving the lives of people and families affected
+                by disease and maintenance of general health.
+
+                We have been meeting the needs of individuals and families with disease since year 2005. We are here to help you.
+
+                Our team comprising of 200 staff, working at different branches in coordination with each other are  dedicated to improving the
+                health of individuals and families. This  system consists of various features such as keep track of patient histories and records,
+                generate reports and invoices, make doctor appointments, aid to doctors in keeping record of their patients etc...
+            </b>
+
+        </div>
+        <div >
+            <blockquote>
+                Pictured: Members of the Our Hospital staff celebrating the anniversary of 10 years since the hospital was build,  It's an
+                honor we have held for 10 years.
+            </blockquote>
+        </div>
+    </div>
+
+</div>

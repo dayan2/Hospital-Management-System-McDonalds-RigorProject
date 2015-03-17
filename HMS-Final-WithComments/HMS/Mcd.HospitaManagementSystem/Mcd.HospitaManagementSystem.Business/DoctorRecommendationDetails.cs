@@ -1,0 +1,139 @@
+﻿using Mcd.HospitalManagementSystem.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class DoctorRecommendationDetails
+    {
+        public IEnumerable<DoctorRecommendationDTO> GetDoctorRecommendationDetails()
+        {
+            using (var hmsDbContext = new LP_HMSDbEntities())
+            {
+                var recommendations = hmsDbContext.DoctorRecomendations.ToList();
+                var doctors = hmsDbContext.Doctors.ToList();
+                var patients = hmsDbContext.Patients.ToList();
+
+                var doctorRecommendationList = recommendations.Join(doctors, c => c.CurrentDoctorId, d => d.Id,
+                    (c, d) => new { c, d })
+                    .Join(doctors, v => v.c.RecomendedDoctorId, m => m.Id, ((v, m) => new { v, m }))
+                    .Join(patients, y => y.v.c.PatientId, x => x.Id, ((y, x) => new { y, x }))
+                    .Select(m => new DoctorRecommendationDTO 
+                    { 
+                        Id = m.y.v.c.Id,
+                        PatientName = m.x.Name,
+                        PatientId = m.y.v.c.PatientId,
+                        CurrentDoctorId = m.y.v.c.CurrentDoctorId,
+                        CurrentDoctorName = m.y.v.d.Name,
+                        Reason = m.y.v.c.Reason,
+                        RecomendedDoctorId = m.y.v.c.RecomendedDoctorId,
+                        RecomendedDoctorName = m.y.m.Name                    
+                    
+                    }).ToList();
+
+                return doctorRecommendationList;
+            }
+            
+        }
+
+        /// <summary>
+        /// Transfering Patients to other Doctors
+        /// </summary>
+        /// <param name="doctor">
+        /// DoctorRecommendationDTO doctor object is passed here to store PatientTransfer records
+        /// </param>
+        public bool SaveTransferDoctorDetails(DoctorRecommendationDTO doctor)
+        {
+            try
+            {
+                using (var hmsDbContext = new LP_HMSDbEntities())
+                {
+                    DoctorRecomendation doctorObj = new DoctorRecomendation
+                    {
+                        Id = doctor.Id,
+                        Reason = doctor.Reason,
+                        CurrentDoctorId = doctor.CurrentDoctorId,
+                        RecomendedDoctorId = doctor.RecomendedDoctorId,
+                        PatientId = doctor.PatientId
+                    };
+                    hmsDbContext.DoctorRecomendations.Add(doctorObj);
+                    if (hmsDbContext.SaveChanges() == 1)
+                    {
+                        //Confirming that the doctor object has been Transferred from DB(For Confirmation Notifications) 
+                        return true;
+                    }
+
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+                throw new Exception();
+            }
+        }
+
+        public DoctorRecommendationDTO GetDoctorRecommendationById(int id)
+        {
+            using (var hmsDbContext = new LP_HMSDbEntities())
+            {
+                try
+                {                    
+                    var doctorRecommendation = hmsDbContext.DoctorRecomendations.Find(id);
+                    var patient = hmsDbContext.Patients.Find(doctorRecommendation.PatientId);
+                    var doctorCurrent = hmsDbContext.Doctors.Find(doctorRecommendation.CurrentDoctorId);
+                    var doctorRecomended = hmsDbContext.Doctors.Find(doctorRecommendation.RecomendedDoctorId);
+
+                    //Mapping Entity object into DTOs
+                    DoctorRecommendationDTO doctorRecommendationDto = new DoctorRecommendationDTO
+                    {
+                        Id = doctorRecommendation.Id,
+                        CurrentDoctorName = doctorCurrent.Name,
+                        CurrentDoctorId = doctorCurrent.Id,
+                        PatientId = patient.Id,
+                        PatientName = patient.Name,
+                        Reason = doctorRecommendation.Reason,
+                        RecomendedDoctorId = doctorRecomended.Id,
+                        RecomendedDoctorName = doctorRecomended.Name
+                    };
+
+                    return doctorRecommendationDto;
+                }
+                catch (Exception)
+                {
+                    throw new Exception();
+                }
+            }
+        }
+
+        public bool RemoveDoctorRecommendationDetails(int id)
+        {
+
+            try
+            {
+                using (var hmsDbContext = new LP_HMSDbEntities())
+                {
+                    var doctorRecommendation = hmsDbContext.DoctorRecomendations.Find(id);
+                    hmsDbContext.DoctorRecomendations.Remove(doctorRecommendation);
+                    if (hmsDbContext.SaveChanges() == 1)
+                    {
+                        return true;
+                    }
+
+                    return false;
+
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+                throw new Exception();
+            }
+        }
+
+
+    }
+}

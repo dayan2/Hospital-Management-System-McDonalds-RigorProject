@@ -1,0 +1,25 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Mcd.HospitaManagementSystem.Business.Interface
+{
+    public interface IBedManager
+    {
+        #region UserRole Function
+
+        void InsertBed(BedDTO bedDto);
+
+        void DeleteBed(int bedId);
+
+        void EditBed(BedDTO bedDto);
+
+        IEnumerable<BedDTO> ViewAllBed();
+
+        BedDTO ViewtBedById(int BedId);
+
+        #endregion 
+    }
+}

@@ -1,0 +1,72 @@
+﻿using Mcd.HospitaManagementSystem.Business.DTO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Mcd.HospitalManagementSystem.Data;
+
+namespace Mcd.HospitaManagementSystem.Business
+{
+    public class PatientManager : IPatientManager
+    {
+       private MainPatientDetails patient;
+       private PatientAdmissionDetails patientAdmission;
+       
+       public PatientManager()
+       {
+           patient = new MainPatientDetails();
+           patientAdmission = new PatientAdmissionDetails();
+
+       }
+
+       public void InsertPatient(PatientDTO PatientDTO)
+       {
+           patient.InsertPatient(PatientDTO);
+       }
+
+
+      
+        public PatientDTO ViewPatientDetails(int? PatientID)
+       {
+            return patient.ViewPatientDetails(PatientID);
+       }
+        public IEnumerable<PatientDTO> ViewAllPatientDetails()
+        {
+            return patient.ViewAllPatientDetails();
+        }
+        public void EditPatient(PatientDTO PatientDTO)
+        {
+            patient.EditPatient(PatientDTO);
+        }
+        public void Deletepatient(int? PatientId)
+        {
+            patient.Deletepatient(PatientId);
+        }
+        public   IEnumerable<PatientDTO> FillPatients()
+        {
+            return patientAdmission.FillPatients();
+        }
+        public void InsertPatientAdmissionDetails(PatientAdmissionDTO PatientAdmissionDTO)
+        {
+            patientAdmission.InsertPatientAdmissionDetails(PatientAdmissionDTO);
+        }
+       public void EditPatientAdmissionDetails(PatientAdmissionDTO  PatientAdmissionDTO)
+        {
+            patientAdmission.EditPatientAdmissionDetails(PatientAdmissionDTO);
+        }
+
+       public PatientAdmissionDTO ViewPatientAdmissionDetails(int? PatientID)
+       {
+           return patientAdmission.ViewPatientAdmissionDetails(PatientID);
+       }
+       public IEnumerable<PatientAdmissionDTO> ViewAllAdmissionPatientDetails()
+       {
+           return patientAdmission.ViewAllAdmissionPatientDetails();
+       }
+       public void DeletePatientAdmissionDetails(int? PatientId)
+      {
+          patientAdmission.DeletePatientAdmissionDetails(PatientId);
+      }
+    }
+}
